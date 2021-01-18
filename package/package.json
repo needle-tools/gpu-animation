@@ -1,0 +1,19 @@
+{
+  "name": "com.elaborate.animationbakery",
+  "displayName": "Elaborate Games Animation Bakery",
+  "version": "1.1.0-preview.1",
+  "unity": "2019.4",
+  "description": "Bake Skinned Mesh Animation",
+  "keywords": [
+    ""
+  ],
+  "author": {
+    "name": "Marcel Wiessler",
+    "email": "mail@marcelwiessler",
+    "url": "https://marcelwiessler.de"
+  },
+  "dependencies": {
+  },
+  "samples": [
+  ]
+}
