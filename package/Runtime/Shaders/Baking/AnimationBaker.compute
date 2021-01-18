@@ -1,0 +1,8 @@
+﻿#pragma kernel CSMain
+
+#include "AnimationStructures.cginc"
+
+[numthreads(8,1,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+}
