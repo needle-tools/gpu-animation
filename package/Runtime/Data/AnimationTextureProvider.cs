@@ -101,24 +101,20 @@ namespace Elaborate.AnimationBakery
 			using (var buffer = CreateVertexBoneWeightBuffer(mesh))
 			{
 				var textureSize = Mathf.CeilToInt(Mathf.Sqrt(buffer.count));
-				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.RGHalf); // TODO: try ARGBHalf
+				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf); // TODO: try ARGBHalf
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
 				texture.filterMode = FilterMode.Point;
+				texture.Create();
 				res.Texture = texture;
 				
+				Debug.Log("Bake skinning for " + buffer.count + " vertices into " + texture.width + "x" + texture.height + " texture. " + texture.format);
+				
 				shader.SetBuffer(kernel, "Weights", buffer);
+				shader.SetTexture(kernel, "Texture", texture);
 				shader.Dispatch(kernel, Mathf.CeilToInt(buffer.count / 32f), 1, 1);
 			}
 			return res;
-		}
-
-		private struct BoneWeight
-		{
-			public int BoneIndex;
-			public float Weight;
-
-			public static int Size => sizeof(int) + sizeof(float);
 		}
 
 		private static ComputeBuffer CreateVertexBoneWeightBuffer(Mesh mesh)
@@ -128,27 +124,8 @@ namespace Elaborate.AnimationBakery
 			// other than the UnityEngine.BoneWeight 
 			// which holds: boneWeight0, boneWeight1 and so on
 			var boneWeights = mesh.boneWeights;
-			var count = boneWeights.Length * 4;
-			var weightBuffer = new ComputeBuffer(count, BoneWeight.Size);
-			var boneWeightData = new BoneWeight[count];
-			for (var i = 0; i < boneWeights.Length; i++)
-			{
-				var di = i * 4;
-
-				boneWeightData[di].BoneIndex = boneWeights[i].boneIndex0;
-				boneWeightData[di].Weight = boneWeights[i].weight0;
-
-				boneWeightData[di + 1].BoneIndex = boneWeights[i].boneIndex1;
-				boneWeightData[di + 1].Weight = boneWeights[i].weight1;
-
-				boneWeightData[di + 2].BoneIndex = boneWeights[i].boneIndex2;
-				boneWeightData[di + 2].Weight = boneWeights[i].weight2;
-
-				boneWeightData[di + 3].BoneIndex = boneWeights[i].boneIndex3;
-				boneWeightData[di + 3].Weight = boneWeights[i].weight3;
-			}
-
-			weightBuffer.SetData(boneWeightData);
+			var weightBuffer = new ComputeBuffer(boneWeights.Length, sizeof(float)*4 + sizeof(int)*4);
+			weightBuffer.SetData(boneWeights);
 			return weightBuffer;
 		}
 	}

@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elaborate.AnimationBakery
 {
+	[ExecuteInEditMode]
 	public class AnimationBaker : MonoBehaviour
 	{
 		public Animator Animator;
@@ -14,15 +16,22 @@ namespace Elaborate.AnimationBakery
 		public float FrameRate = -1;
 
 		[Header("Output")] public List<AnimationTransformationData> Output;
-		public MeshSkinningData SkinTexture;
-		public AnimationTextureData AnimationTexture;
+		public MeshSkinningData SkinBake;
+		public AnimationTextureData AnimationBake;
 
-		[Header("Test")] public Renderer Visualize;
+		[Header("Test")] public Material VertexAnim;
 		public Material Test;
+		public Material Test2;
 
-		private Material mat;
+		
 
 #if UNITY_EDITOR
+
+		private void OnEnable()
+		{
+			Bake();
+		}
+
 		private void OnValidate()
 		{
 			Bake();
@@ -32,17 +41,23 @@ namespace Elaborate.AnimationBakery
 		public void Bake()
 		{
 			Output = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
-			SkinTexture = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
-			AnimationTexture = AnimationTextureProvider.BakeAnimation(Output, TextureBakingShader);
+			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
+			AnimationBake = AnimationTextureProvider.BakeAnimation(Output, TextureBakingShader);
+
+			if (VertexAnim)
+			{
+				VertexAnim.SetTexture("_Animation", AnimationBake.Texture);
+				VertexAnim.SetTexture("_Skinning", SkinBake.Texture);
+			}
 
 			if (Test)
-				Test.SetTexture("_Animation", AnimationTexture.Texture);
-
-			if (Visualize && Visualize.sharedMaterial)
 			{
-				mat = new Material(Visualize.sharedMaterial);
-				mat.mainTexture = AnimationTexture.Texture;
-				Visualize.sharedMaterial = mat;
+				Test.mainTexture = AnimationBake.Texture;
+			}
+			
+			if (Test2)
+			{
+				Test2.mainTexture = SkinBake.Texture;
 			}
 		}
 #endif
