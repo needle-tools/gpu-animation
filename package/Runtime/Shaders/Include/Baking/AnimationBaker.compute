@@ -1,0 +1,60 @@
+﻿#pragma kernel BakeAnimationTexture_Float4
+#pragma kernel BakeBoneWeights
+
+#include "AnimationBakingStructs.cginc"
+
+StructuredBuffer<float4x4> Matrices;
+RWTexture2D<float4> Texture;
+
+/*
+ *  Texture Data Layout:
+ *  
+ *  pixel_n: Mat_Col0
+ *  pixel_n+1: Mat_Col1
+ *  pixel_n+2: Mat_Col2
+ *  pixel_n+3: Mat_Col3
+ **/
+
+[numthreads(32,1,1)]
+void BakeAnimationTexture_Float4(uint3 _id : SV_DispatchThreadID)
+{
+    const uint id = _id.x; // because each matrix takes 4 pixel
+
+    uint matrixCount, stride;
+    Matrices.GetDimensions(matrixCount, stride);
+    uint matrixIndex = id;
+    if(matrixIndex < matrixCount)
+    {
+        float4x4 mat = Matrices[matrixIndex];
+        uint tw, th;
+        Texture.GetDimensions(tw, th);
+        const uint index = matrixIndex * 4;
+        [unroll]
+        for(uint i = index; i < index + 4; i += 1)
+        {
+            int x = i % tw;
+            int y = floor(i / (float)th);
+            Texture[uint2(x,y)] = mat[i];
+        }
+    }
+}
+
+
+StructuredBuffer<BoneWeight> Weights;
+
+[numthreads(32,1,1)]
+void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
+{
+    uint weightsCount, stride;
+    Weights.GetDimensions(weightsCount, stride);
+    // if(id < weightsCount)
+    // {
+    //     uint tw, th;
+    //     Texture.GetDimensions(tw, th);
+    //     BoneWeight weight = Weights[id];
+    //     int x = id % tw;
+    //     int y = floor(id / (float)th);
+    //     Texture[uint2(x,y)] = float4(weight.BoneIndex, weight.Weight, 0, 0);
+    //     return;
+    // }
+}

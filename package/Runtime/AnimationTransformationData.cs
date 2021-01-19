@@ -9,6 +9,12 @@ namespace Elaborate.AnimationBakery
 	{
 		public AnimationClip Clip;
 		public BoneTransformationData[] BoneData;
+
+		public AnimationTransformationData(AnimationClip clip, BoneTransformationData[] boneData)
+		{
+			this.Clip = clip;
+			this.BoneData = boneData;
+		}
 	}
 
 	[Serializable]
@@ -29,9 +35,9 @@ namespace Elaborate.AnimationBakery
 	{
 		public float Time;
 		public Matrix4x4 Matrix;
-		public bool NeedsScale = false;
+		public bool Scaled;
 
-		public BoneTransformation(float time, Matrix4x4 mat)
+		public BoneTransformation(float time, Matrix4x4 mat, bool scaled)
 		{
 			this.Time = time;
 			this.Matrix = mat;

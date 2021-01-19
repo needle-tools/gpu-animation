@@ -31,11 +31,7 @@ namespace Elaborate.AnimationBakery
 					if (result[i].Clip == clip) continue;
 
 				var data = SampleAnimationData(animator, rootBone, bones, bonesInfo, clip, skip, frameRate);
-				result.Add(new AnimationTransformationData()
-				{
-					Clip = clip,
-					BoneData = data
-				});
+				result.Add(new AnimationTransformationData(clip, data));
 			}
 
 			return result;
@@ -109,7 +105,7 @@ namespace Elaborate.AnimationBakery
 					if (boneTransformations.ContainsKey(bone) == false)
 						boneTransformations.Add(bone, new BoneTransformationData(info.Index, new List<BoneTransformation>()));
 
-					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix));
+					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix, scale != Vector3.one));
 				}
 			}
 

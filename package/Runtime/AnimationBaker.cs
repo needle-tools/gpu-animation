@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elaborate.AnimationBakery
 {
@@ -13,9 +14,13 @@ namespace Elaborate.AnimationBakery
 		public float FrameRate = -1;
 
 		[Header("Output")] public List<AnimationTransformationData> Output;
-		public AnimationTextureData Texture;
+		public MeshSkinningData SkinTexture;
+		public AnimationTextureData AnimationTexture;
 
-		public Renderer Visualize;
+		[Header("Test")] public Renderer Visualize;
+		public Material Test;
+
+		private Material mat;
 
 #if UNITY_EDITOR
 		private void OnValidate()
@@ -27,8 +32,18 @@ namespace Elaborate.AnimationBakery
 		public void Bake()
 		{
 			Output = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
-			Texture = AnimationTextureProvider.BakeToTexture(Output, TextureBakingShader);
-			if (Visualize && Visualize.sharedMaterial) Visualize.material.mainTexture = Texture.Texture;
+			SkinTexture = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
+			AnimationTexture = AnimationTextureProvider.BakeAnimation(Output, TextureBakingShader);
+
+			if (Test)
+				Test.SetTexture("_Animation", AnimationTexture.Texture);
+
+			if (Visualize && Visualize.sharedMaterial)
+			{
+				mat = new Material(Visualize.sharedMaterial);
+				mat.mainTexture = AnimationTexture.Texture;
+				Visualize.sharedMaterial = mat;
+			}
 		}
 #endif
 	}
