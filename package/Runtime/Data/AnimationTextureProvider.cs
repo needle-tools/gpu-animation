@@ -93,13 +93,15 @@ namespace Elaborate.AnimationBakery
 		}
 
 
-		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader)
+		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader, out ComputeBuffer boneWeights)
 		{
 			var res = new MeshSkinningData();
 			res.Mesh = mesh;
 
 			var kernel = shader.FindKernel("BakeBoneWeights");
-			using (var buffer = CreateVertexBoneWeightBuffer(mesh))
+			boneWeights =  CreateVertexBoneWeightBuffer(mesh);
+			var buffer = boneWeights;
+			// using ()
 			{
 				Debug.Log(buffer.count + " - " + Mathf.Sqrt(buffer.count));
 				var textureSize = Mathf.CeilToInt(Mathf.Sqrt(buffer.count*2f));
@@ -160,6 +162,10 @@ namespace Elaborate.AnimationBakery
 			// 		weight3 = 0f
 			// 	}
 			// };
+			// foreach (var bw in boneWeights)
+			// {
+			// 	Debug.Log(bw.weight0 + bw.weight1 + bw.weight2 + bw.weight3);
+			// }
 			var weightBuffer = new ComputeBuffer(boneWeights.Length, sizeof(float) * 4 + sizeof(int) * 4);
 			weightBuffer.SetData(boneWeights);
 			return weightBuffer;

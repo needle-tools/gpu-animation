@@ -23,7 +23,6 @@ namespace Elaborate.AnimationBakery
 		public Material Test;
 		public Material Test2;
 
-		
 
 #if UNITY_EDITOR
 
@@ -41,25 +40,28 @@ namespace Elaborate.AnimationBakery
 		public void Bake()
 		{
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
-			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
+			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader, out var buffer);
 			AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
 
 			if (VertexAnim)
 			{
 				VertexAnim.SetTexture("_Animation", AnimationBake.Texture);
 				VertexAnim.SetTexture("_Skinning", SkinBake.Texture);
-				VertexAnim.SetVector("_Skinning_TexelSize", new Vector4(0,0, SkinBake.Texture.width, SkinBake.Texture.height));
+				VertexAnim.SetVector("_Skinning_TexelSize", new Vector4(0, 0, SkinBake.Texture.width, SkinBake.Texture.height));
+				VertexAnim.SetBuffer("_BoneWeights", buffer);
 			}
 
 			if (Test)
 			{
 				Test.mainTexture = AnimationBake.Texture;
 			}
-			
+
 			if (Test2)
 			{
 				Test2.mainTexture = SkinBake.Texture;
 			}
+			
+			// ReadPixels(SkinBake.Texture);
 		}
 #endif
 	}

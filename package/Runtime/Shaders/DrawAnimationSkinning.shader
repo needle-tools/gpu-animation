@@ -24,6 +24,7 @@
 		#pragma target 4.5
 		#pragma multi_compile_instancing
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE _KIN_QUALITY_TWO SKIN_QUALITY_ONE
+		#include "Include/Baking/AnimationBakingStructs.cginc"
 
 		sampler2D _MainTex, _Emission;
 
@@ -64,6 +65,12 @@
 
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
+
+		
+
+		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+		StructuredBuffer<BoneWeight> _BoneWeights;
+		#endif
 		
 		struct AnimationInfo
 		{
@@ -75,7 +82,6 @@
 		float Time;
 		float AnimationIndex = 0;
 
-		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 
 		float remap(float p, float p0, float p1, float t0, float t1)
 		{
@@ -89,18 +95,23 @@
 
 			int id = v.vertex_id;
 			int instanceId = v.instance_id;
-			result.color = 1;
 
-			float2 skinning_size = _Skinning_TexelSize.zw;
-			int skin_index = id * 2;
-			float2 skinning_coord0 = float2(fmod (skin_index, skinning_size.x), floor(skin_index / skinning_size.y)) / skinning_size;
-			float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
-			skin_index += 1;
-			float2 skinning_coord1 = float2(fmod (skin_index, skinning_size.x), floor(skin_index / skinning_size.y)) / skinning_size;
-			float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
-			result.color = float4(boneWeights01.xz, boneWeights23.xz);
-			result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
-			result.skinCoords = skinning_coord0;
+
+			// float2 skinning_size = _Skinning_TexelSize.zw;
+			// int skin_index0 = id * 2;
+			// float2 skinning_coord0 = float2(skin_index0 % skinning_size.x, floor(skin_index0 / skinning_size.y)) / skinning_size;
+			// float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
+			// int skin_index1 = skin_index0 + 1;
+			// float2 skinning_coord1 = float2(skin_index1 % skinning_size.x, floor(skin_index1 / skinning_size.y)) / skinning_size;
+			// float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
+			// // result.color = float4(boneWeights01.xz, boneWeights23.xz);
+			// result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
+			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+			BoneWeight weight = _BoneWeights[v.vertex_id];
+			result.color = weight.weight0 + weight.weight1 + weight.weight2 + weight.weight3;
+			// result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
+			#endif
+			// result.skinCoords = skinning_coord0;
 			// result.color = float4(skinning_coord0, 0,0);
 			// result.color = (float)id / 3012;
 
