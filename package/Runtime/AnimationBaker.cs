@@ -48,6 +48,7 @@ namespace Elaborate.AnimationBakery
 			{
 				VertexAnim.SetTexture("_Animation", AnimationBake.Texture);
 				VertexAnim.SetTexture("_Skinning", SkinBake.Texture);
+				VertexAnim.SetVector("_Skinning_TexelSize", new Vector4(0,0, SkinBake.Texture.width, SkinBake.Texture.height));
 			}
 
 			if (Test)

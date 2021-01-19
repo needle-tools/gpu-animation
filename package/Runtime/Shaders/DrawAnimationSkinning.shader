@@ -47,6 +47,7 @@
 		{
 			float2 uv_MainTex;
 			float4 color;
+			float2 skinCoords;
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
@@ -90,7 +91,7 @@
 			int instanceId = v.instance_id;
 			result.color = 1;
 
-			float2 skinning_size = float2(3,3);// _Skinning_TexelSize.zw;
+			float2 skinning_size = _Skinning_TexelSize.zw;
 			int skin_index = id * 2;
 			float2 skinning_coord0 = float2(fmod (skin_index, skinning_size.x), floor(skin_index / skinning_size.y)) / skinning_size;
 			float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
@@ -99,7 +100,8 @@
 			float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
 			result.color = float4(boneWeights01.xz, boneWeights23.xz);
 			result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
-			result.color = float4(skinning_coord0, 0,0);
+			result.skinCoords = skinning_coord0;
+			// result.color = float4(skinning_coord0, 0,0);
 			// result.color = (float)id / 3012;
 
 			// #ifdef SHADER_API_D3D11
@@ -139,6 +141,7 @@
 			
 			o.Albedo = 0;
 			o.Emission = IN.color;
+			// o.Emission = tex2D(_Skinning, IN.skinCoords);
 		}
 		ENDCG
 

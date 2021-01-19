@@ -57,9 +57,12 @@ void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
     uint tw, th;
     Texture.GetDimensions(tw, th);
     BoneWeight weight = Weights[weightIndex];
-    const int textureIndex = weightIndex * 2; // because we store a weight into two pixels
+    int textureIndex = weightIndex * 2; // because we store a weight into two pixels
     float4 skin01 = float4(weight.weight0, weight.boneIndex0, weight.weight1, weight.boneIndex1);
     float4 skin23 = float4(weight.weight2, weight.boneIndex2, weight.weight3, weight.boneIndex3);
+    // skin23 = 0;
+    // skin01 = float4(1,0, 0, 0);
     Write(textureIndex, tw, th, skin01);
-    Write(textureIndex+1, tw, th, skin23);
+    textureIndex += 1;
+    Write(textureIndex, tw, th, skin23);
 }
