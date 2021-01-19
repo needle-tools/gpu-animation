@@ -15,7 +15,7 @@ namespace Elaborate.AnimationBakery
 		public int Skip;
 		public float FrameRate = -1;
 
-		[Header("Output")] public List<AnimationTransformationData> Output;
+		[Header("Output")] public List<AnimationTransformationData> AnimationData;
 		public MeshSkinningData SkinBake;
 		public AnimationTextureData AnimationBake;
 
@@ -32,17 +32,17 @@ namespace Elaborate.AnimationBakery
 			Bake();
 		}
 
-		private void OnValidate()
+		private void Update()
 		{
-			Bake();
+			if (!Application.isPlaying) Bake();
 		}
 
 		[ContextMenu(nameof(Bake))]
 		public void Bake()
 		{
-			Output = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
+			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
-			AnimationBake = AnimationTextureProvider.BakeAnimation(Output, TextureBakingShader);
+			AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
 
 			if (VertexAnim)
 			{

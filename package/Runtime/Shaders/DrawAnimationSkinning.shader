@@ -38,7 +38,7 @@
 			float3 normal : NORMAL;
 			float2 texcoord : TEXCOORD0;
 			float4 tangent : TANGENT;
-			uint id : SV_VertexID;
+			uint vertex_id : SV_VertexID;
 			uint instance_id : SV_InstanceID;
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
@@ -62,13 +62,14 @@
 		StructuredBuffer<Keyframe> keyframes;
 		#endif
 
+		sampler2D _Animation, _Skinning;
+		float4 _Animation_TexelSize, _Skinning_TexelSize;
+		
 		struct AnimationInfo
 		{
 			int StartIndex;
 			int Length;
 		};
-		sampler2D _Animation;
-		uint2 _AnimationTextureSize;
 		AnimationInfo CurrentAnimation;
 
 		float Time;
@@ -84,11 +85,22 @@
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
-			int id = v.id;
-			int index = v.id;
+			int id = v.vertex_id;
 			int instanceId = v.instance_id;
 			result.color = 1;
-			
+
+			float2 skinning_size =  _Skinning_TexelSize.zw;
+			int skin_index = id;
+			float2 skinning_coord0 = 1 - float2(skin_index % skinning_size.x, floor(skin_index / skinning_size.y)) / skinning_size;
+			// skinning_coord0.y = 1 - skinning_coord0.y;
+			float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
+			skin_index += 1;
+			float2 skinning_coord1 = float2(skin_index % skinning_size.x, floor(skin_index / skinning_size.y)) / skinning_size;
+			float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
+			result.color = float4(boneWeights01.xz, boneWeights23.xz);
+			result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
+			// result.color = (float)id / 3012;
+			result.color = float4(skinning_coord0, 0,0);
 
 			// #ifdef SHADER_API_D3D11
 			// Horse horse = horses[instanceId];
@@ -118,12 +130,15 @@
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color * IN.color; 
+			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
 			o.Albedo = col.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
 			o.Alpha = col.a;
+			
+			o.Albedo = 0;
+			o.Emission = IN.color;
 		}
 		ENDCG
 

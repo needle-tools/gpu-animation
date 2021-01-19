@@ -39,11 +39,12 @@ void BakeAnimationTexture_Float4(uint3 _id : SV_DispatchThreadID)
 
 StructuredBuffer<BoneWeight> Weights;
 
-void Write(uint index, float4 values, uint textureWidth, uint textureHeight)
+void Write(uint index, uint textureWidth, uint textureHeight, float4 values)
 {
     int x = index % textureWidth;
     int y = floor(index / (float)textureHeight);
-    Texture[uint2(x,y)] = values;
+    uint2 coord = uint2(x,y);
+    Texture[coord] = values;// 1 - (float)x / textureWidth;// values;
 }
 
 [numthreads(32,1,1)]
@@ -57,6 +58,8 @@ void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
     Texture.GetDimensions(tw, th);
     BoneWeight weight = Weights[weightIndex];
     const int textureIndex = weightIndex * 2; // because we store a weight into two pixels
-    Write(textureIndex, float4(weight.weight0, weight.boneIndex0, weight.weight1, weight.boneIndex1), tw, th);
-    Write(textureIndex+1, float4(weight.weight2, weight.boneIndex2, weight.weight3, weight.boneIndex3), tw, th);
+    float4 skin01 = float4(weight.weight0, weight.boneIndex0, weight.weight1, weight.boneIndex1);
+    float4 skin23 = float4(weight.weight2, weight.boneIndex2, weight.weight3, weight.boneIndex3);
+    Write(textureIndex, tw, th, skin01);
+    Write(textureIndex+1, tw, th, skin23);
 }

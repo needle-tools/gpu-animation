@@ -11,10 +11,10 @@ namespace Elaborate.AnimationBakery
 
 		public void Dispose()
 		{
-			if(Texture is RenderTexture rt && rt) rt.Release();
+			if (Texture is RenderTexture rt && rt) rt.Release();
 		}
 	}
-	
+
 	[Serializable]
 	public class AnimationTextureData : BakedData
 	{
@@ -96,24 +96,25 @@ namespace Elaborate.AnimationBakery
 		{
 			var res = new MeshSkinningData();
 			res.Mesh = mesh;
-			
+
 			var kernel = shader.FindKernel("BakeBoneWeights");
 			using (var buffer = CreateVertexBoneWeightBuffer(mesh))
 			{
-				var textureSize = Mathf.CeilToInt(Mathf.Sqrt(buffer.count));
-				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf); // TODO: try ARGBHalf
+				var textureSize = Mathf.CeilToInt(Mathf.Sqrt(buffer.count) * 1.5f);
+				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
 				texture.filterMode = FilterMode.Point;
 				texture.Create();
 				res.Texture = texture;
-				
+
 				Debug.Log("Bake skinning for " + buffer.count + " vertices into " + texture.width + "x" + texture.height + " texture. " + texture.format);
-				
+
 				shader.SetBuffer(kernel, "Weights", buffer);
 				shader.SetTexture(kernel, "Texture", texture);
 				shader.Dispatch(kernel, Mathf.CeilToInt(buffer.count / 32f), 1, 1);
 			}
+
 			return res;
 		}
 
@@ -124,7 +125,17 @@ namespace Elaborate.AnimationBakery
 			// other than the UnityEngine.BoneWeight 
 			// which holds: boneWeight0, boneWeight1 and so on
 			var boneWeights = mesh.boneWeights;
-			var weightBuffer = new ComputeBuffer(boneWeights.Length, sizeof(float)*4 + sizeof(int)*4);
+			boneWeights = new BoneWeight[]
+			{
+				new BoneWeight()
+				{
+					weight0 = 1,
+					weight1 = 0,
+					weight2 = 0, 
+					weight3 = 0
+				}
+			};
+			var weightBuffer = new ComputeBuffer(boneWeights.Length, sizeof(float) * 4 + sizeof(int) * 4);
 			weightBuffer.SetData(boneWeights);
 			return weightBuffer;
 		}
