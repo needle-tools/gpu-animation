@@ -7,8 +7,8 @@ namespace Elaborate.AnimationBakery
 	[Serializable]
 	public class AnimationTransformationData
 	{
-		public AnimationClip clip;
-		public BoneTransformationData[] transformations;
+		public AnimationClip Clip;
+		public BoneTransformationData[] BoneData;
 	}
 
 	[Serializable]
@@ -29,6 +29,7 @@ namespace Elaborate.AnimationBakery
 	{
 		public float Time;
 		public Matrix4x4 Matrix;
+		public bool NeedsScale = false;
 
 		public BoneTransformation(float time, Matrix4x4 mat)
 		{

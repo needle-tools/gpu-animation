@@ -28,13 +28,13 @@ namespace Elaborate.AnimationBakery
 			{
 				// make sure not to add one clip multiple times
 				for (var i = 0; i < result.Count; i++)
-					if (result[i].clip == clip) continue;
+					if (result[i].Clip == clip) continue;
 
 				var data = SampleAnimationData(animator, rootBone, bones, bonesInfo, clip, skip, frameRate);
 				result.Add(new AnimationTransformationData()
 				{
-					clip = clip,
-					transformations = data
+					Clip = clip,
+					BoneData = data
 				});
 			}
 

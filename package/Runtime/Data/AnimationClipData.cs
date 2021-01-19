@@ -8,6 +8,6 @@ namespace Elaborate.AnimationBakery
 		public string Name;
 		public float Duration;
 		public float FrameRate;
-		public Dictionary<Transform, AnimationClipCurve> Curves;
+		public Dictionary<Transform, AnimationClipCurveData> Curves;
 	}
 }

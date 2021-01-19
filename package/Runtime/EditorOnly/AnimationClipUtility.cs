@@ -18,7 +18,7 @@ namespace Elaborate.AnimationBakery
 			}
 
 			// 1 - save animation data from curves for easier applying that to the skeleton per frame
-			var curves = new Dictionary<Transform, AnimationClipCurve>();
+			var curves = new Dictionary<Transform, AnimationClipCurveData>();
 			foreach (var binding in bindings)
 			{
 				// continue;
@@ -42,7 +42,7 @@ namespace Elaborate.AnimationBakery
 
 				if (animatedObject == null) continue;
 
-				var clipCurve = curves.ContainsKey(animatedObject) ? curves[animatedObject] : new AnimationClipCurve();
+				var clipCurve = curves.ContainsKey(animatedObject) ? curves[animatedObject] : new AnimationClipCurveData();
 				clipCurve.Add(propertyName, curve);
 				curves[animatedObject] = clipCurve;
 			}

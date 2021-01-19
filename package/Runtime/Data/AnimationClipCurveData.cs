@@ -3,7 +3,7 @@
 namespace Elaborate.AnimationBakery
 {
 	[System.Serializable]
-	public struct AnimationClipCurve
+	public struct AnimationClipCurveData
 	{
 		public AnimationCurve positionX, positionY, positionZ;
 		public AnimationCurve rotationX, rotationY, rotationZ, rotationW;
