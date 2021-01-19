@@ -21,7 +21,7 @@
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
-		#pragma target 5.0
+		#pragma target 4.5
 		#pragma multi_compile_instancing
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE _KIN_QUALITY_TWO SKIN_QUALITY_ONE
 
@@ -50,17 +50,16 @@
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
-		#include "Include/Skinning.cginc"
-		#include "Include/Animation.cginc"
-		#include "Include/Quaternion.cginc"
+		// #include "Include/Skinning.cginc"
+		// #include "Include/Animation.cginc"
+		// #include "Include/Quaternion.cginc"
 
-
-		#ifdef SHADER_API_D3D11
-		StructuredBuffer<BoneWeight> boneWeights;
-		StructuredBuffer<AnimationClip> animations;
-		StructuredBuffer<BoneAnimation> animationClips;
-		StructuredBuffer<Keyframe> keyframes;
-		#endif
+		// #ifdef SHADER_API_D3D11
+		// StructuredBuffer<BoneWeight> boneWeights;
+		// StructuredBuffer<AnimationClip> animations;
+		// StructuredBuffer<BoneAnimation> animationClips;
+		// StructuredBuffer<Keyframe> keyframes;
+		// #endif
 
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
@@ -74,6 +73,8 @@
 
 		float Time;
 		float AnimationIndex = 0;
+
+		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 
 		float remap(float p, float p0, float p1, float t0, float t1)
 		{
@@ -89,18 +90,17 @@
 			int instanceId = v.instance_id;
 			result.color = 1;
 
-			float2 skinning_size =  _Skinning_TexelSize.zw;
-			int skin_index = id;
-			float2 skinning_coord0 = 1 - float2(skin_index % skinning_size.x, floor(skin_index / skinning_size.y)) / skinning_size;
-			// skinning_coord0.y = 1 - skinning_coord0.y;
+			float2 skinning_size = float2(3,3);// _Skinning_TexelSize.zw;
+			int skin_index = id * 2;
+			float2 skinning_coord0 = float2(fmod (skin_index, skinning_size.x), floor(skin_index / skinning_size.y)) / skinning_size;
 			float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
 			skin_index += 1;
-			float2 skinning_coord1 = float2(skin_index % skinning_size.x, floor(skin_index / skinning_size.y)) / skinning_size;
+			float2 skinning_coord1 = float2(fmod (skin_index, skinning_size.x), floor(skin_index / skinning_size.y)) / skinning_size;
 			float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
 			result.color = float4(boneWeights01.xz, boneWeights23.xz);
 			result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
-			// result.color = (float)id / 3012;
 			result.color = float4(skinning_coord0, 0,0);
+			// result.color = (float)id / 3012;
 
 			// #ifdef SHADER_API_D3D11
 			// Horse horse = horses[instanceId];
@@ -130,12 +130,12 @@
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
-			o.Albedo = col.rgb;
-			o.Metallic = _Metallic;
-			o.Smoothness = _Glossiness;
-			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
-			o.Alpha = col.a;
+			// fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
+			// o.Albedo = col.rgb;
+			// o.Metallic = _Metallic;
+			// o.Smoothness = _Glossiness;
+			// o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
+			// o.Alpha = col.a;
 			
 			o.Albedo = 0;
 			o.Emission = IN.color;
