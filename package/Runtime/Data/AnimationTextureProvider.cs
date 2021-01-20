@@ -46,9 +46,9 @@ namespace Elaborate.AnimationBakery
 
 	public static class AnimationTextureProvider
 	{
-		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader)
+		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader, out ComputeBuffer bones)
 		{
-			var matrixData = new List<Matrix4x4>();
+			var matrixData = new List<Bone>();
 			var clipInfos = new List<AnimationTextureData.Clip>();
 			var anyScaled = false;
 			foreach (var anim in animationData)
@@ -60,7 +60,7 @@ namespace Elaborate.AnimationBakery
 					foreach (var frame in boneData.Transformations)
 					{
 						// Debug.Log(frame.Matrix);
-						matrixData.Add(frame.Matrix);
+						matrixData.Add(new Bone(frame.Matrix));
 						if (frame.Scaled) anyScaled = true;
 					}
 				}
@@ -84,14 +84,16 @@ namespace Elaborate.AnimationBakery
 			          texture.width + "x" + texture.height + ", Need Scale? " + anyScaled);
 
 			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
-			using (var matrixBuffer = new ComputeBuffer(matrixData.Count, sizeof(float) * 4 * 4))
+			var bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
+			bonesBuffer.SetData(matrixData);
+			// using ()
 			{
-				matrixBuffer.SetData(matrixData);
-				shader.SetBuffer(kernel, "Matrices", matrixBuffer);
+				shader.SetBuffer(kernel, "Matrices", bonesBuffer);
 				shader.SetTexture(kernel, "Texture", texture);
 				shader.Dispatch(kernel, Mathf.CeilToInt(matrixData.Count / 32f), 1, 1);
 			}
 
+			bones = bonesBuffer;
 			return res;
 		}
 
@@ -106,7 +108,6 @@ namespace Elaborate.AnimationBakery
 			var buffer = boneWeights;
 			// using ()
 			{
-				Debug.Log(buffer.count + " - " + Mathf.Sqrt(buffer.count));
 				var textureSize = ToSquareSize(buffer.count*2);
 				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
@@ -129,6 +130,8 @@ namespace Elaborate.AnimationBakery
 		public struct Bone
 		{
 			public Matrix4x4 Transformation;
+
+			public Bone(Matrix4x4 mat) => Transformation = mat;
 
 			public static int Stride => sizeof(float) * 4 * 4;
 		}
@@ -162,7 +165,6 @@ namespace Elaborate.AnimationBakery
 			// other than the UnityEngine.BoneWeight 
 			// which holds: boneWeight0, boneWeight1 and so on
 			var boneWeights = mesh.boneWeights;
-			Debug.Log(boneWeights.Length + ", " + mesh.vertexCount);
 			// NativeArray<BoneWeight1> boneWeights = mesh.GetAllBoneWeights();
 			// foreach (var bw in boneWeights)
 			// {

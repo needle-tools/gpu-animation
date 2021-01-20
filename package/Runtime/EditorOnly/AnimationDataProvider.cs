@@ -12,54 +12,59 @@ namespace Elaborate.AnimationBakery
 		public static List<AnimationTransformationData> GetAnimations(
 			Animator animator, List<AnimationClip> animationClips, SkinnedMeshRenderer skinnedMeshRenderer,
 			int skip, float frameRate = -1
-			)
+		)
 		{
-			Debug.Log(skinnedMeshRenderer.rootBone.rotation.eulerAngles);
-			
-			var rootBone = skinnedMeshRenderer.rootBone;
 			var bones = skinnedMeshRenderer.bones;
 
 			var boneData = GetData(skinnedMeshRenderer);
 			var bonesInfo = new Dictionary<Transform, SkinnedMesh_BoneData>();
-			for (var i = 0; i < boneData.Length; i++)
+			for (var i = 0; i < boneData.Count; i++)
 				bonesInfo.Add(boneData[i].Bone, boneData[i]);
 
 			var result = new List<AnimationTransformationData>();
-			var clips = animationClips;// //AnimationUtility.GetAnimationClips(animator.gameObject);
+			var clips = animationClips; // //AnimationUtility.GetAnimationClips(animator.gameObject);
 			foreach (var clip in clips)
 			{
 				// make sure not to add one clip multiple times
-				for (var i = 0; i < result.Count; i++)
-					if (result[i].Clip == clip) continue;
+				if (result.Any(r => r.Clip == clip)) continue;
 
-				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, rootBone, bones, bonesInfo, clip, skip, frameRate);
+				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, bones, bonesInfo, clip, skip, frameRate);
 				result.Add(new AnimationTransformationData(clip, data));
 			}
 
 			return result;
 		}
-		
+
 		private static BoneTransformationData[] SampleAnimationData(
-			Mesh mesh,
-			Animator animatedObject, Transform rootBone, Transform[] bones, Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
-			AnimationClip clip, int skip, float frameRate = -1)
+			Mesh mesh, Animator animatedObject,
+			Transform[] bones,
+			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
+			AnimationClip clip, int skip, float frameRate = -1
+		)
 		{
-			if (!AnimationClipUtility.GetData(animatedObject, clip, out var data)) return null;
-			
+			if (!AnimationClipUtility.GetData(animatedObject, clip, out AnimationClipData data))
+			{
+				Debug.LogError("Failed getting data from " + clip + ", " + animatedObject, animatedObject);
+				return null;
+			}
+
 			// 1: save bind transformations of bones
-			var bindStates = GetTransformationState(rootBone);
+			var transformStates = GetTransformationState(bones);
 
 			// 2: sample transformations in clip
 			var transformations = SampleAndStoreAnimationClipData(mesh, bones, bonesInfo, data, skip, frameRate);
 
 			// 3: restore transformation state
-			RestoreTransformationState(rootBone, bindStates);
+			RestoreTransformationState(transformStates);
 
 			return transformations;
 		}
 
-		private static BoneTransformationData[] SampleAndStoreAnimationClipData(Mesh mesh, Transform[] bones, Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
-			AnimationClipData data, int skip, float frameRate = -1)
+		private static BoneTransformationData[] SampleAndStoreAnimationClipData(
+			Mesh mesh, Transform[] bones,
+			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
+			AnimationClipData data, int skip, float frameRate = -1
+			)
 		{
 			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
 
@@ -97,7 +102,6 @@ namespace Elaborate.AnimationBakery
 					var info = kvp.Value;
 					var index = info.Index;
 					var bone = bones[index];
-					//Debug.Log("store transformation for " + path);
 
 					var pos = bone.position;
 					var rot = bone.rotation;
@@ -120,10 +124,11 @@ namespace Elaborate.AnimationBakery
 			}
 
 			return boneTransformations.Values.ToArray();
+			return boneTransformations.Values.OrderBy(e => e.BoneIndex).ToArray();
 		}
 
 
-		public static SkinnedMesh_BoneData[] GetData(SkinnedMeshRenderer renderer)
+		public static List<SkinnedMesh_BoneData> GetData(SkinnedMeshRenderer renderer)
 		{
 			var boneHierarchy = new List<SkinnedMesh_BoneData>();
 
@@ -142,42 +147,37 @@ namespace Elaborate.AnimationBakery
 				boneHierarchy.Add(newData);
 			}
 
-			return boneHierarchy.ToArray();
+			return boneHierarchy;
 		}
 
-		
-		private static void RestoreTransformationState(Transform root, Dictionary<Transform, TransformState> states)
+
+		private static void RestoreTransformationState(Dictionary<Transform, TransformState> states)
 		{
-			var children = root.GetComponentsInChildren<Transform>();
-			foreach (var child in children)
+			foreach (var kvp in states)
 			{
-				if (states.ContainsKey(child))
-				{
-					var state = states[child];
-					child.localPosition = state.LocalPosition;
-					child.localRotation = state.LocalRotation;
-					child.localScale = state.LocalScale;
-				}
+				var transform = kvp.Key;
+				var state = kvp.Value;
+				transform.localPosition = state.LocalPosition;
+				transform.localRotation = state.LocalRotation;
+				transform.localScale = state.LocalScale;
 			}
 		}
 
-		private static Dictionary<Transform, TransformState> GetTransformationState(Transform root)
+		private static Dictionary<Transform, TransformState> GetTransformationState(IEnumerable<Transform> bones)
 		{
 			var state = new Dictionary<Transform, TransformState>();
-			var children = root.GetComponentsInChildren<Transform>();
-			foreach (var child in children)
-				state.Add(child, new TransformState()
+			foreach (var bone in bones)
+				state.Add(bone, new TransformState()
 				{
-					Position = child.position,
-					LocalPosition = child.localPosition,
-					Rotation = child.rotation,
-					LocalRotation = child.localRotation,
-					LossyScale = child.lossyScale,
-					LocalScale = child.localScale
+					Position = bone.position,
+					LocalPosition = bone.localPosition,
+					Rotation = bone.rotation,
+					LocalRotation = bone.localRotation,
+					LossyScale = bone.lossyScale,
+					LocalScale = bone.localScale
 				});
 			return state;
 		}
-
 	}
 }
 #endif

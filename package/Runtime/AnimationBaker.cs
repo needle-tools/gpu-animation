@@ -19,7 +19,8 @@ namespace Elaborate.AnimationBakery
 		public MeshSkinningData SkinBake;
 		public AnimationTextureData AnimationBake;
 
-		[Header("Test")] public Material VertexAnim;
+		[Header("Test")] 
+		public Material VertexAnim;
 		public Material Test;
 		public Material Test2;
 
@@ -47,20 +48,20 @@ namespace Elaborate.AnimationBakery
 		{
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader, out weightBuffer);
-			AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
+			AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader, out animBuffer);
 
 			if (VertexAnim)
 			{
 				VertexAnim.SetTexture("_Animation", AnimationBake.Texture);
 				VertexAnim.SetTexture("_Skinning", SkinBake.Texture);
-				VertexAnim.SetVector("_Skinning_TexelSize", new Vector4(0, 0, SkinBake.Texture.width, SkinBake.Texture.height));
 				VertexAnim.SetBuffer("_BoneWeights", weightBuffer);
 				BoneWeights = new BoneWeight[weightBuffer.count];
 				weightBuffer.GetData(BoneWeights);
-				this.animBuffer = AnimationTextureProvider.ReadAnimation(AnimationBake, TextureBakingShader);
+				// this.animBuffer = AnimationTextureProvider.ReadAnimation(AnimationBake, TextureBakingShader);
 				Bones = new AnimationTextureProvider.Bone[animBuffer.count];
 				this.animBuffer.GetData(Bones);
 				VertexAnim.SetBuffer("_Animations", animBuffer);
+				VertexAnim.SetInt("_BonesCount", Renderer.bones.Length);
 			}
 
 			if (Test)

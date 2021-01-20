@@ -83,6 +83,7 @@
 		float Time;
 		float AnimationIndex = 0;
 		int _Frame;
+		uint _BonesCount;
 
 		float remap(float p, float p0, float p1, float t0, float t1)
 		{
@@ -114,7 +115,9 @@
 			result.color = weight.weight0 + weight.weight1 + weight.weight2 + weight.weight3;
 			result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
 
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, 0, _Frame);
+			// result.color = weight.boneIndex0/43.0f;
+
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, 0, 9, _Frame, _BonesCount);
 
 
 			

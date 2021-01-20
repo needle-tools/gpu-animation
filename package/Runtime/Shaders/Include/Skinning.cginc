@@ -77,12 +77,9 @@ float4x4 SampleMatrix(sampler2D animationTex, float4 animationTexel, uint index)
 	return float4x4(p0, p1, p2, p3);
 }
 
-float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeights, StructuredBuffer<Bone> animations, sampler2D animation, float4 animationTexel, uint startIndex, uint frame)
+float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeights, StructuredBuffer<Bone> animations, sampler2D animation, float4 animationTexel, uint startIndex, uint animationLength, uint frame, uint bonesCount)
 {
-	int index = vertexId;
-	int weightIndex = index;
-
-	BoneWeight bw = boneWeights[weightIndex];
+	BoneWeight bw = boneWeights[vertexId];
 	
 	float w0 = bw.weight0;
 	float w1 = bw.weight1;
@@ -93,21 +90,28 @@ float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeigh
 	uint bi1 = bw.boneIndex1;
 	uint bi2 = bw.boneIndex2;
 	uint bi3 = bw.boneIndex3;
+	
+	bi0 *= animationLength;
+	bi1 *= animationLength;
+	bi2 *= animationLength;
+	bi3 *= animationLength;
+
+	frame %= animationLength;
+
+	bi0 += frame;
+	bi1 += frame;
+	bi2 += frame;
+	bi3 += frame;
 
 	bi0 += startIndex;
 	bi1 += startIndex;
 	bi2 += startIndex;
 	bi3 += startIndex;
-
-	uint i0 = (bi0 + frame);
-	uint i1 = (bi1 + frame);
-	uint i2 = (bi2 + frame);
-	uint i3 = (bi3 + frame);
 	
-	Bone bone0 = animations[i0];
-	Bone bone1 = animations[i1];
-	Bone bone2 = animations[i2];
-	Bone bone3 = animations[i3];
+	Bone bone0 = animations[bi0];
+	Bone bone1 = animations[bi1];
+	Bone bone2 = animations[bi2];
+	Bone bone3 = animations[bi3];
 
 	// float4x4 m0 = SampleMatrix(animation, animationTexel, i0);
 	// float4x4 m1 = SampleMatrix(animation, animationTexel, i1);
