@@ -20,11 +20,16 @@ namespace Elaborate.AnimationBakery
 	[Serializable]
 	public class BoneTransformationData
 	{
+		public string Name;
+		public Transform Bone;
+		
 		public int BoneIndex;
 		public List<BoneTransformation> Transformations;
 
-		public BoneTransformationData(int index, List<BoneTransformation> transformations)
+		public BoneTransformationData(string name, Transform bone, int index, List<BoneTransformation> transformations)
 		{
+			this.Name = name;
+			this.Bone = bone;
 			this.BoneIndex = index;
 			this.Transformations = transformations;
 		}

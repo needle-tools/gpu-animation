@@ -1,79 +1,116 @@
 #ifndef _GPU_SKINNING_
 #define _GPU_SKINNING_
+#include "AnimationTypes.cginc"
 
-struct Bone
-{
-    float4x4 transform;
-}; 
+// struct Bone
+// {
+//     float4x4 transform;
+// }; 
 
 struct BindPose 
 {
     float4x4 transform;
 };
 
-struct BoneWeight 
-{
-    int boneIndex;
-    float weight;
-};
-
 #if SHADER_TARGET >= 35 && (defined(SHADER_API_D3D11)) 
 
 float4 skin4(float4 vert, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3, float w3, float4x4 m4, float w4)
 {
-	float4x4 matrices = m1 * w1 + m2 * w2 + m3 * w3 + m4 * w4;
-	return mul(matrices, vert);
+	const float4x4 mat = m1 * w1 + m2 * w2 + m3 * w3 + m4 * w4;
+	return mul(mat, vert);
 }
+//
+// float4 skin3(float4 vert, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3)
+// {
+// 	float4x4 matrices = m1 * w1 + m2 * w2 + m3 * (1 - (w1 + w2));
+// 	return mul(matrices, vert);
+// }
+//
+// float4 skin2(float4 vert, float4x4 m1, float w1, float4x4 m2)
+// {
+// 	float4x4 matrices = m1 * w1 + m2 * (1 - w1);
+// 	return mul(matrices, vert);
+// }
+//
+// float4 skin1(float4 vert, float4x4 m1)
+// {
+// 	float4x4 matrices = m1 * 1;
+// 	return mul(matrices, vert);
+// }
 
-float4 skin3(float4 vert, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3)
+
+float4 IndexToCoord(float index, float4 texelSize)
 {
-	float4x4 matrices = m1 * w1 + m2 * w2 + m3 * (1 - (w1 + w2));
-	return mul(matrices, vert);
+	index = floor(index);
+	float2 size = float2( texelSize.z,  texelSize.w);
+	float2 uv = float2(index % size.x, (int)(index / size.y)) / size;
+	return float4(uv, 0, 0);
 }
 
-float4 skin2(float4 vert, float4x4 m1, float w1, float4x4 m2)
+float4 IndexToUv(float index, float4 texelSize)
 {
-	float4x4 matrices = m1 * w1 + m2 * (1 - w1);
-	return mul(matrices, vert);
+	int iIndex = trunc(index + 0.5);
+	float2 wh = float2(texelSize.z, texelSize.w);
+	int row = (int)(iIndex / wh.x);
+	float col = iIndex - row*wh.x;
+	return float4((col+0.5)/wh.x, (row+0.5) /wh.y, 0, 0);
 }
 
-float4 skin1(float4 vert, float4x4 m1)
+float4x4 SampleMatrix(sampler2D animationTex, float4 animationTexel, uint boneIndex, uint frame)
 {
-	float4x4 matrices = m1 * 1;
-	return mul(matrices, vert);
+	uint index = (boneIndex+frame) * 4;
+	float4 coord0 = IndexToUv(index, animationTexel);
+	float4 p0 = tex2Dlod(animationTex, float4(coord0));
+	float4 coord1 = IndexToUv(index+1, animationTexel);
+	float4 p1 = tex2Dlod(animationTex, float4(coord1));
+	float4 coord2 = IndexToUv(index+2, animationTexel);
+	float4 p2 = tex2Dlod(animationTex, float4(coord2));
+	float4 coord3 = IndexToUv(index+3, animationTexel);
+	float4 p3 = tex2Dlod(animationTex, float4(coord3));
+	float4x4 mat;
+	mat[0] = p0;
+	mat[1] = p1;
+	mat[2] = p2;
+	mat[3] = p3;
+	return mat;
+	// return float4x4(p0, p1, p2, p3);
 }
 
-float4 skin4(int instanceId, int vertexId, float4 vertex, StructuredBuffer<BoneWeight> boneWeights, StructuredBuffer<Bone> bones)
+float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeights, sampler2D animation, float4 animationTexel, uint animationIndex, uint animationLength, uint frame)
 {
 	int index = vertexId;
-	int weightIndex = index * 4;
+	int weightIndex = index;
 
-	BoneWeight bw1 = boneWeights[weightIndex];
-	BoneWeight bw2 = boneWeights[weightIndex + 1];
-	BoneWeight bw3 = boneWeights[weightIndex + 2];
-	BoneWeight bw4 = boneWeights[weightIndex + 3];
+	BoneWeight bw = boneWeights[weightIndex];
 
-	float w1 = bw1.weight;
-	float w2 = bw2.weight;
-	float w3 = bw3.weight;
-	float w4 = bw4.weight;
+	float w0 = bw.weight0;
+	float w1 = bw.weight1;
+	float w2 = bw.weight2;
+	float w3 = bw.weight3;
 
-	int bi1 = bw1.boneIndex;
-	int bi2 = bw2.boneIndex;
-	int bi3 = bw3.boneIndex;
-	int bi4 = bw4.boneIndex;
+	uint bi0 = bw.boneIndex0;
+	uint bi1 = bw.boneIndex1;
+	uint bi2 = bw.boneIndex2;
+	uint bi3 = bw.boneIndex3;
 
-	Bone bone1 = bones[bi1];
-	Bone bone2 = bones[bi2];
-	Bone bone3 = bones[bi3];
-	Bone bone4 = bones[bi4];
+	float4x4 m0 = SampleMatrix(animation, animationTexel, (bi0), frame);
+	float4x4 m1 = SampleMatrix(animation, animationTexel, (bi1), frame);
+	float4x4 m2 = SampleMatrix(animation, animationTexel, (bi2), frame);
+	float4x4 m3 = SampleMatrix(animation, animationTexel, (bi3), frame);
 
-	float4x4 m1 = bone1.transform;
-	float4x4 m2 = bone2.transform;
-	float4x4 m3 = bone3.transform;
-	float4x4 m4 = bone4.transform;
+	// Bone bone1 = bones[bi1];
+	// Bone bone2 = bones[bi2];
+	// Bone bone3 = bones[bi3];
+	// Bone bone4 = bones[bi4];
+	//
+	// float4x4 m1 = bone1.transform;
+	// float4x4 m2 = bone2.transform;
+	// float4x4 m3 = bone3.transform;
+	// float4x4 m4 = bone4.transform;
 
-	return skin4(vertex, m1, w1, m2, w2, m3, w3, m4, w4);
+	// return mul(m0, vertex);
+	return skin4(vertex, m0, w0, m1, w1, m2, w2, m3, w3);
+	return vertex;
 }
 #endif
 

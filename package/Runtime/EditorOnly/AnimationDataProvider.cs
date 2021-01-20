@@ -14,6 +14,8 @@ namespace Elaborate.AnimationBakery
 			int skip, float frameRate = -1
 			)
 		{
+			Debug.Log(skinnedMeshRenderer.rootBone.rotation.eulerAngles);
+			
 			var rootBone = skinnedMeshRenderer.rootBone;
 			var bones = skinnedMeshRenderer.bones;
 
@@ -30,7 +32,7 @@ namespace Elaborate.AnimationBakery
 				for (var i = 0; i < result.Count; i++)
 					if (result[i].Clip == clip) continue;
 
-				var data = SampleAnimationData(animator, rootBone, bones, bonesInfo, clip, skip, frameRate);
+				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, rootBone, bones, bonesInfo, clip, skip, frameRate);
 				result.Add(new AnimationTransformationData(clip, data));
 			}
 
@@ -38,6 +40,7 @@ namespace Elaborate.AnimationBakery
 		}
 		
 		private static BoneTransformationData[] SampleAnimationData(
+			Mesh mesh,
 			Animator animatedObject, Transform rootBone, Transform[] bones, Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
 			AnimationClip clip, int skip, float frameRate = -1)
 		{
@@ -47,7 +50,7 @@ namespace Elaborate.AnimationBakery
 			var bindStates = GetTransformationState(rootBone);
 
 			// 2: sample transformations in clip
-			var transformations = SampleAndStoreAnimationClipData(bones, bonesInfo, data, skip, frameRate);
+			var transformations = SampleAndStoreAnimationClipData(mesh, bones, bonesInfo, data, skip, frameRate);
 
 			// 3: restore transformation state
 			RestoreTransformationState(rootBone, bindStates);
@@ -55,7 +58,7 @@ namespace Elaborate.AnimationBakery
 			return transformations;
 		}
 
-		private static BoneTransformationData[] SampleAndStoreAnimationClipData(Transform[] bones, Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
+		private static BoneTransformationData[] SampleAndStoreAnimationClipData(Mesh mesh, Transform[] bones, Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
 			AnimationClipData data, int skip, float frameRate = -1)
 		{
 			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
@@ -94,22 +97,24 @@ namespace Elaborate.AnimationBakery
 					var info = kvp.Value;
 					var index = info.Index;
 					var bone = bones[index];
-
 					//Debug.Log("store transformation for " + path);
 
 					var pos = bone.position;
 					var rot = bone.rotation;
 					var scale = bone.lossyScale;
 					var boneMatrix = Matrix4x4.TRS(pos, rot, scale);
+					// boneMatrix *= Matrix4x4.Rotate(Quaternion.Euler(270, 90, 0));
+					// bindposes are already inverted!!!
+					boneMatrix *= mesh.bindposes[index];
 
 					if (boneTransformations.ContainsKey(bone) == false)
-						boneTransformations.Add(bone, new BoneTransformationData(info.Index, new List<BoneTransformation>()));
+						boneTransformations.Add(bone, new BoneTransformationData(bone.name, bone, info.Index, new List<BoneTransformation>()));
 
 					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix, scale != Vector3.one));
 				}
 			}
 
-			return boneTransformations.Select(v => v.Value).ToArray();
+			return boneTransformations.Values.ToArray();
 		}
 
 

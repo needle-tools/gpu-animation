@@ -10,6 +10,7 @@
 		_Emission ("Emission", 2D) = "black" {}
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
+		_Frame("Frame", int) = 0
 	}
 	SubShader
 	{
@@ -24,7 +25,8 @@
 		#pragma target 4.5
 		#pragma multi_compile_instancing
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE _KIN_QUALITY_TWO SKIN_QUALITY_ONE
-		#include "Include/Baking/AnimationBakingStructs.cginc"
+		#include "Include/AnimationTypes.cginc"
+		#include "Include/Skinning.cginc"
 
 		sampler2D _MainTex, _Emission;
 
@@ -52,7 +54,6 @@
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
-		// #include "Include/Skinning.cginc"
 		// #include "Include/Animation.cginc"
 		// #include "Include/Quaternion.cginc"
 
@@ -66,7 +67,6 @@
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
 
-		
 
 		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		StructuredBuffer<BoneWeight> _BoneWeights;
@@ -81,7 +81,7 @@
 
 		float Time;
 		float AnimationIndex = 0;
-
+		int _Frame;
 
 		float remap(float p, float p0, float p1, float t0, float t1)
 		{
@@ -107,10 +107,20 @@
 			// // result.color = float4(boneWeights01.xz, boneWeights23.xz);
 			// result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+
+			
 			BoneWeight weight = _BoneWeights[v.vertex_id];
 			result.color = weight.weight0 + weight.weight1 + weight.weight2 + weight.weight3;
-			// result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
+			result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
+
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, 0, 16, _Frame);
+
+
+			
 			#endif
+
+
+			
 			// result.skinCoords = skinning_coord0;
 			// result.color = float4(skinning_coord0, 0,0);
 			// result.color = (float)id / 3012;
