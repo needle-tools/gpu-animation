@@ -72,13 +72,9 @@
 		StructuredBuffer<BoneWeight> _BoneWeights;
 		StructuredBuffer<Bone> _Animations;
 		#endif
-		
-		struct AnimationInfo
-		{
-			int StartIndex;
-			int Length;
-		};
-		AnimationInfo CurrentAnimation;
+
+
+		float3 _CurrentAnimation; // StartIndex, Length, Frame
 
 		float Time;
 		float AnimationIndex = 0;
@@ -117,7 +113,7 @@
 
 			// result.color = weight.boneIndex0/43.0f;
 
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, 0, 9, _Frame, _BonesCount);
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z, _BonesCount);
 
 
 			
@@ -157,15 +153,15 @@
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			// fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
-			// o.Albedo = col.rgb;
-			// o.Metallic = _Metallic;
-			// o.Smoothness = _Glossiness;
-			// o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
-			// o.Alpha = col.a;
+			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
+			o.Albedo = col.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
+			o.Alpha = col.a;
 			
-			o.Albedo = 0;
-			o.Emission = IN.color;
+			// o.Albedo = 0;
+			// o.Emission = IN.color;
 			// o.Emission = tex2D(_Skinning, IN.skinCoords);
 		}
 		ENDCG

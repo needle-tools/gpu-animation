@@ -25,6 +25,8 @@ namespace Elaborate.AnimationBakery
 		public Material Test2;
 
 
+		public int Frame;
+		
 #if UNITY_EDITOR
 
 		private void OnEnable()
@@ -62,6 +64,7 @@ namespace Elaborate.AnimationBakery
 				this.animBuffer.GetData(Bones);
 				VertexAnim.SetBuffer("_Animations", animBuffer);
 				VertexAnim.SetInt("_BonesCount", Renderer.bones.Length);
+				VertexAnim.SetVector("_CurrentAnimation", new Vector4(AnimationBake.Animations[0].IndexStart, AnimationBake.Animations[0].Frames, Frame, 0));
 			}
 
 			if (Test)

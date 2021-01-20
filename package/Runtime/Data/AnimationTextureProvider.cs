@@ -22,18 +22,19 @@ namespace Elaborate.AnimationBakery
 	{
 		public List<Clip> Animations;
 
-		public int TotalFrames => Animations.Sum(c => c.Length);
+		public int TotalFrames => Animations.Sum(c => c.TotalLength);
 
 		[Serializable]
 		public struct Clip
 		{
 			public int IndexStart;
-			public int Length;
+			public int Frames;
+			public int TotalLength;
 			public static int Stride => sizeof(int) * 2;
 
 			public override string ToString()
 			{
-				return "Start=" + IndexStart + ", Length=" + Length;
+				return "Start=" + IndexStart + ", Length=" + TotalLength;
 			}
 		}
 	}
@@ -57,15 +58,15 @@ namespace Elaborate.AnimationBakery
 				clip.IndexStart = matrixData.Count;
 				foreach (var boneData in anim.BoneData)
 				{
+					clip.Frames = boneData.Transformations.Count;
 					foreach (var frame in boneData.Transformations)
 					{
-						// Debug.Log(frame.Matrix);
 						matrixData.Add(new Bone(frame.Matrix));
 						if (frame.Scaled) anyScaled = true;
 					}
 				}
 
-				clip.Length = matrixData.Count - clip.IndexStart;
+				clip.TotalLength = matrixData.Count - clip.IndexStart;
 				Debug.Log("Clip \t" + clipInfos.Count + "\t" + clip);
 				clipInfos.Add(clip);
 			}
