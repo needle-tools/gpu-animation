@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 
@@ -21,12 +22,14 @@ namespace Elaborate.AnimationBakery
 	{
 		public List<Clip> Animations;
 
+		public int TotalFrames => Animations.Sum(c => c.Length);
+
 		[Serializable]
 		public struct Clip
 		{
 			public int IndexStart;
 			public int Length;
-			public int Stride => sizeof(int) * 2;
+			public static int Stride => sizeof(int) * 2;
 
 			public override string ToString()
 			{
@@ -67,7 +70,7 @@ namespace Elaborate.AnimationBakery
 				clipInfos.Add(clip);
 			}
 
-			var textureSize = ToSquareSize(matrixData.Count);
+			var textureSize = ToSquareSize(matrixData.Count*4);
 			var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
@@ -77,7 +80,7 @@ namespace Elaborate.AnimationBakery
 			res.Texture = texture;
 			res.Animations = clipInfos;
 
-			Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " matrices: 4x4 = " + (matrixData.Count * 4) + " pixel TextureSize: " +
+			Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " 4x4 matrices = " + (matrixData.Count * 4) + " pixel TextureSize: " +
 			          texture.width + "x" + texture.height + ", Need Scale? " + anyScaled);
 
 			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
@@ -104,7 +107,7 @@ namespace Elaborate.AnimationBakery
 			// using ()
 			{
 				Debug.Log(buffer.count + " - " + Mathf.Sqrt(buffer.count));
-				var textureSize = ToSquareSize(buffer.count);
+				var textureSize = ToSquareSize(buffer.count*2);
 				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
@@ -122,9 +125,34 @@ namespace Elaborate.AnimationBakery
 			return res;
 		}
 
-		private static int ToSquareSize(int count)
+		[Serializable]
+		public struct Bone
 		{
-			return Mathf.CeilToInt(Mathf.Sqrt(count * 2));
+			public Matrix4x4 Transformation;
+
+			public static int Stride => sizeof(float) * 4 * 4;
+		}
+
+		public static ComputeBuffer ReadAnimation(AnimationTextureData data, ComputeShader shader)
+		{
+			var kernel = shader.FindKernel("ReadAnimation");
+			var res = new ComputeBuffer(data.TotalFrames, Bone.Stride);
+			using (var clipsBuffer = new ComputeBuffer(data.Animations.Count, AnimationTextureData.Clip.Stride))
+			{
+				clipsBuffer.SetData(data.Animations);
+				shader.SetBuffer(kernel, "Clips", clipsBuffer);
+				shader.SetTexture(kernel, "Texture", data.Texture);
+				shader.SetBuffer(kernel, "Bones", res);
+				var tx = Mathf.CeilToInt(data.Animations.Count / 32f);
+				shader.Dispatch(kernel, tx, 1, 1);
+			}
+
+			return res;
+		}
+
+		private static int ToSquareSize(int pixel)
+		{
+			return Mathf.CeilToInt(Mathf.Sqrt(pixel));
 		}
 
 		private static ComputeBuffer CreateVertexBoneWeightBuffer(Mesh mesh)
@@ -136,37 +164,6 @@ namespace Elaborate.AnimationBakery
 			var boneWeights = mesh.boneWeights;
 			Debug.Log(boneWeights.Length + ", " + mesh.vertexCount);
 			// NativeArray<BoneWeight1> boneWeights = mesh.GetAllBoneWeights();
-			// boneWeights = new BoneWeight[]
-			// {
-			// 	new BoneWeight()
-			// 	{
-			// 		weight0 = 1,
-			// 		weight1 = 0,
-			// 		weight2 = .5f,
-			// 		weight3 = 0
-			// 	},
-			// 	new BoneWeight()
-			// 	{
-			// 		weight0 = 0,
-			// 		weight1 = 1,
-			// 		weight2 = .2f,
-			// 		weight3 = .5f
-			// 	},
-			// 	new BoneWeight()
-			// 	{
-			// 		weight0 = 0,
-			// 		weight1 = 1,
-			// 		weight2 = 1,
-			// 		weight3 = 1
-			// 	},
-			// 	new BoneWeight()
-			// 	{
-			// 		weight0 = 1,
-			// 		weight1 = 1,
-			// 		weight2 = 1f,
-			// 		weight3 = 0f
-			// 	}
-			// };
 			// foreach (var bw in boneWeights)
 			// {
 			// 	Debug.Log(bw.weight0 + bw.weight1 + bw.weight2 + bw.weight3);

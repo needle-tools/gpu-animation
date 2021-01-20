@@ -70,6 +70,7 @@
 
 		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		StructuredBuffer<BoneWeight> _BoneWeights;
+		StructuredBuffer<Bone> _Animations;
 		#endif
 		
 		struct AnimationInfo
@@ -113,7 +114,7 @@
 			result.color = weight.weight0 + weight.weight1 + weight.weight2 + weight.weight3;
 			result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
 
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, 0, 16, _Frame);
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, 0, _Frame);
 
 
 			

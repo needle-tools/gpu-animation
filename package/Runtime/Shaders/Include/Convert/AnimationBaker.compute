@@ -1,5 +1,6 @@
 ﻿#pragma kernel BakeAnimationTexture_Float4
 #pragma kernel BakeBoneWeights
+#pragma kernel ReadAnimation
 
 #include "../AnimationTypes.cginc"
 
@@ -65,4 +66,44 @@ void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
     Write(textureIndex, tw, th, skin01);
     textureIndex += 1;
     Write(textureIndex, tw, th, skin23);
+}
+
+
+StructuredBuffer<AnimationClip> Clips;
+RWStructuredBuffer<Bone> Bones;
+
+[numthreads(32,1,1)]
+void ReadAnimation(uint3 _id : SV_DispatchThreadID)
+{
+    const uint clipIndex = _id.x;
+    uint clipsCount, stride;
+    Clips.GetDimensions(clipsCount, stride);
+    if(clipIndex >= clipsCount) return;
+
+    uint tw, th;
+    Texture.GetDimensions(tw, th);
+    
+    // get indices from animation clips
+    const AnimationClip clip = Clips[clipIndex];
+    for(int k = 0; k < clip.Length; k++)
+    {
+        // x4 because 4 pixel per matrix
+        const uint matIndex = clip.IndexStart + k;
+        const uint pixelIndex = clip.IndexStart + k * 4;
+
+        // build matrix from 4 pixels
+        float4x4 mat = 0;
+        [unroll]
+        for(uint n = 0; n < 4; n += 1)
+        {
+            const uint ti = pixelIndex + n;
+            int x = ti % tw;
+            int y = floor(ti / (float)th);
+            mat[n] = Texture[uint2(x,y)];
+        }
+            
+        Bone bone;
+        bone.transformation = mat;
+        Bones[matIndex] = bone;
+    }
 }

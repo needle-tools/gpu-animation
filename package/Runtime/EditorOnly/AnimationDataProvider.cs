@@ -103,9 +103,14 @@ namespace Elaborate.AnimationBakery
 					var rot = bone.rotation;
 					var scale = bone.lossyScale;
 					var boneMatrix = Matrix4x4.TRS(pos, rot, scale);
-					// boneMatrix *= Matrix4x4.Rotate(Quaternion.Euler(270, 90, 0));
+					// boneMatrix = Matrix4x4.Rotate(Quaternion.Euler(-90, 0, 0)) * boneMatrix;
 					// bindposes are already inverted!!!
-					boneMatrix *= mesh.bindposes[index];
+					var bp = mesh.bindposes[index];
+					// bp = bp.inverse;
+					// bp = Matrix4x4.Rotate(Quaternion.Euler(-90, 0, 0)) * bp;
+					// bp = bp.inverse;
+					boneMatrix *= bp;
+					// boneMatrix *= Matrix4x4.Rotate(Quaternion.Euler(90, 0, 0));
 
 					if (boneTransformations.ContainsKey(bone) == false)
 						boneTransformations.Add(bone, new BoneTransformationData(bone.name, bone, info.Index, new List<BoneTransformation>()));
@@ -123,7 +128,7 @@ namespace Elaborate.AnimationBakery
 			var boneHierarchy = new List<SkinnedMesh_BoneData>();
 
 			//Debug.LogWarning("make sure we start with the parent of the skinned mesh root bone because thats how it is stored in the animation clip as well");
-			var rootBone = renderer.rootBone;
+			// var rootBone = renderer.rootBone;
 			var bones = renderer.bones;
 
 			for (int i = 0; i < bones.Length; i++)

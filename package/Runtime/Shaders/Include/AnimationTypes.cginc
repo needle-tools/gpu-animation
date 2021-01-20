@@ -13,4 +13,15 @@ struct BoneWeight
     int boneIndex3;
 };
 
+struct Bone
+{
+    float4x4 transformation;
+};
+
+struct AnimationClip
+{
+    int IndexStart;
+    int Length;
+};
+
 #endif
