@@ -67,7 +67,7 @@ namespace Elaborate.AnimationBakery
 				clipInfos.Add(clip);
 			}
 
-			var textureSize = Mathf.CeilToInt(Mathf.Sqrt(matrixData.Count));
+			var textureSize = ToSquareSize(matrixData.Count);
 			var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
@@ -104,7 +104,7 @@ namespace Elaborate.AnimationBakery
 			// using ()
 			{
 				Debug.Log(buffer.count + " - " + Mathf.Sqrt(buffer.count));
-				var textureSize = Mathf.CeilToInt(Mathf.Sqrt(buffer.count*2f));
+				var textureSize = ToSquareSize(buffer.count);
 				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
@@ -120,6 +120,11 @@ namespace Elaborate.AnimationBakery
 			}
 
 			return res;
+		}
+
+		private static int ToSquareSize(int count)
+		{
+			return Mathf.CeilToInt(Mathf.Sqrt(count * 2));
 		}
 
 		private static ComputeBuffer CreateVertexBoneWeightBuffer(Mesh mesh)
