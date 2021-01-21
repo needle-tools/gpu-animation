@@ -75,11 +75,13 @@ MonoBehaviour:
   hiddenTextureAssets:
   - {fileID: 5249261454620987064}
   - {fileID: -1747492158049551964}
+  Shader: {fileID: 7200000, guid: 87aefcafb4c744688d7375e5ab83a224, type: 3}
   GameObject: {fileID: 100000, guid: a85d92b72304a79449904f3b49e3d5ea, type: 3}
   Animations:
   - {fileID: 7400000, guid: 739a527acf30e794999333672821df88, type: 3}
   - {fileID: 7400000, guid: a748dee4242461842b2f083a18157d1f, type: 3}
   - {fileID: 7400000, guid: f93e0aef0e51f7240b6df07faa08500d, type: 3}
+  UpdateImmediately: 1
 --- !u!28 &5249261454620987064
 Texture2D:
   m_ObjectHideFlags: 1
