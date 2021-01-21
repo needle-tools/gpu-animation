@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 namespace Elaborate.AnimationBakery
 {
@@ -19,7 +20,7 @@ namespace Elaborate.AnimationBakery
 		public List<AnimationTransformationData> AnimationData;
 		public BakedAnimation Target;
 
-		[Header("Test")] 
+		[Header("Test")] public bool DebugLog;
 		public Material AnimationTex;
 		public Material SkinTex;
 		
@@ -38,11 +39,13 @@ namespace Elaborate.AnimationBakery
 				Debug.LogError("Missing clips");
 				return;
 			}
-			Debug.Log("Bake");
+
+			AnimationTextureProvider.DebugLog = DebugLog;
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			if (!Target) return;
 			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
 			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
+			AnimationTextureProvider.DebugLog = false;
 			
 
 			if (AnimationTex)
@@ -55,6 +58,7 @@ namespace Elaborate.AnimationBakery
 				SkinTex.mainTexture = Target.SkinBake.Texture;
 			}
 		}
+
 #endif
 	}
 }

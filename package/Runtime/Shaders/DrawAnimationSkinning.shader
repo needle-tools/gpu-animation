@@ -7,7 +7,7 @@
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 		_EmissionFactor ("Emission Factor", float) = 0
-		_Emission ("Emission", 2D) = "black" {}
+		_Emission ("Emission", 2D) = "white" {}
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
 	}

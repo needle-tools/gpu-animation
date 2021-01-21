@@ -43,7 +43,7 @@ StructuredBuffer<BoneWeight> Weights;
 void Write(uint index, uint textureWidth, uint textureHeight, float4 values)
 {
     int x = index % textureWidth;
-    int y = floor(index / (float)textureHeight);
+    int y = floor(index / (float)textureWidth);
     uint2 coord = uint2(x,y);
     Texture[coord] = values;// 1 - (float)x / textureWidth;// values;
 }

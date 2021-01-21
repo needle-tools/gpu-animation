@@ -28,7 +28,7 @@ namespace Elaborate.AnimationBakery
 				// make sure not to add one clip multiple times
 				if (result.Any(r => r.Clip == clip)) continue;
 
-				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, bones, bonesInfo, clip, skip, out int fps, frameRate);
+				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, skinnedMeshRenderer.rootBone, bones, bonesInfo, clip, skip, out int fps, frameRate);
 				result.Add(new AnimationTransformationData(clip, data, fps));
 			}
 
@@ -36,7 +36,9 @@ namespace Elaborate.AnimationBakery
 		}
 
 		private static BoneTransformationData[] SampleAnimationData(
-			Mesh mesh, Animator animatedObject,
+			Mesh mesh, 
+			Animator animatedObject,
+			Transform rootBone,
 			Transform[] bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
 			AnimationClip clip, int skip, 
@@ -53,18 +55,25 @@ namespace Elaborate.AnimationBakery
 
 			// 1: save bind transformations of bones
 			var transformStates = GetTransformationState(bones);
+			// var rootState = rootBone.GetTransformationState();
+			// var prevParent = rootBone.parent;
+			// rootBone.position = Vector3.zero;
+			// rootBone.rotation = Quaternion.identity;
+			// rootBone.localScale = Vector3.one;
 
 			// 2: sample transformations in clip
-			var transformations = SampleAndStoreAnimationClipData(mesh, bones, bonesInfo, data, skip, frameRate, out sampledFramesPerSecond);
+			var transformations = SampleAndStoreAnimationClipData(animatedObject, clip, mesh, bones, bonesInfo, data, skip, frameRate, out sampledFramesPerSecond);
 
 			// 3: restore transformation state
 			RestoreTransformationState(transformStates);
+			// rootBone.RestoreTransformationState(rootState);
 
 			return transformations;
 		}
 
 		private static BoneTransformationData[] SampleAndStoreAnimationClipData(
-			Mesh mesh, Transform[] bones,
+			Animator animator, AnimationClip clip,
+			Mesh mesh, IReadOnlyList<Transform> bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
 			AnimationClipData data, int skip, float frameRate,
 			out int sampledFramesPerSecond
@@ -81,26 +90,31 @@ namespace Elaborate.AnimationBakery
 
 			var duration = data.Duration;
 			var frames = duration * frameRate;
+			
+			AnimationMode.StartAnimationMode();
 			for (var i = 0; i < frames; i++)
 			{
 				if (skip > 1 && i % skip != 0) continue;
 
 				var frame = i;
 				var time = ((float) frame / frames) * duration;
+				
+				AnimationMode.BeginSampling();
+				AnimationMode.SampleAnimationClip(animator.gameObject, clip, time);
 
 				// set pose
-				foreach (var curveData in data.Curves)
-				{
-					var bone = curveData.Key;
-					var curve = curveData.Value;
-
-					if (curve.HasPositionKeyframes)
-						bone.localPosition = curve.Position(time);
-					if (curve.HasRotationKeyframes)
-						bone.localRotation = curve.Rotation(time);
-					if (curve.HasScaleKeyframes)
-						bone.localScale = curve.Scale(time);
-				}
+				// foreach (var curveData in data.Curves)
+				// {
+				// 	var bone = curveData.Key;
+				// 	var curve = curveData.Value;
+				//
+				// 	if (curve.HasPositionKeyframes)
+				// 		bone.localPosition = curve.Position(time);
+				// 	if (curve.HasRotationKeyframes)
+				// 		bone.localRotation = curve.Rotation(time);
+				// 	if (curve.HasScaleKeyframes)
+				// 		bone.localScale = curve.Scale(time);
+				// }
 
 				// add keyframes for all bones for now...
 				foreach (var kvp in bonesInfo)
@@ -112,22 +126,22 @@ namespace Elaborate.AnimationBakery
 					var pos = bone.position;
 					var rot = bone.rotation;
 					var scale = bone.lossyScale;
+
 					var boneMatrix = Matrix4x4.TRS(pos, rot, scale);
-					// boneMatrix = Matrix4x4.Rotate(Quaternion.Euler(-90, 0, 0)) * boneMatrix;
 					// bindposes are already inverted!!!
 					var bp = mesh.bindposes[index];
-					// bp = bp.inverse;
-					// bp = Matrix4x4.Rotate(Quaternion.Euler(-90, 0, 0)) * bp;
-					// bp = bp.inverse;
 					boneMatrix *= bp;
-					// boneMatrix *= Matrix4x4.Rotate(Quaternion.Euler(90, 0, 0));
 
 					if (boneTransformations.ContainsKey(bone) == false)
 						boneTransformations.Add(bone, new BoneTransformationData(bone.name, bone, info.Index, new List<BoneTransformation>()));
 
 					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix, scale != Vector3.one));
 				}
+				
+				AnimationMode.EndSampling();
 			}
+			AnimationMode.StopAnimationMode();
+			
 
 			return boneTransformations.Values.ToArray();
 			return boneTransformations.Values.OrderBy(e => e.BoneIndex).ToArray();
@@ -163,27 +177,46 @@ namespace Elaborate.AnimationBakery
 			{
 				var transform = kvp.Key;
 				var state = kvp.Value;
-				transform.localPosition = state.LocalPosition;
-				transform.localRotation = state.LocalRotation;
-				transform.localScale = state.LocalScale;
+				RestoreTransformationState(transform, state);
 			}
+		}
+
+		private static void RestoreTransformationState(this Transform transform, TransformState state)
+		{
+			transform.localPosition = state.LocalPosition;
+			transform.localRotation = state.LocalRotation;
+			transform.localScale = state.LocalScale;
 		}
 
 		private static Dictionary<Transform, TransformState> GetTransformationState(IEnumerable<Transform> bones)
 		{
-			var state = new Dictionary<Transform, TransformState>();
-			foreach (var bone in bones)
-				state.Add(bone, new TransformState()
-				{
-					Position = bone.position,
-					LocalPosition = bone.localPosition,
-					Rotation = bone.rotation,
-					LocalRotation = bone.localRotation,
-					LossyScale = bone.lossyScale,
-					LocalScale = bone.localScale
-				});
-			return state;
+			return bones.ToDictionary(bone => bone, bone => bone.GetTransformationState());
 		}
+
+		private static TransformState GetTransformationState(this Transform bone)
+		{
+			return new TransformState()
+			{
+				Position = bone.position,
+				LocalPosition = bone.localPosition,
+				Rotation = bone.rotation,
+				LocalRotation = bone.localRotation,
+				LossyScale = bone.lossyScale,
+				LocalScale = bone.localScale
+			};
+		}
+
+
+		
+		// private static TransformState CaptureTransformAndSetParentToCenter(Transform rootBone)
+		// {
+		// 	
+		// }
+		//
+		// private static void SetPreviousRoot(Transform rootBone)
+		// {
+		// 	
+		// }
 	}
 }
 #endif
