@@ -21,7 +21,8 @@ struct Bone
 struct AnimationClip
 {
     int IndexStart;
-    int Length;
+    int TotalLength;
+    int Frames;
 };
 
 #endif

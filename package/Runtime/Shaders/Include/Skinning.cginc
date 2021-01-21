@@ -41,11 +41,11 @@ float4 skin4(float4 vert, float4x4 m1, float w1, float4x4 m2, float w2, float4x4
 
 float4 IndexToCoord(float index, float4 texelSize)
 {
-	index = trunc(index+.5);
-	float2 size = float2( texelSize.z,  texelSize.w);
+	index = floor(index);
+	const float2 size = float2( texelSize.z,  texelSize.w);
 	int col = index % size.x;
-	int row = (int)(index / size.y);
-	float2 uv = float2(col+.5, row+.5) / size;
+	int row = floor(index / size.y);
+	float2 uv = float2(col, row) / size;
 	return float4(uv, 0, 0);
 }
 
@@ -60,21 +60,21 @@ float4 IndexToUv(float index, float4 texelSize)
 
 float4x4 SampleMatrix(sampler2D animationTex, float4 animationTexel, uint index)
 {
-	float4 coord0 = IndexToUv(index, animationTexel);
+	float4 coord0 = IndexToCoord(index, animationTexel);
 	float4 p0 = tex2Dlod(animationTex, coord0);
-	float4 coord1 = IndexToUv(index+1, animationTexel);
+	float4 coord1 = IndexToCoord(index+1, animationTexel);
 	float4 p1 = tex2Dlod(animationTex, coord1);
-	float4 coord2 = IndexToUv(index+2, animationTexel);
+	float4 coord2 = IndexToCoord(index+2, animationTexel);
 	float4 p2 = tex2Dlod(animationTex, coord2);
-	float4 coord3 = IndexToUv(index+3, animationTexel);
+	float4 coord3 = IndexToCoord(index+3, animationTexel);
 	float4 p3 = tex2Dlod(animationTex, coord3);
-	// float4x4 mat;
-	// mat[0] = p0;
-	// mat[1] = p1;
-	// mat[2] = p2;
-	// mat[3] = p3;
-	// return mat;
-	return float4x4(p0, p1, p2, p3);
+	float4x4 mat;
+	mat[0] = p0;
+	mat[1] = p1;
+	mat[2] = p2;
+	mat[3] = p3;
+	return mat;
+	// return float4x4(p0, p1, p2, p3);
 }
 
 float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeights, StructuredBuffer<Bone> animations, sampler2D animation, float4 animationTexel, uint startIndex, uint animationLength, uint frame, uint bonesCount)
@@ -113,10 +113,10 @@ float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeigh
 	Bone bone2 = animations[bi2];
 	Bone bone3 = animations[bi3];
 
-	// float4x4 m0 = SampleMatrix(animation, animationTexel, i0);
-	// float4x4 m1 = SampleMatrix(animation, animationTexel, i1);
-	// float4x4 m2 = SampleMatrix(animation, animationTexel, i2);
-	// float4x4 m3 = SampleMatrix(animation, animationTexel, i3);
+	// float4x4 m0 = SampleMatrix(animation, animationTexel, bi0);
+	// float4x4 m1 = SampleMatrix(animation, animationTexel, bi1);
+	// float4x4 m2 = SampleMatrix(animation, animationTexel, bi2);
+	// float4x4 m3 = SampleMatrix(animation, animationTexel, bi3);
 
 	
 	float4x4 m0 = bone0.transformation;

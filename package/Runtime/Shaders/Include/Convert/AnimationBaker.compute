@@ -17,19 +17,18 @@ RWTexture2D<float4> Texture;
  **/
 
 [numthreads(32,1,1)]
-void BakeAnimationTexture_Float4(uint3 _id : SV_DispatchThreadID)
+void BakeAnimationTexture_Float4(uint3 id : SV_DispatchThreadID)
 {
-    const uint id = _id.x; // because each matrix takes 4 pixel
+    const uint matrixIndex = id.x;
     uint matrixCount, stride;
     Matrices.GetDimensions(matrixCount, stride);
-    const uint matrixIndex = id;
     if(matrixIndex >= matrixCount) return;
     float4x4 mat = Matrices[matrixIndex];
     uint tw, th;
     Texture.GetDimensions(tw, th);
-    const uint index = matrixIndex * 4;
+    const uint pixelIndex = matrixIndex * 4;
     [unroll]
-    for(uint i = index; i < index + 4; i += 1)
+    for(uint i = pixelIndex; i < (pixelIndex + 4); i += 1)
     {
         int x = i % tw;
         int y = floor(i / (float)th);
@@ -85,16 +84,16 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
     
     // get indices from animation clips
     const AnimationClip clip = Clips[clipIndex];
-    for(int k = 0; k < clip.Length; k++)
+    for(int k = 0; k < clip.TotalLength; k++)
     {
         // x4 because 4 pixel per matrix
         const uint matIndex = clip.IndexStart + k;
-        const uint pixelIndex = clip.IndexStart + k * 4;
+        const uint pixelIndex = (clip.IndexStart + k) * 4;
 
         // build matrix from 4 pixels
         float4x4 mat = 0;
         [unroll]
-        for(uint n = 0; n < 4; n += 1)
+        for(uint n = 0; n < 4; n ++)
         {
             const uint ti = pixelIndex + n;
             int x = ti % tw;

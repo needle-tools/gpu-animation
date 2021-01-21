@@ -28,9 +28,12 @@ namespace Elaborate.AnimationBakery
 		public struct Clip
 		{
 			public int IndexStart;
-			public int Frames;
 			public int TotalLength;
-			public static int Stride => sizeof(int) * 2;
+			/// <summary>
+			/// How many frames does this animation clip have
+			/// </summary>
+			public int Frames;
+			public static int Stride => sizeof(int) * 3;
 
 			public override string ToString()
 			{
@@ -47,7 +50,7 @@ namespace Elaborate.AnimationBakery
 
 	public static class AnimationTextureProvider
 	{
-		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader, out ComputeBuffer bones)
+		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader, out ComputeBuffer bonesBuffer)
 		{
 			var matrixData = new List<Bone>();
 			var clipInfos = new List<AnimationTextureData.Clip>();
@@ -85,7 +88,7 @@ namespace Elaborate.AnimationBakery
 			          texture.width + "x" + texture.height + ", Need Scale? " + anyScaled);
 
 			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
-			var bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
+			bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
 			bonesBuffer.SetData(matrixData);
 			// using ()
 			{
@@ -94,7 +97,6 @@ namespace Elaborate.AnimationBakery
 				shader.Dispatch(kernel, Mathf.CeilToInt(matrixData.Count / 32f), 1, 1);
 			}
 
-			bones = bonesBuffer;
 			return res;
 		}
 

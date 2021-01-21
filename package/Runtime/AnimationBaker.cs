@@ -19,7 +19,7 @@ namespace Elaborate.AnimationBakery
 		public MeshSkinningData SkinBake;
 		public AnimationTextureData AnimationBake;
 
-		[Header("Test")] 
+		[Header("Test")] public bool TextureToStructuredBuffer = true;
 		public Material VertexAnim;
 		public Material Test;
 		public Material Test2;
@@ -42,7 +42,7 @@ namespace Elaborate.AnimationBakery
 
 		private ComputeBuffer animBuffer, weightBuffer;
 
-		public AnimationTextureProvider.Bone[] Bones;
+		public AnimationTextureProvider.Bone[] Bones, Bones2;
 		public BoneWeight[] BoneWeights;
 
 		[ContextMenu(nameof(Bake))]
@@ -59,9 +59,14 @@ namespace Elaborate.AnimationBakery
 				VertexAnim.SetBuffer("_BoneWeights", weightBuffer);
 				BoneWeights = new BoneWeight[weightBuffer.count];
 				weightBuffer.GetData(BoneWeights);
-				// this.animBuffer = AnimationTextureProvider.ReadAnimation(AnimationBake, TextureBakingShader);
 				Bones = new AnimationTextureProvider.Bone[animBuffer.count];
 				this.animBuffer.GetData(Bones);
+				if (TextureToStructuredBuffer)
+				{
+					this.animBuffer = AnimationTextureProvider.ReadAnimation(AnimationBake, TextureBakingShader);
+					Bones2 = new AnimationTextureProvider.Bone[animBuffer.count];
+					this.animBuffer.GetData(Bones2);
+				}
 				VertexAnim.SetBuffer("_Animations", animBuffer);
 				VertexAnim.SetInt("_BonesCount", Renderer.bones.Length);
 				VertexAnim.SetVector("_CurrentAnimation", new Vector4(AnimationBake.Animations[0].IndexStart, AnimationBake.Animations[0].Frames, Frame, 0));
