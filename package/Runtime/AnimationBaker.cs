@@ -25,6 +25,7 @@ namespace Elaborate.AnimationBakery
 		public Material Test2;
 
 
+		public int ClipIndex;
 		public int Frame;
 		
 #if UNITY_EDITOR
@@ -50,7 +51,8 @@ namespace Elaborate.AnimationBakery
 		{
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader, out weightBuffer);
-			AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader, out animBuffer);
+			animBuffer = AnimationTextureProvider.GetBuffer(AnimationData, out var clipInfos);
+			AnimationBake = AnimationTextureProvider.BakeAnimation(TextureBakingShader, animBuffer, clipInfos);
 
 			if (VertexAnim)
 			{
@@ -69,7 +71,8 @@ namespace Elaborate.AnimationBakery
 				}
 				VertexAnim.SetBuffer("_Animations", animBuffer);
 				VertexAnim.SetInt("_BonesCount", Renderer.bones.Length);
-				VertexAnim.SetVector("_CurrentAnimation", new Vector4(AnimationBake.Animations[0].IndexStart, AnimationBake.Animations[0].Frames, Frame, 0));
+				var index = ClipIndex % AnimationBake.Animations.Count;
+				VertexAnim.SetVector("_CurrentAnimation", new Vector4(AnimationBake.Animations[index].IndexStart, AnimationBake.Animations[index].Frames, Frame, 0));
 			}
 
 			if (Test)

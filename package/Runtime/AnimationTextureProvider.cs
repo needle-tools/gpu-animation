@@ -1,59 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 
 namespace Elaborate.AnimationBakery
 {
-	[Serializable]
-	public class BakedData : IDisposable
-	{
-		public Texture Texture;
-
-		public void Dispose()
-		{
-			if (Texture is RenderTexture rt && rt) rt.Release();
-		}
-	}
-
-	[Serializable]
-	public class AnimationTextureData : BakedData
-	{
-		public List<Clip> Animations;
-
-		public int TotalFrames => Animations.Sum(c => c.TotalLength);
-
-		[Serializable]
-		public struct Clip
-		{
-			public int IndexStart;
-			public int TotalLength;
-			/// <summary>
-			/// How many frames does this animation clip have
-			/// </summary>
-			public int Frames;
-			public static int Stride => sizeof(int) * 3;
-
-			public override string ToString()
-			{
-				return "Start=" + IndexStart + ", Length=" + TotalLength;
-			}
-		}
-	}
-
-	[Serializable]
-	public class MeshSkinningData : BakedData
-	{
-		public Mesh Mesh;
-	}
-
 	public static class AnimationTextureProvider
 	{
-		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader, out ComputeBuffer bonesBuffer)
+		public static AnimationTextureData BakeAnimation(
+			ComputeShader shader, ComputeBuffer animationBuffer, List<AnimationTextureData.Clip> clipInfos)
+		{
+			var textureSize = ToTextureSize(animationBuffer.count*4);
+			Debug.Log("Bake into " + textureSize + "x" + textureSize + " Texture");
+			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
+			texture.enableRandomWrite = true;
+			texture.useMipMap = false;
+			texture.filterMode = FilterMode.Point;
+			texture.Create();
+			var res = new AnimationTextureData();
+			res.Texture = texture;
+			res.Animations = clipInfos;
+			
+			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
+			shader.SetBuffer(kernel, "Matrices", animationBuffer);
+			shader.SetTexture(kernel, "Texture", texture);
+			shader.Dispatch(kernel, Mathf.CeilToInt(animationBuffer.count / 32f), 1, 1);
+			return res;
+		}
+		
+		public static ComputeBuffer GetBuffer(IEnumerable<AnimationTransformationData> animationData, out List<AnimationTextureData.Clip> clipInfos)
 		{
 			var matrixData = new List<Bone>();
-			var clipInfos = new List<AnimationTextureData.Clip>();
+			clipInfos = new List<AnimationTextureData.Clip>();
 			var anyScaled = false;
 			foreach (var anim in animationData)
 			{
@@ -73,33 +51,11 @@ namespace Elaborate.AnimationBakery
 				Debug.Log("Clip \t" + clipInfos.Count + "\t" + clip);
 				clipInfos.Add(clip);
 			}
-
-			var textureSize = ToSquareSize(matrixData.Count*4);
-			var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
-			texture.enableRandomWrite = true;
-			texture.useMipMap = false;
-			texture.filterMode = FilterMode.Point;
-			texture.Create();
-			var res = new AnimationTextureData();
-			res.Texture = texture;
-			res.Animations = clipInfos;
-
-			Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " 4x4 matrices = " + (matrixData.Count * 4) + " pixel TextureSize: " +
-			          texture.width + "x" + texture.height + ", Need Scale? " + anyScaled);
-
-			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
-			bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
+			Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " 4x4 matrices = " + (matrixData.Count * 4) + " pixel, Need Scale? " + anyScaled);
+			var bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
 			bonesBuffer.SetData(matrixData);
-			// using ()
-			{
-				shader.SetBuffer(kernel, "Matrices", bonesBuffer);
-				shader.SetTexture(kernel, "Texture", texture);
-				shader.Dispatch(kernel, Mathf.CeilToInt(matrixData.Count / 32f), 1, 1);
-			}
-
-			return res;
+			return bonesBuffer;
 		}
-
 
 		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader, out ComputeBuffer boneWeights)
 		{
@@ -111,8 +67,8 @@ namespace Elaborate.AnimationBakery
 			var buffer = boneWeights;
 			// using ()
 			{
-				var textureSize = ToSquareSize(buffer.count*2);
-				var texture = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBHalf);
+				var textureSize = ToTextureSize(buffer.count*2);
+				var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
 				texture.filterMode = FilterMode.Point;
@@ -156,23 +112,22 @@ namespace Elaborate.AnimationBakery
 			return res;
 		}
 
-		private static int ToSquareSize(int pixel)
+		private static Vector2Int ToTextureSize(int pixel)
 		{
-			return Mathf.CeilToInt(Mathf.Sqrt(pixel));
+			var px = 4;
+			var py = 4;
+			while ((px*py) < pixel)
+			{
+				px *= 2;
+				if ((px * py) >= pixel) break;
+				py *= 2;
+			}
+			return new Vector2Int(px, py);
 		}
 
 		private static ComputeBuffer CreateVertexBoneWeightBuffer(Mesh mesh)
 		{
-			// because each element only holds one index of a bone 
-			// and the weight for this bone
-			// other than the UnityEngine.BoneWeight 
-			// which holds: boneWeight0, boneWeight1 and so on
 			var boneWeights = mesh.boneWeights;
-			// NativeArray<BoneWeight1> boneWeights = mesh.GetAllBoneWeights();
-			// foreach (var bw in boneWeights)
-			// {
-			// 	Debug.Log(bw.weight0 + bw.weight1 + bw.weight2 + bw.weight3);
-			// }
 			var weightBuffer = new ComputeBuffer(boneWeights.Length, sizeof(float) * 4 + sizeof(int) * 4);
 			weightBuffer.SetData(boneWeights);
 			return weightBuffer;

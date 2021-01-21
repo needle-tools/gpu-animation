@@ -23,15 +23,16 @@ void BakeAnimationTexture_Float4(uint3 id : SV_DispatchThreadID)
     uint matrixCount, stride;
     Matrices.GetDimensions(matrixCount, stride);
     if(matrixIndex >= matrixCount) return;
-    float4x4 mat = Matrices[matrixIndex];
+    float4x4 mat = Matrices[(uint)floor(matrixIndex)];
     uint tw, th;
     Texture.GetDimensions(tw, th);
     const uint pixelIndex = matrixIndex * 4;
+    const int end = pixelIndex + 4;
     [unroll]
-    for(uint i = pixelIndex; i < (pixelIndex + 4); i += 1)
+    for(uint i = pixelIndex; i < end; i ++)
     {
         int x = i % tw;
-        int y = floor(i / (float)th);
+        int y = floor(i / (float)tw);
         Texture[uint2(x,y)] = mat[i];
     }
 }
@@ -97,7 +98,7 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
         {
             const uint ti = pixelIndex + n;
             int x = ti % tw;
-            int y = floor(ti / (float)th);
+            int y = floor(ti / (float)tw);
             mat[n] = Texture[uint2(x,y)];
         }
             

@@ -39,13 +39,14 @@ float4 skin4(float4 vert, float4x4 m1, float w1, float4x4 m2, float w2, float4x4
 // }
 
 
-float4 IndexToCoord(float index, float4 texelSize)
+float4 IndexToCoord(uint index, float4 texelSize)
 {
-	index = trunc(index + 0.5);
-	float2 size = float2(texelSize.z, texelSize.w);
-	int row = (int)(index / size.x);
-	float col = index - row*size.x;
-	return float4(float2((col+0.5), (row+0.5)) / size, 0, 0);
+	// index = trunc(index + 0.5);
+	const float2 size = float2(texelSize.z, texelSize.w);
+	const int row = (int)(index / size.x);
+	const float col = index % size.x;
+	const float2 coord = float2(col+0.5, row+0.5) / size;
+	return float4(coord, 0, 0);
 }
 
 float4x4 SampleMatrix(sampler2D animationTex, float4 animationTexel, uint index)
@@ -99,20 +100,20 @@ float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeigh
 	bi2 += startIndex;
 	bi3 += startIndex;
 	
-	Bone bone0 = animations[bi0];
-	Bone bone1 = animations[bi1];
-	Bone bone2 = animations[bi2];
-	Bone bone3 = animations[bi3];
-	
-	float4x4 m0 = bone0.transformation;
-	float4x4 m1 = bone1.transformation;
-	float4x4 m2 = bone2.transformation;
-	float4x4 m3 = bone3.transformation;
+	// Bone bone0 = animations[bi0];
+	// Bone bone1 = animations[bi1];
+	// Bone bone2 = animations[bi2];
+	// Bone bone3 = animations[bi3];
+	//
+	// float4x4 m0 = bone0.transformation;
+	// float4x4 m1 = bone1.transformation;
+	// float4x4 m2 = bone2.transformation;
+	// float4x4 m3 = bone3.transformation;
 
-	m0 = SampleMatrix(animation, animationTexel, bi0);
-	m1 = SampleMatrix(animation, animationTexel, bi1);
-	m2 = SampleMatrix(animation, animationTexel, bi2);
-	m3 = SampleMatrix(animation, animationTexel, bi3);
+	float4x4 m0 = SampleMatrix(animation, animationTexel, bi0);
+	float4x4 m1 = SampleMatrix(animation, animationTexel, bi1);
+	float4x4 m2 = SampleMatrix(animation, animationTexel, bi2);
+	float4x4 m3 = SampleMatrix(animation, animationTexel, bi3);
 
 	// return mul(m0, vertex);
 	return skin4(vertex, m0, w0, m1, w1, m2, w2, m3, w3);
