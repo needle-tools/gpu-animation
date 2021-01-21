@@ -17,24 +17,21 @@ namespace Elaborate.AnimationBakery
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
 		private Material[] _previewMaterial;
-
-		private void OnValidate()
-		{
-			if (TryGetComponent(out AnimationBaker baker))
-				Animation = baker.Target;
-		}
+		private AnimationBaker _baker;
 
 		private void Update()
 		{
+			if ((!Animation || !_baker) && TryGetComponent(out _baker))
+				Animation = _baker.Target;
+
 			if (!Animation) return;
 			if (!PreviewMaterial) return;
 			if (SkinBake == null || !SkinBake.Texture) return;
 			if (AnimationBake == null || !AnimationBake.Texture) return;
 
-			
 			if (_previewMaterial == null || _previewMaterial.Length != AnimationBake.ClipsInfos.Count)
 				_previewMaterial = new Material[AnimationBake.ClipsInfos.Count];
-			
+
 			for (var i = 0; i < AnimationBake.ClipsInfos.Count; i++)
 			{
 				var clip = AnimationBake.ClipsInfos[i];
@@ -44,10 +41,8 @@ namespace Elaborate.AnimationBakery
 				mat.SetTexture(Animation1, AnimationBake.Texture);
 				mat.SetTexture(Skinning, SkinBake.Texture);
 				mat.SetVector(CurrentAnimation, clip.AsVector4);
-				Graphics.DrawMesh(Animation.SkinBake.Mesh, Matrix4x4.Translate(transform.position + Offset * (1+i)), mat, 0);
+				Graphics.DrawMesh(Animation.SkinBake.Mesh, Matrix4x4.Translate(transform.position + Offset * (1 + i)), mat, 0);
 			}
 		}
-		
-		
 	}
 }
