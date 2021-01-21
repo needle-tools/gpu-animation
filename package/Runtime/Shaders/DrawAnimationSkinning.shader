@@ -79,7 +79,6 @@
 		float Time;
 		float AnimationIndex = 0;
 		int _Frame;
-		uint _BonesCount;
 
 		float remap(float p, float p0, float p1, float t0, float t1)
 		{
@@ -90,9 +89,6 @@
 		{
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
-
-			int id = v.vertex_id;
-			int instanceId = v.instance_id;
 
 
 			// float2 skinning_size = _Skinning_TexelSize.zw;
@@ -113,7 +109,8 @@
 
 			// result.color = weight.boneIndex0/43.0f;
 
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z, _BonesCount);
+			// v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
 
 
 			
