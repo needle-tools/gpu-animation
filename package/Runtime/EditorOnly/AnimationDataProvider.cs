@@ -22,7 +22,7 @@ namespace Elaborate.AnimationBakery
 				bonesInfo.Add(boneData[i].Bone, boneData[i]);
 
 			var result = new List<AnimationTransformationData>();
-			var clips = animationClips; // //AnimationUtility.GetAnimationClips(animator.gameObject);
+			var clips = animationClips;
 			foreach (var clip in clips)
 			{
 				// make sure not to add one clip multiple times
@@ -46,15 +46,8 @@ namespace Elaborate.AnimationBakery
 			float frameRate = -1
 		)
 		{
-			if (!AnimationClipUtility.GetData(animatedObject, clip, out AnimationClipData data))
-			{
-				Debug.LogError("Failed getting data from " + clip + ", " + animatedObject, animatedObject);
-				sampledFramesPerSecond = 0;
-				return null;
-			}
-
 			// 1: save bind transformations of bones
-			var transformStates = GetTransformationState(bones);
+			var transformStates = CaptureTransformationAndPrepareForSampling(rootBone, bones);
 			// var rootState = rootBone.GetTransformationState();
 			// var prevParent = rootBone.parent;
 			// rootBone.position = Vector3.zero;
@@ -62,7 +55,7 @@ namespace Elaborate.AnimationBakery
 			// rootBone.localScale = Vector3.one;
 
 			// 2: sample transformations in clip
-			var transformations = SampleAndStoreAnimationClipData(animatedObject, clip, mesh, bones, bonesInfo, data, skip, frameRate, out sampledFramesPerSecond);
+			var transformations = SampleAndStoreAnimationClipData(animatedObject, clip, mesh, bones, bonesInfo, skip, frameRate, out sampledFramesPerSecond);
 
 			// 3: restore transformation state
 			RestoreTransformationState(transformStates);
@@ -75,23 +68,23 @@ namespace Elaborate.AnimationBakery
 			Animator animator, AnimationClip clip,
 			Mesh mesh, IReadOnlyList<Transform> bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
-			AnimationClipData data, int skip, float frameRate,
+			int skip, float frameRate,
 			out int sampledFramesPerSecond
 			)
 		{
-			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
 
-			frameRate = frameRate <= 0 ? data.FrameRate : frameRate;
-
+			frameRate = frameRate <= 0 ? clip.frameRate : frameRate;
 			skip = Mathf.Max(0, skip);
 			skip += 1;
-			
 			sampledFramesPerSecond = Mathf.FloorToInt((float) frameRate / skip);
-
-			var duration = data.Duration;
+			
+			var duration = clip.length;
 			var frames = duration * frameRate;
 			
 			AnimationMode.StartAnimationMode();
+			AnimationMode.BeginSampling();
+
+			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
 			for (var i = 0; i < frames; i++)
 			{
 				if (skip > 1 && i % skip != 0) continue;
@@ -99,24 +92,9 @@ namespace Elaborate.AnimationBakery
 				var frame = i;
 				var time = ((float) frame / frames) * duration;
 				
-				AnimationMode.BeginSampling();
 				AnimationMode.SampleAnimationClip(animator.gameObject, clip, time);
-
-				// set pose
-				// foreach (var curveData in data.Curves)
-				// {
-				// 	var bone = curveData.Key;
-				// 	var curve = curveData.Value;
-				//
-				// 	if (curve.HasPositionKeyframes)
-				// 		bone.localPosition = curve.Position(time);
-				// 	if (curve.HasRotationKeyframes)
-				// 		bone.localRotation = curve.Rotation(time);
-				// 	if (curve.HasScaleKeyframes)
-				// 		bone.localScale = curve.Scale(time);
-				// }
-
-				// add keyframes for all bones for now...
+				
+				// sample all bones
 				foreach (var kvp in bonesInfo)
 				{
 					var info = kvp.Value;
@@ -137,14 +115,12 @@ namespace Elaborate.AnimationBakery
 
 					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix, scale != Vector3.one));
 				}
-				
-				AnimationMode.EndSampling();
 			}
+			AnimationMode.EndSampling();
 			AnimationMode.StopAnimationMode();
 			
 
 			return boneTransformations.Values.ToArray();
-			return boneTransformations.Values.OrderBy(e => e.BoneIndex).ToArray();
 		}
 
 
@@ -153,9 +129,7 @@ namespace Elaborate.AnimationBakery
 			var boneHierarchy = new List<SkinnedMesh_BoneData>();
 
 			//Debug.LogWarning("make sure we start with the parent of the skinned mesh root bone because thats how it is stored in the animation clip as well");
-			// var rootBone = renderer.rootBone;
 			var bones = renderer.bones;
-
 			for (int i = 0; i < bones.Length; i++)
 			{
 				var bone = bones[i];
@@ -206,17 +180,24 @@ namespace Elaborate.AnimationBakery
 			};
 		}
 
+		private static Dictionary<Transform, TransformState> CaptureTransformationAndPrepareForSampling(Transform rootBone, IEnumerable<Transform> bones)
+		{
+			var states = GetTransformationState(bones);
+			if(!states.ContainsKey(rootBone)) 
+				states.Add(rootBone, GetTransformationState(rootBone));
+			var parent = rootBone.parent;
+			while (parent)
+			{
+				if(!states.ContainsKey(parent)) 
+					states.Add(parent, GetTransformationState(parent));
+				parent.localPosition = Vector3.zero;
+				parent.localRotation = Quaternion.identity;
+				parent.localScale = Vector3.one;
+				parent = parent.parent;
+			}
 
-		
-		// private static TransformState CaptureTransformAndSetParentToCenter(Transform rootBone)
-		// {
-		// 	
-		// }
-		//
-		// private static void SetPreviousRoot(Transform rootBone)
-		// {
-		// 	
-		// }
+			return states;
+		}
 	}
 }
 #endif

@@ -44,13 +44,13 @@ namespace Elaborate.AnimationBakery
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			if (!Target) return;
 			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
-			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
+			Target.bakedAnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
 			AnimationTextureProvider.DebugLog = false;
 			
 
 			if (AnimationTex)
 			{
-				AnimationTex.mainTexture = Target.AnimationBake.Texture;
+				AnimationTex.mainTexture = Target.bakedAnimationBake.Texture;
 			}
 
 			if (SkinTex)

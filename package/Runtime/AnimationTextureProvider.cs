@@ -8,7 +8,7 @@ namespace Elaborate.AnimationBakery
 	{
 		public static bool DebugLog = false;
 
-		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader)
+		public static BakedAnimationData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader)
 		{
 			using (var animationBuffer = GetBuffer(animationData, out var clipInfos))
 			{
@@ -16,7 +16,7 @@ namespace Elaborate.AnimationBakery
 			}
 		}
 
-		public static AnimationTextureData BakeAnimation(ComputeShader shader, ComputeBuffer animationBuffer, List<TextureClipInfo> clipInfos)
+		public static BakedAnimationData BakeAnimation(ComputeShader shader, ComputeBuffer animationBuffer, List<TextureClipInfo> clipInfos)
 		{
 			var textureSize = ToTextureSize(animationBuffer.count * 4);
 			if (DebugLog)
@@ -26,7 +26,7 @@ namespace Elaborate.AnimationBakery
 			texture.useMipMap = false;
 			texture.filterMode = FilterMode.Point;
 			texture.Create();
-			var res = new AnimationTextureData();
+			var res = new BakedAnimationData();
 			res.Texture = texture;
 			res.ClipsInfos = clipInfos;
 
@@ -71,9 +71,9 @@ namespace Elaborate.AnimationBakery
 			return bonesBuffer;
 		}
 
-		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader)
+		public static BakedMeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader)
 		{
-			var res = new MeshSkinningData();
+			var res = new BakedMeshSkinningData();
 			res.Mesh = mesh;
 
 			var kernel = shader.FindKernel("BakeBoneWeights");
@@ -110,7 +110,7 @@ namespace Elaborate.AnimationBakery
 			public static int Stride => sizeof(float) * 4 * 4;
 		}
 
-		public static ComputeBuffer ReadAnimation(AnimationTextureData data, ComputeShader shader)
+		public static ComputeBuffer ReadAnimation(BakedAnimationData data, ComputeShader shader)
 		{
 			var kernel = shader.FindKernel("ReadAnimation");
 			var res = new ComputeBuffer(data.TotalFrames, Bone.Stride);

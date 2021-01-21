@@ -10,7 +10,6 @@ namespace Elaborate.AnimationBakery
 
 		public void Dispose()
 		{
-			Debug.Log("Dispose");
 			if (Texture is RenderTexture rt && rt) rt.Release();
 		}
 	}

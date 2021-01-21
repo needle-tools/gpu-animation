@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
@@ -7,6 +8,7 @@ namespace Elaborate.AnimationBakery
 {
 	public static class AnimationClipUtility
 	{
+		[Obsolete("Use AnimationMode, this does not support Humanoids")]
 		public static bool GetData(Animator animator, AnimationClip clip, out AnimationClipData data)
 		{
 			var bindings = AnimationUtility.GetCurveBindings(clip);

@@ -8,8 +8,8 @@ namespace Elaborate.AnimationBakery
 		public BakedAnimation Animation;
 		public int ClipIndex;
 
-		private MeshSkinningData SkinBake => Animation.SkinBake;
-		private AnimationTextureData AnimationBake => Animation.AnimationBake;
+		private BakedMeshSkinningData SkinBake => Animation.SkinBake;
+		private BakedAnimationData BakedAnimationBake => Animation.bakedAnimationBake;
 
 		private Renderer rend;
 		private MaterialPropertyBlock block;
@@ -23,10 +23,10 @@ namespace Elaborate.AnimationBakery
 
 			if (block == null) block = new MaterialPropertyBlock();
 
-			block.SetTexture("_Animation", AnimationBake.Texture);
+			block.SetTexture("_Animation", BakedAnimationBake.Texture);
 			block.SetTexture("_Skinning", SkinBake.Texture);
-			var index = ClipIndex % AnimationBake.ClipsInfos.Count;
-			var clip = AnimationBake.ClipsInfos[index];
+			var index = ClipIndex % BakedAnimationBake.ClipsInfos.Count;
+			var clip = BakedAnimationBake.ClipsInfos[index];
 			block.SetVector("_CurrentAnimation", clip.AsVector4);
 			rend.SetPropertyBlock(block);
 		}

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Elaborate.AnimationBakery
 {
 	[Serializable]
-	public class AnimationTextureData : BakedData
+	public class BakedAnimationData : BakedData
 	{
 		public List<TextureClipInfo> ClipsInfos;
 		public int TotalFrames => ClipsInfos.Sum(c => c.Length);
