@@ -21,7 +21,7 @@ namespace Elaborate.AnimationBakery
 			var textureSize = ToTextureSize(animationBuffer.count * 4);
 			if (DebugLog)
 				Debug.Log("Bake into " + textureSize + " Texture");
-			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
+			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBHalf);
 			texture.name = "animation";
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;

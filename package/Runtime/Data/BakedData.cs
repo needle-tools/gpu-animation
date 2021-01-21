@@ -17,7 +17,11 @@ namespace Elaborate.AnimationBakery
 			#if UNITY_EDITOR
 			if (EditorUtility.IsPersistent(Texture)) return;
 			#endif
-			if (Texture is RenderTexture rt && rt) rt.Release();
+			if (Texture is RenderTexture rt && rt)
+			{
+				Debug.Log("Release " + this);
+				rt.Release();
+			}
 		}
 	}
 }

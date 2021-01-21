@@ -27,7 +27,8 @@ void BakeAnimationTexture_Float4(uint3 id : SV_DispatchThreadID)
     uint tw, th;
     Texture.GetDimensions(tw, th);
     const uint pixelIndex = matrixIndex * 4;
-    const int end = pixelIndex + 4;
+    const uint end = pixelIndex + 4;
+    
     [unroll]
     for(uint i = pixelIndex; i < end; i ++)
     {

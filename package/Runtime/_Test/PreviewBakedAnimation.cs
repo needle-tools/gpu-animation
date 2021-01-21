@@ -9,6 +9,7 @@ namespace Elaborate.AnimationBakery
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
 		public Vector3 Offset = new Vector3(0, 0, 1);
+		public bool SkipFirst = true;
 
 		private BakedMeshSkinningData SkinBake => Animation.SkinBake;
 		private BakedAnimationData AnimationBake => Animation.AnimationBake;
@@ -69,7 +70,10 @@ namespace Elaborate.AnimationBakery
 				mat.SetTexture(Animation1, AnimationBake.Texture);
 				mat.SetTexture(Skinning, SkinBake.Texture);
 				mat.SetVector(CurrentAnimation, clip.AsVector4);
-				var matrix = Matrix4x4.Translate(transform.position + Offset * (1 + i));
+				var offset = Offset;
+				if (SkipFirst) offset *= i + 1;
+				else offset *= i;
+				var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
 				Graphics.DrawMesh(Animation.SkinBake.Mesh, matrix, mat, 0);
 			}
 		}
