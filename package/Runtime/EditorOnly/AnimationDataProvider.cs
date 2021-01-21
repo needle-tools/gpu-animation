@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Elaborate.AnimationBakery
@@ -48,18 +49,12 @@ namespace Elaborate.AnimationBakery
 		{
 			// 1: save bind transformations of bones
 			var transformStates = CaptureTransformationAndPrepareForSampling(rootBone, bones);
-			// var rootState = rootBone.GetTransformationState();
-			// var prevParent = rootBone.parent;
-			// rootBone.position = Vector3.zero;
-			// rootBone.rotation = Quaternion.identity;
-			// rootBone.localScale = Vector3.one;
 
 			// 2: sample transformations in clip
 			var transformations = SampleAndStoreAnimationClipData(animatedObject, clip, mesh, bones, bonesInfo, skip, frameRate, out sampledFramesPerSecond);
 
-			// 3: restore transformation state
+			// 3: restore transformation stat
 			RestoreTransformationState(transformStates);
-			// rootBone.RestoreTransformationState(rootState);
 
 			return transformations;
 		}
@@ -80,7 +75,7 @@ namespace Elaborate.AnimationBakery
 			
 			var duration = clip.length;
 			var frames = duration * frameRate;
-			
+
 			AnimationMode.StartAnimationMode();
 			AnimationMode.BeginSampling();
 

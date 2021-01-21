@@ -1,4 +1,4 @@
-﻿Shader "Custom/AnimationSkinning"
+﻿Shader "BakedAnimation/PreviewAnimation"
 {
 	Properties
 	{

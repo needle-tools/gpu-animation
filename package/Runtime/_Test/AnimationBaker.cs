@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.XR;
 
@@ -9,21 +10,19 @@ namespace Elaborate.AnimationBakery
 	[ExecuteInEditMode]
 	public class AnimationBaker : MonoBehaviour
 	{
+		[FormerlySerializedAs("BakeShader")] [FormerlySerializedAs("TextureBakingShader")] public ComputeShader Shader;
 		public Animator Animator;
 		public SkinnedMeshRenderer Renderer;
 		public List<AnimationClip> Clips;
-		public ComputeShader TextureBakingShader;
 		public int Skip;
-		public float FrameRate = -1;
 
 		[Header("Output")] 
 		public List<AnimationTransformationData> AnimationData;
 		public BakedAnimation Target;
 
-		[Header("Test")] public bool DebugLog;
-		public Material AnimationTex;
-		public Material SkinTex;
-		
+		[Header("Debug")] 
+		public bool DebugLog;
+
 #if UNITY_EDITOR
 
 		private void OnValidate()
@@ -41,22 +40,11 @@ namespace Elaborate.AnimationBakery
 			}
 
 			AnimationTextureProvider.DebugLog = DebugLog;
-			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
+			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, -1);
 			if (!Target) return;
-			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, TextureBakingShader);
-			Target.bakedAnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, TextureBakingShader);
+			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, Shader);
+			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, Shader);
 			AnimationTextureProvider.DebugLog = false;
-			
-
-			if (AnimationTex)
-			{
-				AnimationTex.mainTexture = Target.bakedAnimationBake.Texture;
-			}
-
-			if (SkinTex)
-			{
-				SkinTex.mainTexture = Target.SkinBake.Texture;
-			}
 		}
 
 #endif

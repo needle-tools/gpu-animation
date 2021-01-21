@@ -6,6 +6,6 @@ namespace Elaborate.AnimationBakery
 	public class BakedAnimation : ScriptableObject
 	{
 		public BakedMeshSkinningData SkinBake;
-		public BakedAnimationData bakedAnimationBake;
+		public BakedAnimationData AnimationBake;
 	}
 }
