@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ContentModelUserStore">
     <attachedFolders>
-      <Path>../../package</Path>
       <Path>../../packages/com.elaborate.animationbakery</Path>
     </attachedFolders>
     <explicitIncludes>
@@ -23,10 +22,8 @@
     <explicitExcludes>
       <Path>.idea</Path>
       <Path>Library</Path>
-      <Path>Logs</Path>
       <Path>Temp</Path>
       <Path>UserSettings</Path>
-      <Path>obj</Path>
     </explicitExcludes>
   </component>
 </project>

@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
-using Object = UnityEngine.Object;
 
 namespace Elaborate.AnimationBakery
 {
@@ -32,8 +31,8 @@ namespace Elaborate.AnimationBakery
 				hiddenTextureAssets.RemoveAt(index);
 			}
 
-			SaveRenderTexture(SkinBake, "skinning");
-			SaveRenderTexture(AnimationBake, "animation");
+			// SaveRenderTexture(SkinBake, "skinning");
+			// SaveRenderTexture(AnimationBake, "animation");
 			EditorUtility.SetDirty(this);
 			AssetDatabase.SaveAssets();
 		}
@@ -51,7 +50,7 @@ namespace Elaborate.AnimationBakery
 				nt.ReadPixels(new Rect(Vector2.zero, new Vector2(texture.width, texture.height)), 0, 0);
 				RenderTexture.active = null;
 				texture = nt;
-				// EditorUtility.CompressTexture(nt, TextureFormat.DXT5Crunched, TextureCompressionQuality.Best);
+				// EditorUtility.CompressTexture(nt, TextureFormat.ASTC_RGBA_4x4, TextureCompressionQuality.Best);
 				rt.Release();
 			}
 			

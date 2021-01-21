@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,10 +19,11 @@ namespace Elaborate.AnimationBakery
 		public List<AnimationClip> Clips;
 		public int Skip;
 
-		[Header("Output")] public List<AnimationTransformationData> AnimationData;
+		[Header("Output")] 
 		public BakedAnimation Target;
 
-		[Header("Debug")] public bool DebugLog;
+		[Header("Debug")] 
+		public bool DebugLog;
 
 #if UNITY_EDITOR
 
@@ -51,9 +53,9 @@ namespace Elaborate.AnimationBakery
 			if (!Animator || !Renderer) return;
 
 			AnimationTextureProvider.DebugLog = DebugLog;
-			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, -1);
+			var animData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, -1);;
+			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
 			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, Shader);
-			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, Shader);
 			Target.SaveAssets();
 			AnimationTextureProvider.DebugLog = false;
 		}
