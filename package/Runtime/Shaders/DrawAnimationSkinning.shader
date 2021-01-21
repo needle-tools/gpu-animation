@@ -76,24 +76,19 @@
 
 		float3 _CurrentAnimation; // StartIndex, Length, Frame
 
-		float Time;
-		float AnimationIndex = 0;
-		int _Frame;
-
-		float remap(float p, float p0, float p1, float t0, float t1)
-		{
-			return t0 + (t1 - t0) * ((p - p0) / (p1 - p0));
-		}
+		// float remap(float p, float p0, float p1, float t0, float t1)
+		// {
+		// 	return t0 + (t1 - t0) * ((p - p0) / (p1 - p0));
+		// }
 
 		void vert(inout appdata v, out Input result)
 		{
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
-
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-			// v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _Time.z*15);
+			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
+			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _Time.z*15);
 			#endif
 
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Elaborate.AnimationBakery
@@ -11,7 +10,7 @@ namespace Elaborate.AnimationBakery
 			ComputeShader shader, ComputeBuffer animationBuffer, List<AnimationTextureData.Clip> clipInfos)
 		{
 			var textureSize = ToTextureSize(animationBuffer.count*4);
-			Debug.Log("Bake into " + textureSize + "x" + textureSize + " Texture");
+			Debug.Log("Bake into " + textureSize + " Texture");
 			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
