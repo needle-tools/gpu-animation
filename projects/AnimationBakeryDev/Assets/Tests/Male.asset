@@ -10,11 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8b07fb0cd5446ee85f647d7967179c6, type: 3}
-  m_Name: MyBake
+  m_Name: Male
   m_EditorClassIdentifier: 
   SkinBake:
     Texture: {fileID: 0}
-    Mesh: {fileID: 0}
+    Mesh: {fileID: 4300000, guid: 07c4ef91a6ad63442ba51d1f34fe16be, type: 3}
   AnimationBake:
     Texture: {fileID: 0}
-    ClipsInfos: []
+    ClipsInfos:
+    - IndexStart: 0
+      Length: 960
+      Frames: 16
+      FPS: 30

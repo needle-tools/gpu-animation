@@ -16,6 +16,8 @@ namespace Elaborate.AnimationBakery
 
 		private void Update()
 		{
+			if (!Animation) return;
+			
 			if (!rend && !TryGetComponent(out rend))
 				return;
 

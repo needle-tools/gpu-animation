@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8b07fb0cd5446ee85f647d7967179c6, type: 3}
+  m_Name: Horse
+  m_EditorClassIdentifier: 
+  SkinBake:
+    Texture: {fileID: 0}
+    Mesh: {fileID: 4300002, guid: a85d92b72304a79449904f3b49e3d5ea, type: 3}
+  AnimationBake:
+    Texture: {fileID: 0}
+    ClipsInfos:
+    - IndexStart: 0
+      Length: 1075
+      Frames: 25
+      FPS: 30
+    - IndexStart: 1075
+      Length: 5160
+      Frames: 120
+      FPS: 30

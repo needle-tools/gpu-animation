@@ -33,6 +33,11 @@ namespace Elaborate.AnimationBakery
 		[ContextMenu(nameof(Bake))]
 		public void Bake()
 		{
+			if (Clips.Count <= 0)
+			{
+				Debug.LogError("Missing clips");
+				return;
+			}
 			Debug.Log("Bake");
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, FrameRate);
 			if (!Target) return;
