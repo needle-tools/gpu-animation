@@ -1,6 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Elaborate.AnimationBakery
 {
 	[Serializable]
@@ -10,6 +14,9 @@ namespace Elaborate.AnimationBakery
 
 		public void Dispose()
 		{
+			#if UNITY_EDITOR
+			if (EditorUtility.IsPersistent(Texture)) return;
+			#endif
 			if (Texture is RenderTexture rt && rt) rt.Release();
 		}
 	}

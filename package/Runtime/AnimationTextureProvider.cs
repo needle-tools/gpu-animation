@@ -22,6 +22,7 @@ namespace Elaborate.AnimationBakery
 			if (DebugLog)
 				Debug.Log("Bake into " + textureSize + " Texture");
 			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
+			texture.name = "animation";
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
 			texture.filterMode = FilterMode.Point;
@@ -82,6 +83,7 @@ namespace Elaborate.AnimationBakery
 				var buffer = boneWeights;
 				var textureSize = ToTextureSize(buffer.count * 2);
 				var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBHalf);
+				texture.name = "skinning";
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
 				texture.filterMode = FilterMode.Point;

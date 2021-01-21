@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
-using UnityEngine.XR;
 
 namespace Elaborate.AnimationBakery
 {
@@ -57,6 +54,7 @@ namespace Elaborate.AnimationBakery
 			AnimationData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, -1);
 			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, Shader);
 			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(AnimationData, Shader);
+			Target.SaveAssets();
 			AnimationTextureProvider.DebugLog = false;
 		}
 
