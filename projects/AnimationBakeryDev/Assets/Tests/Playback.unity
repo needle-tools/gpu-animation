@@ -307,7 +307,7 @@ GameObject:
   - component: {fileID: 1084357299}
   - component: {fileID: 1084357298}
   m_Layer: 0
-  m_Name: Male (1)
+  m_Name: Horse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -325,11 +325,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed0c3add66f24b2e960b4afd5aac08c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animation: {fileID: 11400000, guid: 96b706c34b6de3448ad43820c4d87e1e, type: 2}
+  Animation: {fileID: 11400000, guid: 2ef06c73c54308d47ae49f7fd5fbc151, type: 2}
   PreviewMaterial: {fileID: 2100000, guid: d3f798ee6e635944d94978d38c065c21, type: 2}
   Offset: {x: -1.35, y: 0, z: 0}
-  skin: {fileID: 9136084005497174125, guid: 96b706c34b6de3448ad43820c4d87e1e, type: 2}
-  anim: {fileID: -8156160413790751302, guid: 96b706c34b6de3448ad43820c4d87e1e, type: 2}
+  SkipFirst: 0
 --- !u!4 &1084357299
 Transform:
   m_ObjectHideFlags: 0
@@ -373,11 +372,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed0c3add66f24b2e960b4afd5aac08c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animation: {fileID: 11400000, guid: 45a4684f3a084a446aec6f97cb1abd3a, type: 2}
+  Animation: {fileID: 11400000, guid: 73c43993865f5044f915f64c7c954793, type: 2}
   PreviewMaterial: {fileID: 2100000, guid: d3f798ee6e635944d94978d38c065c21, type: 2}
-  Offset: {x: 0, y: 0, z: -2}
-  skin: {fileID: -2862990654626075340, guid: 45a4684f3a084a446aec6f97cb1abd3a, type: 2}
-  anim: {fileID: -7257362021872035901, guid: 45a4684f3a084a446aec6f97cb1abd3a, type: 2}
+  Offset: {x: 0, y: 0, z: -1.08}
+  SkipFirst: 0
 --- !u!4 &1405463119
 Transform:
   m_ObjectHideFlags: 0
