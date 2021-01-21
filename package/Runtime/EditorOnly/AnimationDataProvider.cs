@@ -72,16 +72,15 @@ namespace Elaborate.AnimationBakery
 		{
 			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
 
-			var duration = data.Duration;
 			frameRate = frameRate <= 0 ? data.FrameRate : frameRate;
 
-			var frames = duration * frameRate;
-			//var frameDuration = 1 / frameRate;
-
+			skip = Mathf.Max(0, skip);
 			skip += 1;
-
-			sampledFramesPerSecond = Mathf.FloorToInt((float) frameRate / skip * .5f); 
 			
+			sampledFramesPerSecond = Mathf.FloorToInt((float) frameRate / skip);
+
+			var duration = data.Duration;
+			var frames = duration * frameRate;
 			for (var i = 0; i < frames; i++)
 			{
 				if (skip > 1 && i % skip != 0) continue;

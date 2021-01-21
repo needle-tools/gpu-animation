@@ -71,7 +71,7 @@
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 			TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.z * clip.FramesPerSecond));
+			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
 			#endif
 
 
