@@ -31,8 +31,8 @@ namespace Elaborate.AnimationBakery
 				hiddenTextureAssets.RemoveAt(index);
 			}
 
-			// SaveRenderTexture(SkinBake, "skinning");
-			// SaveRenderTexture(AnimationBake, "animation");
+			SaveRenderTexture(SkinBake, "skinning");
+			SaveRenderTexture(AnimationBake, "animation");
 			EditorUtility.SetDirty(this);
 			AssetDatabase.SaveAssets();
 		}
