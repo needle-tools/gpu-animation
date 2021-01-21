@@ -6,11 +6,21 @@ namespace Elaborate.AnimationBakery
 {
 	public static class AnimationTextureProvider
 	{
-		public static AnimationTextureData BakeAnimation(
-			ComputeShader shader, ComputeBuffer animationBuffer, List<AnimationTextureData.Clip> clipInfos)
+		public static bool DebugLog = false;
+
+		public static AnimationTextureData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader)
 		{
-			var textureSize = ToTextureSize(animationBuffer.count*4);
-			Debug.Log("Bake into " + textureSize + " Texture");
+			using (var animationBuffer = GetBuffer(animationData, out var clipInfos))
+			{
+				return BakeAnimation(shader, animationBuffer, clipInfos);
+			}
+		}
+
+		public static AnimationTextureData BakeAnimation(ComputeShader shader, ComputeBuffer animationBuffer, List<TextureClipInfo> clipInfos)
+		{
+			var textureSize = ToTextureSize(animationBuffer.count * 4);
+			if (DebugLog)
+				Debug.Log("Bake into " + textureSize + " Texture");
 			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBFloat); // TODO: try ARGBHalf
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
@@ -18,23 +28,23 @@ namespace Elaborate.AnimationBakery
 			texture.Create();
 			var res = new AnimationTextureData();
 			res.Texture = texture;
-			res.Animations = clipInfos;
-			
+			res.ClipsInfos = clipInfos;
+
 			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
 			shader.SetBuffer(kernel, "Matrices", animationBuffer);
 			shader.SetTexture(kernel, "Texture", texture);
 			shader.Dispatch(kernel, Mathf.CeilToInt(animationBuffer.count / 32f), 1, 1);
 			return res;
 		}
-		
-		public static ComputeBuffer GetBuffer(IEnumerable<AnimationTransformationData> animationData, out List<AnimationTextureData.Clip> clipInfos)
+
+		public static ComputeBuffer GetBuffer(IEnumerable<AnimationTransformationData> animationData, out List<TextureClipInfo> clipInfos)
 		{
 			var matrixData = new List<Bone>();
-			clipInfos = new List<AnimationTextureData.Clip>();
+			clipInfos = new List<TextureClipInfo>();
 			var anyScaled = false;
 			foreach (var anim in animationData)
 			{
-				var clip = new AnimationTextureData.Clip();
+				var clip = new TextureClipInfo();
 				clip.IndexStart = matrixData.Count;
 				foreach (var boneData in anim.BoneData)
 				{
@@ -46,27 +56,31 @@ namespace Elaborate.AnimationBakery
 					}
 				}
 
-				clip.TotalLength = matrixData.Count - clip.IndexStart;
-				Debug.Log("Clip \t" + clipInfos.Count + "\t" + clip);
+				clip.FPS = anim.SampledFramesPerSecond;
+				clip.Length = matrixData.Count - clip.IndexStart;
+				if (DebugLog)
+					Debug.Log("Clip \t" + clipInfos.Count + "\t" + clip);
 				clipInfos.Add(clip);
 			}
-			Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " 4x4 matrices = " + (matrixData.Count * 4) + " pixel, Need Scale? " + anyScaled);
+
+			if (DebugLog)
+				Debug.Log(clipInfos.Count + " clip(s), data is " + matrixData.Count + " 4x4 matrices = " + (matrixData.Count * 4) + " pixel, Need Scale? " +
+				          anyScaled);
 			var bonesBuffer = new ComputeBuffer(matrixData.Count, Bone.Stride);
 			bonesBuffer.SetData(matrixData);
 			return bonesBuffer;
 		}
 
-		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader, out ComputeBuffer boneWeights)
+		public static MeshSkinningData BakeSkinning(Mesh mesh, ComputeShader shader)
 		{
 			var res = new MeshSkinningData();
 			res.Mesh = mesh;
 
 			var kernel = shader.FindKernel("BakeBoneWeights");
-			boneWeights =  CreateVertexBoneWeightBuffer(mesh);
-			var buffer = boneWeights;
-			// using ()
+			using (var boneWeights = CreateVertexBoneWeightBuffer(mesh))
 			{
-				var textureSize = ToTextureSize(buffer.count*2);
+				var buffer = boneWeights;
+				var textureSize = ToTextureSize(buffer.count * 2);
 				var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBHalf);
 				texture.enableRandomWrite = true;
 				texture.useMipMap = false;
@@ -74,7 +88,9 @@ namespace Elaborate.AnimationBakery
 				texture.Create();
 				res.Texture = texture;
 
-				Debug.Log("Bake skinning for " + mesh.vertexCount + " vertices, weights: " + buffer.count + ", texture: " + texture.width + "x" + texture.height + " texture. " + texture.format);
+				if (DebugLog)
+					Debug.Log("Bake skinning for " + mesh.vertexCount + " vertices, weights: " + buffer.count + ", texture: " + texture.width + "x" +
+					          texture.height + " texture. " + texture.format);
 
 				shader.SetBuffer(kernel, "Weights", buffer);
 				shader.SetTexture(kernel, "Texture", texture);
@@ -98,13 +114,13 @@ namespace Elaborate.AnimationBakery
 		{
 			var kernel = shader.FindKernel("ReadAnimation");
 			var res = new ComputeBuffer(data.TotalFrames, Bone.Stride);
-			using (var clipsBuffer = new ComputeBuffer(data.Animations.Count, AnimationTextureData.Clip.Stride))
+			using (var clipsBuffer = new ComputeBuffer(data.ClipsInfos.Count, TextureClipInfo.Stride))
 			{
-				clipsBuffer.SetData(data.Animations);
+				clipsBuffer.SetData(data.ClipsInfos);
 				shader.SetBuffer(kernel, "Clips", clipsBuffer);
 				shader.SetTexture(kernel, "Texture", data.Texture);
 				shader.SetBuffer(kernel, "Bones", res);
-				var tx = Mathf.CeilToInt(data.Animations.Count / 32f);
+				var tx = Mathf.CeilToInt(data.ClipsInfos.Count / 32f);
 				shader.Dispatch(kernel, tx, 1, 1);
 			}
 
@@ -115,12 +131,13 @@ namespace Elaborate.AnimationBakery
 		{
 			var px = 4;
 			var py = 4;
-			while ((px*py) < pixel)
+			while ((px * py) < pixel)
 			{
 				px *= 2;
 				if ((px * py) >= pixel) break;
 				py *= 2;
 			}
+
 			return new Vector2Int(px, py);
 		}
 

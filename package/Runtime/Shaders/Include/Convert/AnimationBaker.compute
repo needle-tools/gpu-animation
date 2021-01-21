@@ -69,7 +69,7 @@ void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
 }
 
 
-StructuredBuffer<AnimationClip> Clips;
+StructuredBuffer<TextureClipInfo> Clips;
 RWStructuredBuffer<Bone> Bones;
 
 [numthreads(32,1,1)]
@@ -84,7 +84,7 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
     Texture.GetDimensions(tw, th);
     
     // get indices from animation clips
-    const AnimationClip clip = Clips[clipIndex];
+    const TextureClipInfo clip = Clips[clipIndex];
     for(int k = 0; k < clip.TotalLength; k++)
     {
         // x4 because 4 pixel per matrix

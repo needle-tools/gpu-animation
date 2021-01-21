@@ -18,11 +18,22 @@ struct Bone
     float4x4 transformation;
 };
 
-struct AnimationClip
+struct TextureClipInfo
 {
     int IndexStart;
     int TotalLength;
     int Frames;
+    int FramesPerSecond;
 };
+
+inline TextureClipInfo ToTextureClipInfo(float4 vec)
+{
+    TextureClipInfo ci;
+    ci.IndexStart = vec.x;
+    ci.TotalLength = vec.y;
+    ci.Frames = vec.z;
+    ci.FramesPerSecond = vec.w;
+    return ci;
+}
 
 #endif

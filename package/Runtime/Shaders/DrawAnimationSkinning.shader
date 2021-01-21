@@ -10,7 +10,6 @@
 		_Emission ("Emission", 2D) = "black" {}
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
-		_Frame("Frame", int) = 0
 	}
 	SubShader
 	{
@@ -24,8 +23,7 @@
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
 		#pragma target 4.5
 		#pragma multi_compile_instancing
-		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE _KIN_QUALITY_TWO SKIN_QUALITY_ONE
-		#include "Include/AnimationTypes.cginc"
+		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 		#include "Include/Skinning.cginc"
 
 		sampler2D _MainTex, _Emission;
@@ -54,32 +52,16 @@
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
-		// #include "Include/Animation.cginc"
-		// #include "Include/Quaternion.cginc"
-
-		// #ifdef SHADER_API_D3D11
-		// StructuredBuffer<BoneWeight> boneWeights;
-		// StructuredBuffer<AnimationClip> animations;
-		// StructuredBuffer<BoneAnimation> animationClips;
-		// StructuredBuffer<Keyframe> keyframes;
-		// #endif
-
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
+		float4 _CurrentAnimation;
 
+		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+		// StructuredBuffer<BoneWeight> _BoneWeights;
+		// StructuredBuffer<Bone> _Animations;
+		// #endif
 
-		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-		StructuredBuffer<BoneWeight> _BoneWeights;
-		StructuredBuffer<Bone> _Animations;
-		#endif
-
-
-		float3 _CurrentAnimation; // StartIndex, Length, Frame
-
-		// float remap(float p, float p0, float p1, float t0, float t1)
-		// {
-		// 	return t0 + (t1 - t0) * ((p - p0) / (p1 - p0));
-		// }
+		
 
 		void vert(inout appdata v, out Input result)
 		{
@@ -87,8 +69,9 @@
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+			TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _Time.z*15);
+			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.z * clip.FramesPerSecond));
 			#endif
 
 
@@ -102,10 +85,6 @@
 			o.Smoothness = _Glossiness;
 			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
 			o.Alpha = col.a;
-			
-			// o.Albedo = 0;
-			// o.Emission = IN.color;
-			// o.Emission = tex2D(_Skinning, IN.skinCoords);
 		}
 		ENDCG
 

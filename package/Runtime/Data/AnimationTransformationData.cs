@@ -9,11 +9,13 @@ namespace Elaborate.AnimationBakery
 	{
 		public AnimationClip Clip;
 		public BoneTransformationData[] BoneData;
+		public int SampledFramesPerSecond;
 
-		public AnimationTransformationData(AnimationClip clip, BoneTransformationData[] boneData)
+		public AnimationTransformationData(AnimationClip clip, BoneTransformationData[] boneData, int sampledFramesPerSecond)
 		{
 			this.Clip = clip;
 			this.BoneData = boneData;
+			this.SampledFramesPerSecond = sampledFramesPerSecond;
 		}
 	}
 

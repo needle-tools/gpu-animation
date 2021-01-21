@@ -1,12 +1,11 @@
 ﻿#ifndef _SKINNING_UTILS
 #define _SKINNING_UTILS
 
-static const int BONEWEIGHT_PIXEL_COUNT = 2;
-static const int ANIMATION_MATRIX_4x4_PIXEL_COUNT = 4;
+static const int BONEWEIGHT_PIXEL_COUNT = 2; // weight takes 2 pixel (one BoneWeight is 2 x 4 floats)
+static const int ANIMATION_MATRIX_4x4_PIXEL_COUNT = 4; // 4x4 matrix takes 4 pixel (one matrix is 4 x 4 floats)
 
 inline float4 indexToCoord(uint index, float4 texelSize)
 {
-    // index = trunc(index + 0.5);
     const float2 size = float2(texelSize.z, texelSize.w);
     const int row = (int)(index / size.x);
     const float col = index % size.x;
@@ -14,9 +13,9 @@ inline float4 indexToCoord(uint index, float4 texelSize)
     return float4(coord, 0, 0);
 }
 
-BoneWeight sampleBoneWeight(sampler2D weightsTex, float4 weightsTexel, uint index)
+inline BoneWeight sampleBoneWeight(sampler2D weightsTex, float4 weightsTexel, uint index)
 {
-    index *= BONEWEIGHT_PIXEL_COUNT; // weight takes 2 pixel
+    index *= BONEWEIGHT_PIXEL_COUNT;
     const float4 coord0 = indexToCoord(index, weightsTexel);
     const float4 coord1 = indexToCoord(index+1, weightsTexel);
     const float4 p0 = tex2Dlod(weightsTex, coord0);
@@ -35,7 +34,7 @@ BoneWeight sampleBoneWeight(sampler2D weightsTex, float4 weightsTexel, uint inde
 
 float4x4 sampleMatrix4x4(sampler2D animationTex, float4 animationTexel, uint index)
 {
-    index *= ANIMATION_MATRIX_4x4_PIXEL_COUNT; // 4x4 matrix takes 4 pixel
+    index *= ANIMATION_MATRIX_4x4_PIXEL_COUNT; 
     const float4 coord0 = indexToCoord(index, animationTexel);
     const float4 coord1 = indexToCoord(index+1, animationTexel);
     const float4 coord2 = indexToCoord(index+2, animationTexel);
@@ -47,7 +46,7 @@ float4x4 sampleMatrix4x4(sampler2D animationTex, float4 animationTexel, uint ind
     return float4x4(p0, p1, p2, p3);
 }
 
-uint4 getBoneIndices(BoneWeight boneWeight, uint startIndex, uint animationLength, uint frame)
+inline uint4 getBoneIndices(BoneWeight boneWeight, uint startIndex, uint animationLength, uint frame)
 {
     uint bi0 = boneWeight.boneIndex0;
     uint bi1 = boneWeight.boneIndex1;

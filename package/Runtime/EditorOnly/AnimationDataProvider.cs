@@ -28,8 +28,8 @@ namespace Elaborate.AnimationBakery
 				// make sure not to add one clip multiple times
 				if (result.Any(r => r.Clip == clip)) continue;
 
-				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, bones, bonesInfo, clip, skip, frameRate);
-				result.Add(new AnimationTransformationData(clip, data));
+				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, bones, bonesInfo, clip, skip, out int fps, frameRate);
+				result.Add(new AnimationTransformationData(clip, data, fps));
 			}
 
 			return result;
@@ -39,12 +39,15 @@ namespace Elaborate.AnimationBakery
 			Mesh mesh, Animator animatedObject,
 			Transform[] bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
-			AnimationClip clip, int skip, float frameRate = -1
+			AnimationClip clip, int skip, 
+			out int sampledFramesPerSecond,
+			float frameRate = -1
 		)
 		{
 			if (!AnimationClipUtility.GetData(animatedObject, clip, out AnimationClipData data))
 			{
 				Debug.LogError("Failed getting data from " + clip + ", " + animatedObject, animatedObject);
+				sampledFramesPerSecond = 0;
 				return null;
 			}
 
@@ -52,7 +55,7 @@ namespace Elaborate.AnimationBakery
 			var transformStates = GetTransformationState(bones);
 
 			// 2: sample transformations in clip
-			var transformations = SampleAndStoreAnimationClipData(mesh, bones, bonesInfo, data, skip, frameRate);
+			var transformations = SampleAndStoreAnimationClipData(mesh, bones, bonesInfo, data, skip, frameRate, out sampledFramesPerSecond);
 
 			// 3: restore transformation state
 			RestoreTransformationState(transformStates);
@@ -63,7 +66,8 @@ namespace Elaborate.AnimationBakery
 		private static BoneTransformationData[] SampleAndStoreAnimationClipData(
 			Mesh mesh, Transform[] bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
-			AnimationClipData data, int skip, float frameRate = -1
+			AnimationClipData data, int skip, float frameRate,
+			out int sampledFramesPerSecond
 			)
 		{
 			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
@@ -75,6 +79,9 @@ namespace Elaborate.AnimationBakery
 			//var frameDuration = 1 / frameRate;
 
 			skip += 1;
+
+			sampledFramesPerSecond = Mathf.FloorToInt((float) frameRate / skip * .5f); 
+			
 			for (var i = 0; i < frames; i++)
 			{
 				if (skip > 1 && i % skip != 0) continue;

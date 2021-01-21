@@ -2,32 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Elaborate.AnimationBakery
 {
 	[Serializable]
 	public class AnimationTextureData : BakedData
 	{
-		public List<Clip> Animations;
-
-		public int TotalFrames => Animations.Sum(c => c.TotalLength);
-
-		[Serializable]
-		public struct Clip
-		{
-			public int IndexStart;
-			public int TotalLength;
-			/// <summary>
-			/// How many frames does this animation clip have
-			/// </summary>
-			public int Frames;
+		public List<TextureClipInfo> ClipsInfos;
+		public int TotalFrames => ClipsInfos.Sum(c => c.Length);
+	}
+	
+	[Serializable]
+	public struct TextureClipInfo
+	{
+		public int IndexStart;
+		public int Length;
 			
-			public static int Stride => sizeof(int) * 3;
+		/// <summary>
+		/// How many frames does this animation clip have
+		/// </summary>
+		public int Frames;
+		public int FPS;
+			
+		// Must be in sync with AnimationTypes.cginc
+		public static int Stride => sizeof(int) * 4;
 
-			public override string ToString()
-			{
-				return "Start=" + IndexStart + ", Length=" + TotalLength;
-			}
+		public Vector4 AsVector4 => new Vector4(IndexStart, Length, Frames, FPS);
+
+		public override string ToString()
+		{
+			return "Start=" + IndexStart + ", Length=" + Length + ", Frames=" + Frames + ", FPS=" + FPS;
 		}
 	}
 }
