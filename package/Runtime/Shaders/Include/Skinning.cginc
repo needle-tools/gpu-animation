@@ -63,13 +63,13 @@ float4 skin4(float4 vertex, int vertexId, StructuredBuffer<BoneWeight> boneWeigh
 	const float w1 = bw.weight1;
 	const float w2 = bw.weight2;
 	const float w3 = bw.weight3;
-	
+
 	const uint4 indices = getBoneIndices(bw, startIndex, animationLength, frame);
 
-	const float4x4 m0 = SampleMatrix(animation, animationTexel, indices.x);
-	const float4x4 m1 = SampleMatrix(animation, animationTexel, indices.y);
-	const float4x4 m2 = SampleMatrix(animation, animationTexel, indices.z);
-	const float4x4 m3 = SampleMatrix(animation, animationTexel, indices.w);
+	const float4x4 m0 = sampleMatrix4x4(animation, animationTexel, indices.x);
+	const float4x4 m1 = sampleMatrix4x4(animation, animationTexel, indices.y);
+	const float4x4 m2 = sampleMatrix4x4(animation, animationTexel, indices.z);
+	const float4x4 m3 = sampleMatrix4x4(animation, animationTexel, indices.w);
 
 	return skin4(vertex, m0, w0, m1, w1, m2, w2, m3, w3);
 }

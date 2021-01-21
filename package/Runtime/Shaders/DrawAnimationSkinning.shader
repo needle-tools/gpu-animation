@@ -91,61 +91,12 @@
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
 
-			// float2 skinning_size = _Skinning_TexelSize.zw;
-			// int skin_index0 = id * 2;
-			// float2 skinning_coord0 = float2(skin_index0 % skinning_size.x, floor(skin_index0 / skinning_size.y)) / skinning_size;
-			// float4 boneWeights01 = tex2Dlod(_Skinning, float4(skinning_coord0, 0, 0));
-			// int skin_index1 = skin_index0 + 1;
-			// float2 skinning_coord1 = float2(skin_index1 % skinning_size.x, floor(skin_index1 / skinning_size.y)) / skinning_size;
-			// float4 boneWeights23 = tex2Dlod(_Skinning, float4(skinning_coord1, 0,0));
-			// // result.color = float4(boneWeights01.xz, boneWeights23.xz);
-			// result.color = boneWeights01.x + boneWeights01.z, boneWeights23.x + boneWeights23.z;
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-
-			
-			BoneWeight weight = _BoneWeights[v.vertex_id];
-			result.color = weight.weight0 + weight.weight1 + weight.weight2 + weight.weight3;
-			result.color = float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3);
-
-			// result.color = weight.boneIndex0/43.0f;
-
 			// v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-
-
-			
+			v.vertex = skin4(v.vertex, v.vertex_id, _BoneWeights, _Animation, _Animation_TexelSize, _CurrentAnimation.x, _CurrentAnimation.y, _Time.z*15);
 			#endif
 
 
-			
-			// result.skinCoords = skinning_coord0;
-			// result.color = float4(skinning_coord0, 0,0);
-			// result.color = (float)id / 3012;
-
-			// #ifdef SHADER_API_D3D11
-			// Horse horse = horses[instanceId];
-			// float4 rotatedVertex = float4(rotateWithQuaternion(v.vertex.xyz, horse.rotation) + horse.position, 1);
-			//
-			// int i1 = horse.animationIndex;
-			// int i2 = horse.nextAnimationIndex;
-			//
-			// float4 anim1 = skin(
-			// 	Time, i1, instanceId, id, v.vertex,
-			// 	animations, boneWeights, animationClips, keyframes);
-			//
-			// if (i1 != i2)
-			// {
-			// 	float4 anim2 = skin(
-			// 		Time, i2, instanceId, id, v.vertex,
-			// 		animations, boneWeights, animationClips, keyframes);
-			// 	v.vertex = lerp(anim1, anim2, horse.animationLerp);
-			// }
-			// else v.vertex = anim1;
-			//
-			// v.vertex.xyz = rotateWithQuaternion(v.vertex.xyz, horse.rotation);
-			// v.vertex.xyz = v.vertex.xyz + horse.position;
-			//
-			// #endif
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
