@@ -16,7 +16,6 @@ namespace Elaborate.AnimationBakery
 		)
 		{
 			var bones = skinnedMeshRenderer.bones;
-
 			var boneData = GetData(skinnedMeshRenderer);
 			var bonesInfo = new Dictionary<Transform, SkinnedMesh_BoneData>();
 			for (var i = 0; i < boneData.Count; i++)
@@ -26,6 +25,8 @@ namespace Elaborate.AnimationBakery
 			var clips = animationClips;
 			foreach (var clip in clips)
 			{
+				if (!clip) continue;
+				
 				// make sure not to add one clip multiple times
 				if (result.Any(r => r.Clip == clip)) continue;
 

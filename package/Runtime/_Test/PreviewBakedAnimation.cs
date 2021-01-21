@@ -9,7 +9,6 @@ namespace Elaborate.AnimationBakery
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
 		public Vector3 Offset = new Vector3(0, 0, 1);
-		public bool SkipFirst = true;
 
 		private BakedMeshSkinningData SkinBake => Animation.SkinBake;
 		private BakedAnimationData AnimationBake => Animation.AnimationBake;
@@ -19,7 +18,7 @@ namespace Elaborate.AnimationBakery
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
 		private Material[] _previewMaterial;
-		private AnimationBaker _baker;
+		private AnimationBakerComponent bakerComponent;
 
 		// public Texture skin, anim;
 
@@ -30,8 +29,8 @@ namespace Elaborate.AnimationBakery
 
 		private void Update()
 		{
-			if ((!Animation || !_baker) && TryGetComponent(out _baker))
-				Animation = _baker.Target;
+			if ((!Animation || !bakerComponent) && TryGetComponent(out bakerComponent) && bakerComponent.Target)
+				Animation = bakerComponent.Target;
 
 			if (!Animation)
 			{
@@ -71,8 +70,7 @@ namespace Elaborate.AnimationBakery
 				mat.SetTexture(Skinning, SkinBake.Texture);
 				mat.SetVector(CurrentAnimation, clip.AsVector4);
 				var offset = Offset;
-				if (SkipFirst) offset *= i + 1;
-				else offset *= i;
+				offset *= i;
 				var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
 				Graphics.DrawMesh(Animation.SkinBake.Mesh, matrix, mat, 0);
 			}

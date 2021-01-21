@@ -6,8 +6,9 @@ using UnityEngine.Serialization;
 
 namespace Elaborate.AnimationBakery
 {
+	[Obsolete("Use Create/Animation/" + nameof(BakedAnimation) + " and assign Fbx and AnimationClips there")]
 	[ExecuteInEditMode]
-	public class AnimationBaker : MonoBehaviour
+	public class AnimationBakerComponent : MonoBehaviour
 	{
 		[FormerlySerializedAs("BakeShader")] [FormerlySerializedAs("TextureBakingShader")]
 		public ComputeShader Shader;
@@ -56,7 +57,7 @@ namespace Elaborate.AnimationBakery
 			var animData = AnimationDataProvider.GetAnimations(Animator, Clips, Renderer, Skip, -1);;
 			Target.AnimationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
 			Target.SkinBake = AnimationTextureProvider.BakeSkinning(Renderer.sharedMesh, Shader);
-			Target.SaveAssets();
+			Target.Save();
 			AnimationTextureProvider.DebugLog = false;
 		}
 
