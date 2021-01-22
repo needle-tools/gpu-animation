@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[CustomEditor(typeof(BakedAnimation), true)]
 	public class BakedAnimationEditor : Editor

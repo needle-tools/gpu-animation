@@ -1,19 +1,21 @@
 {
-  "name": "com.elaborate.animationbakery",
-  "displayName": "Elaborate Games Animation Bakery",
-  "version": "1.1.0-preview.1",
+  "name": "com.needle.gpu-animation",
+  "displayName": "GPU Animation",
+  "version": "0.0.1-preview",
   "unity": "2019.4",
-  "description": "",
-  "keywords": [
-    ""
-  ],
+  "description": "Baking skinned mesh animation",
   "author": {
-    "name": "Marcel Wiessler",
-    "email": "mail@marcelwiessler",
-    "url": "https://marcelwiessler.de"
+    "name": "Needle",
+    "email": "hi@needle.tools",
+    "url": "https://needle.tools"
   },
+  "keywords": [
+    "animation",
+    "rendering",
+    "gpu",
+    "skinning"
+  ],
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json" : "2.0.0"
   },
   "samples": [
   ]

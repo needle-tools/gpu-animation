@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[CreateAssetMenu(menuName = "Animation/" + nameof(BakedAnimation), order = -1000)] 
 	public class BakedAnimation : ScriptableObject

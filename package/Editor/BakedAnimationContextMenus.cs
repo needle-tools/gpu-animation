@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	// public class BakedAnimationContextMenus
 	// {

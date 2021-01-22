@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	public static class AnimationClipUtility
 	{

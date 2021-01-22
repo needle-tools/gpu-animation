@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	public static class AnimationTextureProvider
 	{

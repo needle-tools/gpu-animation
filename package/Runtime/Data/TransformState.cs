@@ -1,7 +1,7 @@
 ﻿
 using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	internal struct TransformState
 	{

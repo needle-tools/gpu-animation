@@ -1,5 +1,5 @@
 {
-    "name": "Elaborate.AnimationBakery.Editor",
+    "name": "Needle.Gpu-Animation.Editor",
     "references": [
         "GUID:c5c671378facd1c49ad3e8520d8e537e"
     ],

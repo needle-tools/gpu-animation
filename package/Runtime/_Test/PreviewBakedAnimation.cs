@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[ExecuteAlways]
 	public class PreviewBakedAnimation : MonoBehaviour

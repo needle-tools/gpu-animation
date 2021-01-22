@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[Serializable]
 	public class BakedData : IDisposable

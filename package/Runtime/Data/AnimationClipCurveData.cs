@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[System.Serializable]
 	public struct AnimationClipCurveData

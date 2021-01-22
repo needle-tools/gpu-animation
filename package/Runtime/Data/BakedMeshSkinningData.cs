@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Elaborate.AnimationBakery
+namespace needle.GpuAnimation
 {
 	[Serializable]
 	public class BakedMeshSkinningData : BakedData
