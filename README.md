@@ -8,7 +8,7 @@ Currently supports builtin rendering only
 ![](package/Documentation~/header.gif)
 
 ## How To Use 💡
-Please open the <a href="https://github.com/needle-tools/gpu-animation/tree/main/package/Readme.md">Package Readme</a> for more information.
+Please open the <a href="https://github.com/needle-tools/gpu-animation/tree/main/package/README.md">Package Readme</a> for more information.
 
 
 ## Contact ✒️
