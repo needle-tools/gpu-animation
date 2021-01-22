@@ -171,16 +171,16 @@ namespace needle.GpuAnimation
 			var states = GetTransformationState(bones);
 			if(!states.ContainsKey(rootBone)) 
 				states.Add(rootBone, GetTransformationState(rootBone));
-			var parent = rootBone.parent;
-			while (parent)
-			{
-				if(!states.ContainsKey(parent)) 
-					states.Add(parent, GetTransformationState(parent));
-				parent.localPosition = Vector3.zero;
-				parent.localRotation = Quaternion.identity;
-				parent.localScale = Vector3.one;
-				parent = parent.parent;
-			}
+			// var parent = rootBone.parent;
+			// while (parent)
+			// {
+			// 	if(!states.ContainsKey(parent)) 
+			// 		states.Add(parent, GetTransformationState(parent));
+			// 	parent.localPosition = Vector3.zero;
+			// 	parent.localRotation = Quaternion.identity;
+			// 	parent.localScale = Vector3.one;
+			// 	parent = parent.parent;
+			// }
 
 			return states;
 		}

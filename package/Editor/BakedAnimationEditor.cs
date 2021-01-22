@@ -15,6 +15,12 @@ namespace needle.GpuAnimation
 			renderUtility = null;
 		}
 
+		private bool ShowInternalData
+		{
+			get => SessionState.GetBool("_ShowBakedAnimationInternalData", false);
+			set => SessionState.SetBool("_ShowBakedAnimationInternalData", value);
+		}
+
 		private bool ShowPreview
 		{
 			get => SessionState.GetBool("_ShowBakedAnimationPreview", true);
@@ -24,10 +30,23 @@ namespace needle.GpuAnimation
 		public override void OnInspectorGUI()
 		{
 			base.OnInspectorGUI();
+
+			ShowInternalData = EditorGUILayout.Foldout(ShowInternalData, "Internal Data");
+			if (ShowInternalData)
+				DrawInternalData();
+			
 			EditorGUILayout.Space(5);
 			ShowPreview = EditorGUILayout.Foldout(ShowPreview, "Preview");
 			if (ShowPreview)
 				DrawPreview();
+		}
+
+		private void DrawInternalData()
+		{
+			var baked = target as BakedAnimation;
+			if (!baked || !baked.HasBakedAnimation) return;
+			EditorGUILayout.ObjectField("Skinning", baked.SkinBake.Texture, baked.SkinBake.Texture.GetType(), false);
+			EditorGUILayout.ObjectField("Animation", baked.AnimationBake.Texture, baked.AnimationBake.Texture.GetType(), false);
 		}
 
 		private void DrawPreview()

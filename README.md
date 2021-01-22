@@ -10,7 +10,6 @@ Currently supports builtin rendering only
 ## How To Use 💡
 Please open the <a href="https://github.com/needle-tools/gpu-animation/tree/main/package/README.md">Package Readme</a> for more information.
 
-
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
 [@NeedleTools](https://twitter.com/NeedleTools) • 
