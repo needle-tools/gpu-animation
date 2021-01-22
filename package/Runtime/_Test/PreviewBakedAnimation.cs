@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Elaborate.AnimationBakery
 {
@@ -19,11 +17,11 @@ namespace Elaborate.AnimationBakery
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
-		private Material[] _previewMaterial;
+		private Material[] _materials;
 
 		private void OnDisable()
 		{
-			_previewMaterial = null;
+			_materials = null;
 		}
 
 		private void Update()
@@ -52,18 +50,20 @@ namespace Elaborate.AnimationBakery
 				return;
 			}
 
-			// skin = SkinBake.Texture;
-			// anim = AnimationBake.Texture;
-
-			if (_previewMaterial == null || _previewMaterial.Length != AnimationBake.ClipsInfos.Count)
-				_previewMaterial = new Material[AnimationBake.ClipsInfos.Count];
+			if (_materials == null || _materials.Length != AnimationBake.ClipsInfos.Count)
+			{
+				_materials = new Material[AnimationBake.ClipsInfos.Count];
+			}
 
 			for (var i = 0; i < AnimationBake.ClipsInfos.Count; i++)
 			{
 				if (Clip != -1 && i != (Clip % AnimationBake.ClipsInfos.Count)) continue;
 				var clip = AnimationBake.ClipsInfos[i];
-				_previewMaterial[i] = new Material(PreviewMaterial);
-				var mat = _previewMaterial[i];
+				if (!_materials[i])
+				{
+					_materials[i] = new Material(PreviewMaterial);
+				}
+				var mat = _materials[i];
 				mat.CopyPropertiesFromMaterial(PreviewMaterial);
 				mat.SetTexture(Animation1, AnimationBake.Texture);
 				mat.SetTexture(Skinning, SkinBake.Texture);
@@ -71,7 +71,7 @@ namespace Elaborate.AnimationBakery
 				var offset = Offset;
 				offset *= i;
 				var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
-				Graphics.DrawMesh(Animation.SkinBake.Mesh, matrix, mat, 0);
+				Graphics.DrawMesh(Animation.SkinBake.Mesh, matrix, _materials[i], 0);
 			}
 		}
 	}
