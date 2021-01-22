@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -60,22 +59,20 @@ namespace needle.GpuAnimation
 		{
 			if (!GameObject)
 			{
-				if (allowLogs)
-					Debug.LogWarning($"Can not bake {this.name}: No GameObject assigned", this);
+				if (allowLogs) Debug.LogWarning($"Can not bake {this.name}: No GameObject assigned", this);
 				return false;
 			}
 
 			if (!Animations.Any(a => a))
 			{
-				if (allowLogs)
-					Debug.LogWarning($"Can not bake {this.name}:  No Animations assigned", this);
+				if (allowLogs) Debug.LogWarning($"Can not bake {this.name}:  No Animations assigned", this);
 				return false;
 			}
 
 			return true;
 		}
 
-		[ContextMenu(nameof(BakeAnimations))]
+		[ContextMenu("Bake Now")]
 		private void BakeAnimations()
 		{
 			if (!CheckCanBake(false)) return;

@@ -111,6 +111,7 @@ namespace needle.GpuAnimation
 		{
 			if (baked == null) return;
 			if (!baked.IsValid) return;
+			if (i < 0 || i >= baked.Animations.ClipsInfos.Count) return;
 			var clip = baked.Animations.ClipsInfos[i];
 			
 			if (renderUtility == null)
@@ -148,59 +149,64 @@ namespace needle.GpuAnimation
 			EditorGUI.DrawTextureTransparent(rect, tex);
 		}
 
-		// [CustomPreview(typeof(BakedAnimation))]
-		// public class BakedAnimationPreview : ObjectPreview
-		// {
-		// 	public override void Initialize(Object[] targets)
-		// 	{
-		// 		base.Initialize(targets);
-		// 		block = new MaterialPropertyBlock();
-		// 	}
-		//
-		// 	public override bool HasPreviewGUI()
-		// 	{
-		// 		return true;
-		// 	}
-		//
-		// 	private float angle, time;
-		// 	private int index;
-		//
-		// 	public override void OnPreviewSettings()
-		// 	{
-		// 		base.OnPreviewSettings();
-		// 		var t = (BakedAnimation) target;
-		// 		EditorGUI.BeginDisabledGroup(!t.HasBakedAnimation);
-		// 		var rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, 150, 18f, 18f);
-		// 		index = EditorGUI.IntSlider(rect, index, 0, t.ClipsCount - 1);
-		// 		// index = EditorGUI.IntField(rect, index);
-		// 		// index %= t.ClipsCount;
-		// 		EditorGUI.EndDisabledGroup();
-		// 	}
-		//
-		// 	private static MaterialPropertyBlock block;
-		//
-		//
-		// 	public override void OnInteractivePreviewGUI(Rect r, GUIStyle background)
-		// 	{
-		// 		base.OnInteractivePreviewGUI(r, background);
-		//
-		// 		if (Event.current.type == EventType.MouseDrag)
-		// 		{
-		// 			angle += Event.current.delta.x * 2f;
-		// 		}
-		//
-		//
-		// 		if (Event.current.type == EventType.Layout)
-		// 			time += 1f / 30;
-		//
-		// 		var baked = target as BakedAnimation;
-		// 		
-		// 		DrawAnimationPreview(baked.Models, index, r, block, time, angle);
-		// 	}
-		// }
+		[CustomPreview(typeof(BakedAnimation))]
+		public class BakedAnimationPreview : ObjectPreview
+		{
+			public override void Initialize(Object[] targets)
+			{
+				base.Initialize(targets);
+				block = new MaterialPropertyBlock();
+			}
+		
+			public override bool HasPreviewGUI()
+			{
+				return true;
+			}
+		
+			private float angle, time;
+			private int index;
+		
+			public override void OnPreviewSettings()
+			{
+				base.OnPreviewSettings();
+				var t = (BakedAnimation) target;
+				EditorGUI.BeginDisabledGroup(!t.HasBakedAnimation);
+				var rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, 150, 18f, 18f);
+				index = EditorGUI.IntSlider(rect, index, 0, t.ClipsCount - 1);
+				// index = EditorGUI.IntField(rect, index);
+				// index %= t.ClipsCount;
+				EditorGUI.EndDisabledGroup();
+			}
+		
+			private static MaterialPropertyBlock block;
+		
+		
+			public override void OnInteractivePreviewGUI(Rect r, GUIStyle background)
+			{
+				base.OnInteractivePreviewGUI(r, background);
+		
+				if (Event.current.type == EventType.MouseDrag)
+				{
+					angle += Event.current.delta.x * 2f;
+				}
+				
+				if (Event.current.type == EventType.Layout)
+					time += 1f / 30;
+		
+				var baked = target as BakedAnimation;
+				if (baked)
+				{
+					foreach (var bake in baked.Models)
+					{
+						DrawAnimationPreview(bake, index, r, block, time, angle);
+					}
+				}
+			}
+		}
 
 
 		// ReSharper disable once Unity.IncorrectMethodSignature
+		// ReSharper disable once UnusedMember.Global
 		public void OnSceneDrag(SceneView sceneView)
 		{
 			var bake = target as BakedAnimation;
