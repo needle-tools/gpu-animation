@@ -7,49 +7,43 @@ using UnityEngine;
 
 namespace needle.GpuAnimation
 {
+	public class BakedModel
+	{
+		public readonly BakedMeshSkinningData Skinning;
+		public readonly BakedAnimationData Animations;
+
+		public BakedModel(BakedMeshSkinningData skinning, BakedAnimationData animations)
+		{
+			this.Skinning = skinning;
+			this.Animations = animations;
+		}
+	}
+	
 	[CreateAssetMenu(menuName = "Animation/Baked Animation", order = -1000)]
 	public class BakedAnimation : ScriptableObject
 	{
-		private BakedMeshSkinningData _skinBake;
-		private BakedAnimationData _animationBake;
-
-		public BakedMeshSkinningData SkinBake
+		public IReadOnlyList<BakedModel> Bakes
 		{
 			get
 			{
-				if (_skinBake == null || !_skinBake.Texture)
-				{
-					Bake();
-				}
-
-				return _skinBake;
+				if (_bakes == null) BakeAnimations();
+				return _bakes;
 			}
-			private set => _skinBake = value;
 		}
 
-		public BakedAnimationData AnimationBake
-		{
-			get
-			{
-				if (_animationBake == null || !_animationBake.Texture)
-				{
-					Bake();
-				}
+		public bool HasBakedAnimation => Bakes != null && ClipsCount > 0;
+		public int ClipsCount => Bakes?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
 
-				return _animationBake;
-			}
-			private set => _animationBake = value;
-		}
-
-		public bool HasBakedAnimation => ClipsCount > 0;
-		public int ClipsCount => AnimationBake?.ClipsInfos?.Count ?? 0;
-
+		public int Index;
 
 		[SerializeField] private ComputeShader Shader;
-		[Header("Input Data")] 
-		[SerializeField] private GameObject GameObject;
+
+		[Header("Input Data")] [SerializeField]
+		private GameObject GameObject;
+
 		[SerializeField] private List<AnimationClip> Animations;
 
+		private List<BakedModel> _bakes;
 
 		private void OnEnable()
 		{
@@ -75,21 +69,31 @@ namespace needle.GpuAnimation
 			return true;
 		}
 
-		[ContextMenu(nameof(Bake))]
-		private void Bake()
+		[ContextMenu(nameof(BakeAnimations))]
+		private void BakeAnimations()
 		{
 			if (!CheckCanBake(false)) return;
 
+			if (_bakes == null) _bakes = new List<BakedModel>();
+			else _bakes.Clear();
+			
 			var instance = Instantiate(GameObject);
 			try
 			{
-				instance.hideFlags = HideFlags.HideAndDontSave;
+				// instance.hideFlags = HideFlags.HideAndDontSave;
 				var animator = instance.GetComponentInChildren<Animator>();
 				var animatedObject = animator ? animator.gameObject : instance;
-				var renderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
-				var animData = AnimationDataProvider.GetAnimations(animatedObject, Animations, renderer, 0, -1);
-				AnimationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
-				SkinBake = AnimationTextureProvider.BakeSkinning(renderer.sharedMesh, Shader);
+				var renderer = instance.GetComponentsInChildren<SkinnedMeshRenderer>();
+				for (var index = 0; index < renderer.Length; index++)
+				{
+					var rend = renderer[index];
+					Debug.Log(rend);
+					if (Index >= 0 && index != Index) continue; 
+					var animData = AnimationDataProvider.GetAnimations(animatedObject, Animations, rend, 0, -1);
+					var animationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
+					var skinBake = AnimationTextureProvider.BakeSkinning(rend.sharedMesh, Shader);
+					_bakes.Add(new BakedModel(skinBake, animationBake));
+				}
 			}
 			catch (Exception e)
 			{
@@ -97,7 +101,7 @@ namespace needle.GpuAnimation
 			}
 			finally
 			{
-				DestroyImmediate(instance);
+				// DestroyImmediate(instance);
 			}
 		}
 
@@ -121,7 +125,7 @@ namespace needle.GpuAnimation
 					var changed = previousHash != hash;
 					previousHash = hash;
 					if (changed)
-						Bake();
+						BakeAnimations();
 				}
 			}
 		}

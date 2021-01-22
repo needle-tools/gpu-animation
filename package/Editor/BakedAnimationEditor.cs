@@ -45,8 +45,8 @@ namespace needle.GpuAnimation
 		{
 			var baked = target as BakedAnimation;
 			if (!baked || !baked.HasBakedAnimation) return;
-			EditorGUILayout.ObjectField("Skinning", baked.SkinBake.Texture, baked.SkinBake.Texture.GetType(), false);
-			EditorGUILayout.ObjectField("Animation", baked.AnimationBake.Texture, baked.AnimationBake.Texture.GetType(), false);
+			// EditorGUILayout.ObjectField("Skinning", baked.SkinBake.Texture, baked.SkinBake.Texture.GetType(), false);
+			// EditorGUILayout.ObjectField("Animation", baked.AnimationBake.Texture, baked.AnimationBake.Texture.GetType(), false);
 		}
 
 		private void DrawPreview()
@@ -68,18 +68,18 @@ namespace needle.GpuAnimation
 			var spacing = 5;
 			var start = rect;
 			GUILayout.Space(width);
-			for (var i = 0; i < baked.AnimationBake.ClipsInfos.Count; i++)
-			{
-				rect = new Rect(rect.x, rect.y, width, width);
-				DrawAnimationPreview(baked, i, rect, block, time, angle);
-				rect.x += width + spacing;
-				if (rect.x + width > Screen.width)
-				{
-					rect.x = start.x;
-					rect.y += width + spacing;
-					GUILayout.Space(width * .35f);
-				}
-			}
+			// for (var i = 0; i < baked.AnimationBake.ClipsInfos.Count; i++)
+			// {
+			// 	rect = new Rect(rect.x, rect.y, width, width);
+			// 	DrawAnimationPreview(baked, i, rect, block, time, angle);
+			// 	rect.x += width + spacing;
+			// 	if (rect.x + width > Screen.width)
+			// 	{
+			// 		rect.x = start.x;
+			// 		rect.y += width + spacing;
+			// 		GUILayout.Space(width * .35f);
+			// 	}
+			// }
 		}
 
 		private static Material _previewMaterial;
@@ -108,41 +108,41 @@ namespace needle.GpuAnimation
 		{
 			if (!baked) return;
 			if (!baked.HasBakedAnimation) return;
-			var clip = baked.AnimationBake.ClipsInfos[i];
-			
-			if (renderUtility == null)
-				renderUtility = new PreviewRenderUtility();
-			
-			renderUtility.BeginPreview(rect, GUIStyle.none);
-
-			if (block == null) block = new MaterialPropertyBlock();
-			block.SetTexture(Animation1, baked.AnimationBake.Texture);
-			block.SetTexture(Skinning, baked.SkinBake.Texture);
-			block.SetVector(CurrentAnimation, clip.AsVector4);
-			block.SetVector(Time, new Vector4(0, time, 0, 0));
-
-			var bounds = baked.SkinBake.Mesh.bounds;
-			var cam = renderUtility.camera;
-			cam.nearClipPlane = .01f;
-			cam.farClipPlane = bounds.size.magnitude * 2f;
-			cam.fieldOfView = 60;
-			var previewCameraTransform = renderUtility.camera.transform;
-			var pos = bounds.size * 1.3f - (Vector3.up * (bounds.max.y * .2f)) + Vector3.right;
-			var lookTarget = bounds.center + Vector3.up * .2f;
-			pos = Quaternion.Euler(0, angle, 0) * pos;
-			var dir = lookTarget - pos;
-			if (dir == Vector3.zero) dir = Vector3.forward;
-			var camRot = Quaternion.LookRotation(dir, Vector3.up);
-			previewCameraTransform.position = pos;
-			previewCameraTransform.rotation = camRot;
-			var l0 = renderUtility.lights[0];
-			l0.transform.rotation = camRot;
-
-
-			renderUtility.DrawMesh(baked.SkinBake.Mesh, Matrix4x4.identity, PreviewMaterial, 0, block);
-			renderUtility.Render(true, false);
-			var tex = renderUtility.EndPreview();
-			EditorGUI.DrawTextureTransparent(rect, tex);
+			// var clip = baked.AnimationBake.ClipsInfos[i];
+			//
+			// if (renderUtility == null)
+			// 	renderUtility = new PreviewRenderUtility();
+			//
+			// renderUtility.BeginPreview(rect, GUIStyle.none);
+			//
+			// if (block == null) block = new MaterialPropertyBlock();
+			// block.SetTexture(Animation1, baked.AnimationBake.Texture);
+			// block.SetTexture(Skinning, baked.SkinBake.Texture);
+			// block.SetVector(CurrentAnimation, clip.AsVector4);
+			// block.SetVector(Time, new Vector4(0, time, 0, 0));
+			//
+			// var bounds = baked.SkinBake.Mesh.bounds;
+			// var cam = renderUtility.camera;
+			// cam.nearClipPlane = .01f;
+			// cam.farClipPlane = bounds.size.magnitude * 2f;
+			// cam.fieldOfView = 60;
+			// var previewCameraTransform = renderUtility.camera.transform;
+			// var pos = bounds.size * 1.3f - (Vector3.up * (bounds.max.y * .2f)) + Vector3.right;
+			// var lookTarget = bounds.center + Vector3.up * .2f;
+			// pos = Quaternion.Euler(0, angle, 0) * pos;
+			// var dir = lookTarget - pos;
+			// if (dir == Vector3.zero) dir = Vector3.forward;
+			// var camRot = Quaternion.LookRotation(dir, Vector3.up);
+			// previewCameraTransform.position = pos;
+			// previewCameraTransform.rotation = camRot;
+			// var l0 = renderUtility.lights[0];
+			// l0.transform.rotation = camRot;
+			//
+			//
+			// renderUtility.DrawMesh(baked.SkinBake.Mesh, Matrix4x4.identity, PreviewMaterial, 0, block);
+			// renderUtility.Render(true, false);
+			// var tex = renderUtility.EndPreview();
+			// EditorGUI.DrawTextureTransparent(rect, tex);
 		}
 
 		[CustomPreview(typeof(BakedAnimation))]
@@ -204,21 +204,21 @@ namespace needle.GpuAnimation
 			DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
 
 			var evt = Event.current;
-			switch (evt.type)
-			{
-				case EventType.DragPerform:
-					var go = new GameObject();
-					go.name = bake.name;
-					var prev = go.AddComponent<PreviewBakedAnimation>();
-					prev.Animation = bake;
-					prev.PreviewMaterial = new Material(PreviewMaterial);
-					if (bake.HasBakedAnimation)
-						prev.Offset = bake.SkinBake.Mesh.bounds.extents.z * Vector3.back * 2.5f;
-					else
-						prev.Offset = Vector3.back;
-					Selection.activeObject = go;
-					break;
-			}
+			// switch (evt.type)
+			// {
+			// 	case EventType.DragPerform:
+			// 		var go = new GameObject();
+			// 		go.name = bake.name;
+			// 		var prev = go.AddComponent<PreviewBakedAnimation>();
+			// 		prev.Animation = bake;
+			// 		prev.PreviewMaterial = new Material(PreviewMaterial);
+			// 		if (bake.HasBakedAnimation)
+			// 			prev.Offset = bake.SkinBake.Mesh.bounds.extents.z * Vector3.back * 2.5f;
+			// 		else
+			// 			prev.Offset = Vector3.back;
+			// 		Selection.activeObject = go;
+			// 		break;
+			// }
 		}
 
 		// private void OnSceneDrag(SceneView sceneView, int index)
