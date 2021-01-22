@@ -319,31 +319,6 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
-    "m_ObjectId": "2be2ee0914f1413fb4e760d9b51d3e73",
-    "m_Id": 3,
-    "m_DisplayName": "New_3",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "New_3",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector3MaterialSlot",
     "m_ObjectId": "2c99db6d7f2d2688a1e57e7a083457b2",
     "m_Id": 0,
@@ -728,10 +703,10 @@
     },
     "m_Slots": [
         {
-            "m_Id": "2be2ee0914f1413fb4e760d9b51d3e73"
+            "m_Id": "8562e3d5b8fc42bf875ebd0a45febb1a"
         },
         {
-            "m_Id": "a79ef0acf13743659cdc9997eb846e6f"
+            "m_Id": "acbbfa4416164ec6a30167b14d1257f2"
         },
         {
             "m_Id": "0148389e9c954bd8817f251ebfb1100c"
@@ -802,6 +777,31 @@
     "m_Labels": [
         "X"
     ]
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
+    "m_ObjectId": "8562e3d5b8fc42bf875ebd0a45febb1a",
+    "m_Id": 3,
+    "m_DisplayName": "Vertex",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Vertex",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_Labels": []
 }
 
 {
@@ -938,12 +938,12 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector3MaterialSlot",
-    "m_ObjectId": "a79ef0acf13743659cdc9997eb846e6f",
+    "m_ObjectId": "acbbfa4416164ec6a30167b14d1257f2",
     "m_Id": 4,
-    "m_DisplayName": "New_4",
+    "m_DisplayName": "Normal",
     "m_SlotType": 1,
     "m_Hidden": false,
-    "m_ShaderOutputName": "New_4",
+    "m_ShaderOutputName": "Normal",
     "m_StageCapability": 3,
     "m_Value": {
         "x": 0.0,
