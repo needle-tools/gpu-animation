@@ -60,6 +60,7 @@ namespace needle.GpuAnimation
 				_materials = new Material[Animation.ClipsCount];
 			}
 
+			var matIndex = 0;
 			foreach (var bake in Animation.Bakes)
 			{
 				var skin = bake.Skinning;
@@ -68,12 +69,13 @@ namespace needle.GpuAnimation
 				{
 					if (Clip != -1 && i != (Clip % animationBake.ClipsInfos.Count)) continue;
 					var clip = animationBake.ClipsInfos[i];
-					if (!_materials[i])
+					
+					if (!_materials[matIndex])
 					{
-						_materials[i] = new Material(PreviewMaterial);
+						_materials[matIndex] = new Material(PreviewMaterial);
 					}
-
-					var mat = _materials[i];
+					var mat = _materials[matIndex];
+					
 					mat.CopyPropertiesFromMaterial(PreviewMaterial);
 					mat.SetTexture(Animation1, animationBake.Texture);
 					mat.SetTexture(Skinning, skin.Texture);
@@ -83,7 +85,8 @@ namespace needle.GpuAnimation
 					var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
 
 					for (var k = 0; k < skin.Mesh.subMeshCount; k++)
-						Graphics.DrawMesh(skin.Mesh, matrix, _materials[i], 0, cam, k);
+						Graphics.DrawMesh(skin.Mesh, matrix, _materials[matIndex], 0, cam, k);
+					++matIndex;
 				}
 			}
 		}

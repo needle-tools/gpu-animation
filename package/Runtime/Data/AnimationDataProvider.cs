@@ -64,7 +64,6 @@ namespace needle.GpuAnimation
 			out int sampledFramesPerSecond
 			)
 		{
-
 			frameRate = frameRate <= 0 ? clip.frameRate : frameRate;
 			skip = Mathf.Max(0, skip);
 			skip += 1;
@@ -89,7 +88,7 @@ namespace needle.GpuAnimation
 					var info = kvp.Value;
 					var index = info.Index;
 					var bone = bones[index];
-
+					
 					var pos = bone.position;
 					var rot = bone.rotation;
 					var scale = bone.lossyScale;

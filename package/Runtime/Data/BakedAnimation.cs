@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace needle.GpuAnimation
 			this.Animations = animations;
 		}
 	}
-	
+
 	[CreateAssetMenu(menuName = "Animation/Baked Animation", order = -1000)]
 	public class BakedAnimation : ScriptableObject
 	{
@@ -33,8 +34,6 @@ namespace needle.GpuAnimation
 
 		public bool HasBakedAnimation => Bakes != null && ClipsCount > 0;
 		public int ClipsCount => Bakes?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
-
-		public int Index;
 
 		[SerializeField] private ComputeShader Shader;
 
@@ -76,23 +75,25 @@ namespace needle.GpuAnimation
 
 			if (_bakes == null) _bakes = new List<BakedModel>();
 			else _bakes.Clear();
-			
+
 			var instance = Instantiate(GameObject);
 			try
 			{
-				// instance.hideFlags = HideFlags.HideAndDontSave;
+				instance.hideFlags = HideFlags.HideAndDontSave;
 				var animator = instance.GetComponentInChildren<Animator>();
 				var animatedObject = animator ? animator.gameObject : instance;
-				var renderer = instance.GetComponentsInChildren<SkinnedMeshRenderer>();
-				for (var index = 0; index < renderer.Length; index++)
+				var renderers = instance.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+				var renderer = renderers.FirstOrDefault(r => r);
+				if (renderer)
 				{
-					var rend = renderer[index];
-					Debug.Log(rend);
-					if (Index >= 0 && index != Index) continue; 
-					var animData = AnimationDataProvider.GetAnimations(animatedObject, Animations, rend, 0, -1);
-					var animationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
-					var skinBake = AnimationTextureProvider.BakeSkinning(rend.sharedMesh, Shader);
-					_bakes.Add(new BakedModel(skinBake, animationBake));
+					var animData = AnimationDataProvider.GetAnimations(animatedObject, Animations, renderer, 0, -1);
+					for (var index = 0; index < renderers.Length; index++)
+					{
+						renderer = renderers[index];
+						var skinBake = AnimationTextureProvider.BakeSkinning(renderer.sharedMesh, Shader);
+						var animationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
+						_bakes.Add(new BakedModel(skinBake, animationBake));
+					}
 				}
 			}
 			catch (Exception e)
@@ -101,7 +102,7 @@ namespace needle.GpuAnimation
 			}
 			finally
 			{
-				// DestroyImmediate(instance);
+				DestroyImmediate(instance);
 			}
 		}
 
