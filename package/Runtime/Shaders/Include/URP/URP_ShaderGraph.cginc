@@ -8,15 +8,14 @@
 
 sampler2D _Animation, _Skinning;
 float4 _Animation_TexelSize, _Skinning_TexelSize;
-float4 _CurrentAnimation; 
 
-void GpuSkinning_float(float4 vert, float3 normal, float time, out float4 skinnedVertex, out float3 skinnedNormal)
+void GpuSkinning_float(float vertexId, float4 vert, float3 normal, float time, float4 currentAnimation, out float4 skinnedVertex, out float3 skinnedNormal)
 {
     skinnedVertex = vert;
     skinnedNormal = normal;
 
-    const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-    skin(skinnedVertex, skinnedNormal, 0, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
+    const TextureClipInfo clip = ToTextureClipInfo(currentAnimation);
+    skin(skinnedVertex, skinnedNormal, (uint)vertexId, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond))); 
 }
 
 
