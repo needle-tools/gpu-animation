@@ -2,11 +2,11 @@
 {
 	Properties
 	{
-		_Color ("Color", Color) = (1,1,1,1)
+		_Color ("Color", Color) = (.5,.5,.5,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0,1)) = 0.5
+		_Glossiness ("Smoothness", Range(0,1)) = 0.2
 		_Metallic ("Metallic", Range(0,1)) = 0.0
-		_EmissionFactor ("Emission Factor", float) = 0
+		_EmissionFactor ("Emission Factor", float) = .5
 		_Emission ("Emission", 2D) = "white" {}
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0

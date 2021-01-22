@@ -1,5 +1,7 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Elaborate.AnimationBakery
@@ -7,12 +9,6 @@ namespace Elaborate.AnimationBakery
 	[CustomEditor(typeof(BakedAnimation), true)]
 	public class BakedAnimationEditor : Editor
 	{
-		private void OnEnable()
-		{
-			if (renderUtility == null)
-				renderUtility = new PreviewRenderUtility();
-		}
-
 		private void OnDisable()
 		{
 			renderUtility?.Cleanup();
@@ -36,6 +32,9 @@ namespace Elaborate.AnimationBakery
 
 		private void DrawPreview()
 		{
+			if (renderUtility == null)
+				renderUtility = new PreviewRenderUtility();
+
 			var baked = target as BakedAnimation;
 			if (!baked || !baked.HasBakedAnimation) return;
 
@@ -68,12 +67,16 @@ namespace Elaborate.AnimationBakery
 		}
 
 		private static Material _previewMaterial;
+		private static readonly int Color = Shader.PropertyToID("_Color");
+		private static readonly int EmissionFactor = Shader.PropertyToID("_EmissionFactor");
 
 		private static Material PreviewMaterial
 		{
 			get
 			{
 				if (!_previewMaterial) _previewMaterial = new Material(Shader.Find("BakedAnimation/PreviewAnimation"));
+				// _previewMaterial.SetColor(Color, new Color(75, 75, 75));
+				// _previewMaterial.SetFloat(EmissionFactor, 0.54f);
 				return _previewMaterial;
 			}
 		}
@@ -91,6 +94,8 @@ namespace Elaborate.AnimationBakery
 
 		private static void DrawAnimationPreview(BakedAnimation baked, int i, Rect rect, MaterialPropertyBlock block, float time, float angle)
 		{
+			if (!baked) return;
+			if (!baked.HasBakedAnimation) return;
 			var clip = baked.AnimationBake.ClipsInfos[i];
 			renderUtility.BeginPreview(rect, GUIStyle.none);
 
@@ -172,5 +177,63 @@ namespace Elaborate.AnimationBakery
 				DrawAnimationPreview(target as BakedAnimation, index, r, block, time, angle);
 			}
 		}
+
+
+		// ReSharper disable once Unity.IncorrectMethodSignature
+		public void OnSceneDrag(SceneView sceneView)
+		{
+			var bake = target as BakedAnimation;
+			if (!bake) return;
+			// if (bake.HasBakedAnimation)
+			DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+
+			var evt = Event.current;
+			switch (evt.type)
+			{
+				case EventType.DragPerform:
+					var go = new GameObject();
+					go.name = bake.name;
+					var prev = go.AddComponent<PreviewBakedAnimation>();
+					prev.Animation = bake;
+					prev.PreviewMaterial = new Material(PreviewMaterial);
+					if (bake.HasBakedAnimation)
+						prev.Offset = bake.SkinBake.Mesh.bounds.extents.z * Vector3.back * 2.5f;
+					else
+						prev.Offset = Vector3.back;
+					Selection.activeObject = go;
+					break;
+			}
+		}
+
+		// private void OnSceneDrag(SceneView sceneView, int index)
+		// {
+		//
+		// 	// if (Event.current.type == EventType.DragUpdated || Event.current.type == EventType.DragPerform)
+		// 	// {
+		// 	// 	DragAndDrop.visualMode = DragAndDropVisualMode.Copy; // show a drag-add icon on the mouse cursor
+		// 	//
+		// 	// 	if (draggedObj == null)
+		// 	// 		draggedObj = (GameObject)Object.Instantiate(DragAndDrop.objectReferences[0]);
+		// 	//
+		// 	// 	// compute mouse position on the world y=0 plane
+		// 	// 	Ray mouseRay = Camera.current.ScreenPointToRay(new Vector3(Event.current.mousePosition.x, Screen.height - Event.current.mousePosition.y, 0.0f));
+		// 	// 	if (mouseRay.direction.y &lt; 0.0f)
+		// 	// 	{
+		// 	// 		float t = -mouseRay.origin.y / mouseRay.direction.y;
+		// 	// 		Vector3 mouseWorldPos = mouseRay.origin + t * mouseRay.direction;
+		// 	// 		mouseWorldPos.y = 0.0f;
+		// 	//
+		// 	// 		draggedObj.transform.position = terrain.SnapToNearestTileCenter(mouseWorldPos);
+		// 	// 	}
+		// 	//
+		// 	// 	if (Event.current.type == EventType.DragPerform)
+		// 	// 	{
+		// 	// 		DragAndDrop.AcceptDrag();
+		// 	// 		draggedObj = null;
+		// 	// 	}
+		// 	//
+		// 	// 	Event.current.Use();
+		// 	// }
+		// }
 	}
 }

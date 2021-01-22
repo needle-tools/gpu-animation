@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace Elaborate.AnimationBakery
 {
@@ -41,7 +40,7 @@ namespace Elaborate.AnimationBakery
 		}
 
 		public bool HasBakedAnimation => ClipsCount > 0;
-		public int ClipsCount => AnimationBake.ClipsInfos != null ? AnimationBake.ClipsInfos.Count : 0;
+		public int ClipsCount => AnimationBake?.ClipsInfos?.Count ?? 0;
 		
 		
 		[SerializeField] private ComputeShader Shader;
