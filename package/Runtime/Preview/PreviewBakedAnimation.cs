@@ -24,21 +24,26 @@ namespace needle.GpuAnimation
 		private void OnEnable()
 		{
 			Camera.onPreCull += BeforeRender;
+#if SHADERGRAPH_INSTALLED
 			RenderPipelineManager.beginCameraRendering += BeforeRender;
+#endif
 		}
 
 		private void OnDisable()
 		{
-			Camera.onPreCull -= BeforeRender;
-			RenderPipelineManager.beginCameraRendering -= BeforeRender;
 			_materials = null;
+			Camera.onPreCull -= BeforeRender;
+#if SHADERGRAPH_INSTALLED
+			RenderPipelineManager.beginCameraRendering -= BeforeRender;
+#endif
 		}
 
-
+#if SHADERGRAPH_INSTALLED
 		private void BeforeRender(ScriptableRenderContext context, Camera cam)
 		{
 			BeforeRender(cam);
 		}
+#endif
 
 		private void BeforeRender(Camera cam)
 		{
