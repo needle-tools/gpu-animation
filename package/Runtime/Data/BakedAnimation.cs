@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace needle.GpuAnimation
 {
-	[CreateAssetMenu(menuName = "Animation/" + nameof(BakedAnimation), order = -1000)] 
+	[CreateAssetMenu(menuName = "Animation/Baked Animation", order = -1000)]
 	public class BakedAnimation : ScriptableObject
 	{
 		private BakedMeshSkinningData _skinBake;
@@ -21,6 +21,7 @@ namespace needle.GpuAnimation
 				{
 					Bake();
 				}
+
 				return _skinBake;
 			}
 			private set => _skinBake = value;
@@ -34,6 +35,7 @@ namespace needle.GpuAnimation
 				{
 					Bake();
 				}
+
 				return _animationBake;
 			}
 			private set => _animationBake = value;
@@ -41,30 +43,42 @@ namespace needle.GpuAnimation
 
 		public bool HasBakedAnimation => ClipsCount > 0;
 		public int ClipsCount => AnimationBake?.ClipsInfos?.Count ?? 0;
-		
-		
+
+
 		[SerializeField] private ComputeShader Shader;
-
-		[Header("Input Data")] [SerializeField]
-		private GameObject GameObject;
-
+		[Header("Input Data")] 
+		[SerializeField] private GameObject GameObject;
 		[SerializeField] private List<AnimationClip> Animations;
 
-		
-		[ContextMenu(nameof(Bake))]
-		private void Bake()
+
+		private void OnEnable()
+		{
+			CheckCanBake(true);
+		}
+
+		private bool CheckCanBake(bool allowLogs)
 		{
 			if (!GameObject)
 			{
-				Debug.LogWarning("Can not bake: No GameObject assigned", this);
-				return;
+				if (allowLogs)
+					Debug.LogWarning($"Can not bake {this.name}: No GameObject assigned", this);
+				return false;
 			}
 
 			if (!Animations.Any(a => a))
 			{
-				Debug.LogWarning("Can not bake: No Animations assigned", this);
-				return;
+				if (allowLogs)
+					Debug.LogWarning($"Can not bake {this.name}:  No Animations assigned", this);
+				return false;
 			}
+
+			return true;
+		}
+
+		[ContextMenu(nameof(Bake))]
+		private void Bake()
+		{
+			if (!CheckCanBake(false)) return;
 
 			var instance = Instantiate(GameObject);
 			try
@@ -86,8 +100,8 @@ namespace needle.GpuAnimation
 				DestroyImmediate(instance);
 			}
 		}
-		
-		
+
+
 #if UNITY_EDITOR
 		[SerializeField] private bool UpdateImmediately = true;
 		private int previousHash;
@@ -113,7 +127,6 @@ namespace needle.GpuAnimation
 		}
 
 
-		
 		//
 		// private IEnumerable<Object> GetSubAssets()
 		// {
