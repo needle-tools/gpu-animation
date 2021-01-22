@@ -5,7 +5,7 @@ using UnityEditor.ShaderGraph.Internal;
 
 namespace UnityEditor.ShaderGraph
 {
-    [Title("Input", "Custom", "Vertex ID Generator")]
+    [Title("Input", "Custom", "Generate Vertex ID")]
     internal class GenerateVertexIDNode : AbstractMaterialNode, IMayRequireVertexID, IGeneratesBodyCode
     {
         const string kOutputSlotName = "Out";
