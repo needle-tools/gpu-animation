@@ -1,5 +1,8 @@
 #ifndef _GPU_SKINNING_
 #define _GPU_SKINNING_
+
+#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+
 #include "AnimationTypes.cginc"
 #include "SkinningUtils.cginc"
 
@@ -96,5 +99,6 @@ void skin(inout float4 vert, inout float3 normal, int vertId,
 
 	skin4(vert, normal, m0, w0, m1, w1, m2, w2, m3, w3);
 }
-#endif
 
+#endif
+#endif

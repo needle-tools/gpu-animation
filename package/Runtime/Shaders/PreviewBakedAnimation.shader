@@ -37,6 +37,8 @@
 			float4 vertex : POSITION;
 			float3 normal : NORMAL;
 			float2 texcoord : TEXCOORD0;
+			float2 texcoord1 : TEXCOORD1;
+			float2 texcoord2 : TEXCOORD2;
 			float4 tangent : TANGENT;
 			uint vertex_id : SV_VertexID;
 			uint instance_id : SV_InstanceID;
@@ -71,8 +73,6 @@
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
 			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
 			#endif
-
-
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
