@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Elaborate.AnimationBakery
@@ -9,6 +10,7 @@ namespace Elaborate.AnimationBakery
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
 		public Vector3 Offset = new Vector3(0, 0, 1);
+		public int Clip = -1;
 
 		private BakedMeshSkinningData SkinBake => Animation.SkinBake;
 		private BakedAnimationData AnimationBake => Animation.AnimationBake;
@@ -18,8 +20,6 @@ namespace Elaborate.AnimationBakery
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
 		private Material[] _previewMaterial;
-
-		// public Texture skin, anim;
 
 		private void OnDisable()
 		{
@@ -33,17 +33,20 @@ namespace Elaborate.AnimationBakery
 				Debug.LogWarning("No Animation", this);
 				return;
 			}
+
 			if (!PreviewMaterial)
 			{
 				Debug.LogWarning("No PreviewMaterial", this);
 				return;
 			}
+
 			if (SkinBake == null || !SkinBake.Texture)
 			{
 				Debug.LogWarning("No Skin Bake Texture", this);
 				return;
 			}
-			if (AnimationBake == null || !AnimationBake.Texture) 
+
+			if (AnimationBake == null || !AnimationBake.Texture)
 			{
 				Debug.LogWarning("No Animation Bake Texture", this);
 				return;
@@ -57,9 +60,9 @@ namespace Elaborate.AnimationBakery
 
 			for (var i = 0; i < AnimationBake.ClipsInfos.Count; i++)
 			{
+				if (Clip != -1 && i != (Clip % AnimationBake.ClipsInfos.Count)) continue;
 				var clip = AnimationBake.ClipsInfos[i];
-				// if (!_previewMaterial[i]) 
-					_previewMaterial[i] = new Material(PreviewMaterial);
+				_previewMaterial[i] = new Material(PreviewMaterial);
 				var mat = _previewMaterial[i];
 				mat.CopyPropertiesFromMaterial(PreviewMaterial);
 				mat.SetTexture(Animation1, AnimationBake.Texture);

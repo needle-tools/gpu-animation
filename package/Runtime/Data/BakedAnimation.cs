@@ -39,6 +39,9 @@ namespace Elaborate.AnimationBakery
 			}
 			private set => _animationBake = value;
 		}
+
+		public bool HasBakedAnimation => ClipsCount > 0;
+		public int ClipsCount => AnimationBake.ClipsInfos != null ? AnimationBake.ClipsInfos.Count : 0;
 		
 		
 		[SerializeField] private ComputeShader Shader;

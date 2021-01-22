@@ -23,6 +23,7 @@
       <Path>Library</Path>
       <Path>Temp</Path>
       <Path>UserSettings</Path>
+      <Path>builds</Path>
       <Path>obj</Path>
     </explicitExcludes>
   </component>

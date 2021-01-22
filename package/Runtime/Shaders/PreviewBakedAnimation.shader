@@ -55,6 +55,7 @@
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
 		float4 _CurrentAnimation;
+		float Time;
 
 		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		// StructuredBuffer<BoneWeight> _BoneWeights;
