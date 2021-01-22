@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8b07fb0cd5446ee85f647d7967179c6, type: 3}
+  m_Name: male
+  m_EditorClassIdentifier: 
+  Shader: {fileID: 7200000, guid: 87aefcafb4c744688d7375e5ab83a224, type: 3}
+  GameObject: {fileID: 100122, guid: 07c4ef91a6ad63442ba51d1f34fe16be, type: 3}
+  Animations:
+  - {fileID: 7400000, guid: 0bd1f62ab1699a1469551c1ae0dd4ee5, type: 3}
+  - {fileID: 7400000, guid: cd0db4d58249e5843b678a49de53c94a, type: 3}
+  - {fileID: 7400000, guid: 70ed7022d26bbc845ac0aef1283128c2, type: 3}
+  - {fileID: 7400000, guid: 9bed16f5753391f498f7ff2bf4e76992, type: 3}
+  - {fileID: 7400000, guid: 0ec27603504523240905a35178a920b9, type: 3}
+  - {fileID: 7400000, guid: 2f6b2f462e084ff499862ef621e9eded, type: 3}
+  - {fileID: 7400000, guid: 2de49ee9386c7b247b265e8e54659d8b, type: 3}
+  - {fileID: 7400000, guid: eb8c3bd21c706464abf2adda21f43ad6, type: 3}
+  UpdateImmediately: 1

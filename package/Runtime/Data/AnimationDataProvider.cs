@@ -1,9 +1,5 @@
-﻿#if UNITY_EDITOR
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Elaborate.AnimationBakery
@@ -77,9 +73,6 @@ namespace Elaborate.AnimationBakery
 			var duration = clip.length;
 			var frames = duration * frameRate;
 
-			AnimationMode.StartAnimationMode();
-			AnimationMode.BeginSampling();
-
 			var boneTransformations = new Dictionary<Transform, BoneTransformationData>();
 			for (var i = 0; i < frames; i++)
 			{
@@ -88,7 +81,7 @@ namespace Elaborate.AnimationBakery
 				var frame = i;
 				var time = ((float) frame / frames) * duration;
 				
-				AnimationMode.SampleAnimationClip(animator.gameObject, clip, time);
+				clip.SampleAnimation(animator.gameObject, time);
 				
 				// sample all bones
 				foreach (var kvp in bonesInfo)
@@ -112,10 +105,7 @@ namespace Elaborate.AnimationBakery
 					boneTransformations[bone].Transformations.Add(new BoneTransformation(time, boneMatrix, scale != Vector3.one));
 				}
 			}
-			AnimationMode.EndSampling();
-			AnimationMode.StopAnimationMode();
 			
-
 			return boneTransformations.Values.ToArray();
 		}
 
@@ -196,4 +186,3 @@ namespace Elaborate.AnimationBakery
 		}
 	}
 }
-#endif

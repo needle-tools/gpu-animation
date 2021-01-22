@@ -36,3 +36,4 @@ sysinfo.txt
 projects/**/Temp
 projects/**/obj
 projects/*/Logs
+projects/**/builds

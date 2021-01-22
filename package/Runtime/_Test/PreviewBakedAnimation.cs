@@ -18,7 +18,6 @@ namespace Elaborate.AnimationBakery
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
 		private Material[] _previewMaterial;
-		private AnimationBakerComponent bakerComponent;
 
 		// public Texture skin, anim;
 
@@ -29,9 +28,6 @@ namespace Elaborate.AnimationBakery
 
 		private void Update()
 		{
-			if ((!Animation || !bakerComponent) && TryGetComponent(out bakerComponent) && bakerComponent.Target)
-				Animation = bakerComponent.Target;
-
 			if (!Animation)
 			{
 				Debug.LogWarning("No Animation", this);
