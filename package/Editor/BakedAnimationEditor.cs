@@ -45,8 +45,11 @@ namespace needle.GpuAnimation
 		{
 			var baked = target as BakedAnimation;
 			if (!baked || !baked.HasBakedAnimation) return;
-			// EditorGUILayout.ObjectField("Skinning", baked.SkinBake.Texture, baked.SkinBake.Texture.GetType(), false);
-			// EditorGUILayout.ObjectField("Animation", baked.AnimationBake.Texture, baked.AnimationBake.Texture.GetType(), false);
+			foreach (var bake in baked.Models)
+			{
+				EditorGUILayout.ObjectField("Skinning", bake.Skinning.Texture, bake.Skinning.Texture.GetType(), false);
+				EditorGUILayout.ObjectField("Animation", bake.Animations.Texture, bake.Animations.Texture.GetType(), false);
+			}
 		}
 
 		private void DrawPreview()

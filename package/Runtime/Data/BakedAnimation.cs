@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace needle.GpuAnimation
 {
@@ -52,7 +55,6 @@ namespace needle.GpuAnimation
 		{
 			_bakes = null;
 			CheckCanBake(true);
-			// EditorApplication.playModeStateChanged += OnPlayModeChange;
 		}
 		
 		private bool CheckCanBake(bool allowLogs)
