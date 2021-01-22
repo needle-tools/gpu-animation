@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8b07fb0cd5446ee85f647d7967179c6, type: 3}
-  m_Name: Horse
+  m_Name: Villager
   m_EditorClassIdentifier: 
   Shader: {fileID: 7200000, guid: 87aefcafb4c744688d7375e5ab83a224, type: 3}
-  GameObject: {fileID: 100000, guid: a85d92b72304a79449904f3b49e3d5ea, type: 3}
+  GameObject: {fileID: 919132149155446097, guid: 0c032b9d04eadfe4ba7015638db602d1,
+    type: 3}
   Animations:
-  - {fileID: 7400000, guid: a748dee4242461842b2f083a18157d1f, type: 3}
-  - {fileID: 7400000, guid: f93e0aef0e51f7240b6df07faa08500d, type: 3}
-  - {fileID: 7400000, guid: 739a527acf30e794999333672821df88, type: 3}
+  - {fileID: -3419257869308726280, guid: 0c032b9d04eadfe4ba7015638db602d1, type: 3}
   UpdateImmediately: 1
