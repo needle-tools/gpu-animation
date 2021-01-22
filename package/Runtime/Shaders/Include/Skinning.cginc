@@ -10,28 +10,28 @@ void skin4(inout float4 vert, inout float3 normal, float4x4 m1, float w1, float4
 {
     const float4x4 mat = m1 * w1 + m2 * w2 + m3 * w3 + m4 * w4;
     vert = mul(mat, vert);
-    normal = mul(mat, normal);
+    normal = mul(mat, float4(normal,0)).xyz;
 }
 
 void skin3(inout float4 vert, inout float3 normal, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3)
 {
     const float4x4 mat = m1 * w1 + m2 * w2 + m3 * (1 - (w1 + w2));
     vert = mul(mat, vert);
-    normal = mul(mat, normal);
+    normal = mul(mat, float4(normal,0)).xyz;
 }
 
 void skin2(inout float4 vert, inout float3 normal, float4x4 m1, float w1, float4x4 m2)
 {
     const float4x4 mat = m1 * w1 + m2 * (1 - w1);
     vert = mul(mat, vert);
-    normal = mul(mat, normal);
+    normal = mul(mat, float4(normal,0)).xyz;
 }
 
 void skin1(inout float4 vert, inout float3 normal, float4x4 m1)
 {
     const float4x4 mat = m1 * 1;
     vert = mul(mat, vert);
-    normal = mul(mat, normal);
+    normal = mul(mat, float4(normal,0)).xyz;
 }
 
 
