@@ -6,10 +6,10 @@
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.2
 		_Metallic ("Metallic", Range(0,1)) = 0.0
-		_EmissionFactor ("Emission Factor", float) = .5
+		_EmissionFactor ("Emission Factor", float) = .2
 		_Emission ("Emission", 2D) = "white" {}
-		[Header(Skinning)]
-		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
+//		[Header(Skinning)]
+//		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
 	}
 	SubShader
 	{
@@ -27,7 +27,6 @@
 		#include "Include/Skinning.cginc"
 
 		sampler2D _MainTex, _Emission;
-
 		half _Glossiness;
 		half _Metallic;
 		half _EmissionFactor;
@@ -62,8 +61,6 @@
 		// StructuredBuffer<Bone> _Animations;
 		// #endif
 
-		
-
 		void vert(inout appdata v, out Input result)
 		{
 			UNITY_SETUP_INSTANCE_ID(v);
@@ -72,7 +69,7 @@
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 			TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			v.vertex = skin(v.vertex, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
+			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
 			#endif
 
 

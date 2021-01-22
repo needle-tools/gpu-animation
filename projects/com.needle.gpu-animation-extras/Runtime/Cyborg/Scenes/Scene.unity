@@ -213,40 +213,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1304708642
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: BakedAnimation-Preview
-  m_Shader: {fileID: 4800000, guid: c69b0ce0855244f8947ae5e27b0ea9e6, type: 3}
-  m_ShaderKeywords: SKIN_QUALITY_FOUR
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _Emission:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - Skin_Quality: 0
-    - _EmissionFactor: 0.4
-    - _Glossiness: 0
-    - _Metallic: 0
-    m_Colors:
-    - _Color: {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
 --- !u!1 &1458483005
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,7 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 9263c0cd37a4898458fc1b60e52c7349, type: 2}
-  PreviewMaterial: {fileID: 1304708642}
+  PreviewMaterial: {fileID: 1510835188}
   Offset: {x: 0, y: 0, z: -1}
   Clip: -1
 --- !u!4 &1458483007
@@ -294,6 +260,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1510835188
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BakedAnimation-Preview
+  m_Shader: {fileID: 4800000, guid: c69b0ce0855244f8947ae5e27b0ea9e6, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Emission:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _EmissionFactor: 0.2
+    - _Glossiness: 0.2
+    - _Metallic: 0
+    m_Colors:
+    - _Color: {r: 0.4, g: 0.4, b: 0.4, a: 1}
 --- !u!1001 &1561729637
 PrefabInstance:
   m_ObjectHideFlags: 0

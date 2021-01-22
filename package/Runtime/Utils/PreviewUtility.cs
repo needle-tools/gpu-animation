@@ -27,9 +27,9 @@ namespace needle.GpuAnimation
 			{
 				var mat = new Material(PreviewShader);
 				mat.name = nameof(BakedAnimation) + "-Preview";
-				var val = 75 / 255f;
+				var val = 102 / 255f;
 				mat.SetColor(Color, new Color(val, val, val));
-				mat.SetFloat(EmissionFactor, 0.5f);
+				mat.SetFloat(EmissionFactor, 0.2f);
 				return mat;
 			}
 
