@@ -82,6 +82,7 @@
 		{
 			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
 			o.Albedo = col.rgb;
+			o.Occlusion = 0;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;

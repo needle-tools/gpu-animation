@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -19,8 +20,7 @@ namespace needle.GpuAnimation
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
-
-
+		
 		private Material[] _materials;
 
 		private void OnEnable()
@@ -45,6 +45,7 @@ namespace needle.GpuAnimation
 
 			if (!Animation || !Animation.HasBakedAnimation)
 			{
+				Debug.Log("No anim");
 				return;
 			}
 
@@ -61,19 +62,20 @@ namespace needle.GpuAnimation
 			}
 
 			var matIndex = 0;
-			foreach (var bake in Animation.Bakes)
+			foreach (var bake in Animation.Models)
 			{
 				var skin = bake.Skinning;
 				var animationBake = bake.Animations;
 				for (var i = 0; i < animationBake.ClipsInfos.Count; i++)
 				{
-					if (Clip != -1 && i != (Clip % animationBake.ClipsInfos.Count)) continue;
+					if (Clip != -1 && i != (Clip % animationBake.ClipsInfos.Count))
+					{
+						Debug.Log("no clip");
+						continue;
+					}
 					var clip = animationBake.ClipsInfos[i];
 					
-					if (!_materials[matIndex])
-					{
-						_materials[matIndex] = new Material(PreviewMaterial);
-					}
+					if (!_materials[matIndex]) _materials[matIndex] = new Material(PreviewMaterial);
 					var mat = _materials[matIndex];
 					
 					mat.CopyPropertiesFromMaterial(PreviewMaterial);
@@ -83,7 +85,7 @@ namespace needle.GpuAnimation
 					var offset = Offset;
 					offset *= i;
 					var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
-
+					
 					for (var k = 0; k < skin.Mesh.subMeshCount; k++)
 						Graphics.DrawMesh(skin.Mesh, matrix, _materials[matIndex], 0, cam, k);
 					++matIndex;

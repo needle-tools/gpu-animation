@@ -12,6 +12,8 @@ namespace needle.GpuAnimation
 	{
 		public readonly BakedMeshSkinningData Skinning;
 		public readonly BakedAnimationData Animations;
+		public Mesh Mesh => Skinning?.Mesh;
+		public bool IsValid => Mesh && Animations?.ClipsInfos?.Count > 0 && Skinning.Texture && Animations.Texture;
 
 		public BakedModel(BakedMeshSkinningData skinning, BakedAnimationData animations)
 		{
@@ -23,17 +25,20 @@ namespace needle.GpuAnimation
 	[CreateAssetMenu(menuName = "Animation/Baked Animation", order = -1000)]
 	public class BakedAnimation : ScriptableObject
 	{
-		public IReadOnlyList<BakedModel> Bakes
+		public IReadOnlyList<BakedModel> Models
 		{
 			get
 			{
-				if (_bakes == null) BakeAnimations();
+				if (_bakes == null || !_bakes.All(b => b.IsValid))
+				{
+					BakeAnimations();
+				}
 				return _bakes;
 			}
 		}
 
-		public bool HasBakedAnimation => Bakes != null && ClipsCount > 0;
-		public int ClipsCount => Bakes?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
+		public bool HasBakedAnimation => Models != null && ClipsCount > 0;
+		public int ClipsCount => Models?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
 
 		[SerializeField] private ComputeShader Shader;
 
@@ -46,9 +51,11 @@ namespace needle.GpuAnimation
 
 		private void OnEnable()
 		{
+			_bakes = null;
 			CheckCanBake(true);
+			// EditorApplication.playModeStateChanged += OnPlayModeChange;
 		}
-
+		
 		private bool CheckCanBake(bool allowLogs)
 		{
 			if (!GameObject)
