@@ -19,7 +19,7 @@ namespace needle.GpuAnimation
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
-		private Material[] _materials;
+		private MaterialPropertyBlock[] _blocks;
 
 		private void OnEnable()
 		{
@@ -31,7 +31,7 @@ namespace needle.GpuAnimation
 
 		private void OnDisable()
 		{
-			_materials = null;
+			_blocks = null;
 			Camera.onPreCull -= BeforeRender;
 #if SHADERGRAPH_INSTALLED
 			RenderPipelineManager.beginCameraRendering -= BeforeRender;
@@ -66,9 +66,9 @@ namespace needle.GpuAnimation
 					return;
 			}
 
-			if (_materials == null || _materials.Length != Animation.ClipsCount)
+			if (_blocks == null || _blocks.Length != Animation.ClipsCount)
 			{
-				_materials = new Material[Animation.ClipsCount];
+				_blocks = new MaterialPropertyBlock[Animation.ClipsCount];
 			}
 
 			var matIndex = 0;
@@ -85,19 +85,17 @@ namespace needle.GpuAnimation
 
 					var clip = animationBake.ClipsInfos[i];
 
-					if (!_materials[matIndex]) _materials[matIndex] = new Material(PreviewMaterial);
-					var mat = _materials[matIndex];
-
-					mat.CopyPropertiesFromMaterial(PreviewMaterial);
-					mat.SetTexture(Animation1, animationBake.Texture);
-					mat.SetTexture(Skinning, skin.Texture);
-					mat.SetVector(CurrentAnimation, clip.AsVector4);
+					if (_blocks[matIndex] == null) _blocks[matIndex] = new MaterialPropertyBlock();
+					var block = _blocks[matIndex];
+					block.SetTexture(Animation1, animationBake.Texture);
+					block.SetTexture(Skinning, skin.Texture);
+					block.SetVector(CurrentAnimation, clip.AsVector4);
 					var offset = Offset;
 					offset *= i;
 					var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
 
 					for (var k = 0; k < skin.Mesh.subMeshCount; k++)
-						Graphics.DrawMesh(skin.Mesh, matrix, _materials[matIndex], 0, cam, k);
+						Graphics.DrawMesh(skin.Mesh, matrix, PreviewMaterial, 0, cam, k, block);
 					++matIndex;
 				}
 			}
