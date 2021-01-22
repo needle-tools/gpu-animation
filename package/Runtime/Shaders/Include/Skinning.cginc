@@ -3,8 +3,6 @@
 #include "AnimationTypes.cginc"
 #include "SkinningUtils.cginc"
 
-#if SHADER_TARGET >= 35 && (defined(SHADER_API_D3D11))
-
 void skin4(inout float4 vert, inout float3 normal, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3, float w3, float4x4 m4, float w4)
 {
     const float4x4 mat = m1 * w1 + m2 * w2 + m3 * w3 + m4 * w4;
@@ -100,4 +98,3 @@ void skin(inout float4 vert, inout float3 normal, int vertId,
 }
 #endif
 
-#endif

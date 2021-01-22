@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using UnityEditor.Experimental.SceneManagement;
+
 #endif
 namespace needle.GpuAnimation
 {
@@ -9,25 +11,33 @@ namespace needle.GpuAnimation
 	{
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
-		
+
 		public Vector3 Offset = new Vector3(0, 0, 1);
 		public int Clip = -1;
 
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
-		
+
 		private Material[] _materials;
 
 		private void OnEnable()
 		{
 			Camera.onPreCull += BeforeRender;
+			RenderPipelineManager.beginCameraRendering += BeforeRender;
 		}
 
 		private void OnDisable()
 		{
 			Camera.onPreCull -= BeforeRender;
+			RenderPipelineManager.beginCameraRendering -= BeforeRender;
 			_materials = null;
+		}
+
+
+		private void BeforeRender(ScriptableRenderContext context, Camera cam)
+		{
+			BeforeRender(cam);
 		}
 
 		private void BeforeRender(Camera cam)
@@ -41,7 +51,6 @@ namespace needle.GpuAnimation
 
 			if (!Animation || !Animation.HasBakedAnimation)
 			{
-				Debug.Log("No anim");
 				return;
 			}
 
@@ -66,14 +75,14 @@ namespace needle.GpuAnimation
 				{
 					if (Clip != -1 && i != (Clip % animationBake.ClipsInfos.Count))
 					{
-						Debug.Log("no clip");
 						continue;
 					}
+
 					var clip = animationBake.ClipsInfos[i];
-					
+
 					if (!_materials[matIndex]) _materials[matIndex] = new Material(PreviewMaterial);
 					var mat = _materials[matIndex];
-					
+
 					mat.CopyPropertiesFromMaterial(PreviewMaterial);
 					mat.SetTexture(Animation1, animationBake.Texture);
 					mat.SetTexture(Skinning, skin.Texture);
@@ -81,7 +90,7 @@ namespace needle.GpuAnimation
 					var offset = Offset;
 					offset *= i;
 					var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
-					
+
 					for (var k = 0; k < skin.Mesh.subMeshCount; k++)
 						Graphics.DrawMesh(skin.Mesh, matrix, _materials[matIndex], 0, cam, k);
 					++matIndex;
