@@ -7,7 +7,7 @@ namespace needle.GpuAnimation
 	public static class AnimationDataProvider
 	{
 		public static List<AnimationTransformationData> GetAnimations(
-			Animator animator, List<AnimationClip> animationClips, SkinnedMeshRenderer skinnedMeshRenderer,
+			GameObject animatedObject, List<AnimationClip> animationClips, SkinnedMeshRenderer skinnedMeshRenderer,
 			int skip, float frameRate = -1
 		)
 		{
@@ -26,7 +26,7 @@ namespace needle.GpuAnimation
 				// make sure not to add one clip multiple times
 				if (result.Any(r => r.Clip == clip)) continue;
 
-				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animator, skinnedMeshRenderer.rootBone, bones, bonesInfo, clip, skip, out int fps, frameRate);
+				var data = SampleAnimationData(skinnedMeshRenderer.sharedMesh, animatedObject, skinnedMeshRenderer.rootBone, bones, bonesInfo, clip, skip, out int fps, frameRate);
 				result.Add(new AnimationTransformationData(clip, data, fps));
 			}
 
@@ -35,7 +35,7 @@ namespace needle.GpuAnimation
 
 		private static BoneTransformationData[] SampleAnimationData(
 			Mesh mesh, 
-			Animator animatedObject,
+			GameObject animatedObject,
 			Transform rootBone,
 			Transform[] bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
@@ -57,7 +57,7 @@ namespace needle.GpuAnimation
 		}
 
 		private static BoneTransformationData[] SampleAndStoreAnimationClipData(
-			Animator animator, AnimationClip clip,
+			GameObject animatedObject, AnimationClip clip,
 			Mesh mesh, IReadOnlyList<Transform> bones,
 			Dictionary<Transform, SkinnedMesh_BoneData> bonesInfo,
 			int skip, float frameRate,
@@ -81,7 +81,7 @@ namespace needle.GpuAnimation
 				var frame = i;
 				var time = ((float) frame / frames) * duration;
 				
-				clip.SampleAnimation(animator.gameObject, time);
+				clip.SampleAnimation(animatedObject, time);
 				
 				// sample all bones
 				foreach (var kvp in bonesInfo)

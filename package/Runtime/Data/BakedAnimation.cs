@@ -71,8 +71,9 @@ namespace needle.GpuAnimation
 			{
 				instance.hideFlags = HideFlags.HideAndDontSave;
 				var animator = instance.GetComponentInChildren<Animator>();
+				var animatedObject = animator ? animator.gameObject : instance;
 				var renderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
-				var animData = AnimationDataProvider.GetAnimations(animator, Animations, renderer, 0, -1);
+				var animData = AnimationDataProvider.GetAnimations(animatedObject, Animations, renderer, 0, -1);
 				AnimationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
 				SkinBake = AnimationTextureProvider.BakeSkinning(renderer.sharedMesh, Shader);
 			}
@@ -85,8 +86,6 @@ namespace needle.GpuAnimation
 				DestroyImmediate(instance);
 			}
 		}
-
-		
 		
 		
 #if UNITY_EDITOR

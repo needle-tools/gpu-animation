@@ -32,9 +32,6 @@ namespace needle.GpuAnimation
 
 		private void DrawPreview()
 		{
-			if (renderUtility == null)
-				renderUtility = new PreviewRenderUtility();
-
 			var baked = target as BakedAnimation;
 			if (!baked || !baked.HasBakedAnimation) return;
 
@@ -67,16 +64,12 @@ namespace needle.GpuAnimation
 		}
 
 		private static Material _previewMaterial;
-		private static readonly int Color = Shader.PropertyToID("_Color");
-		private static readonly int EmissionFactor = Shader.PropertyToID("_EmissionFactor");
 
 		private static Material PreviewMaterial
 		{
 			get
 			{
-				if (!_previewMaterial) _previewMaterial = new Material(Shader.Find("BakedAnimation/PreviewAnimation"));
-				// _previewMaterial.SetColor(Color, new Color(75, 75, 75));
-				// _previewMaterial.SetFloat(EmissionFactor, 0.54f);
+				if (!_previewMaterial) _previewMaterial = PreviewUtility.CreateNewPreviewMaterial();
 				return _previewMaterial;
 			}
 		}
@@ -97,6 +90,10 @@ namespace needle.GpuAnimation
 			if (!baked) return;
 			if (!baked.HasBakedAnimation) return;
 			var clip = baked.AnimationBake.ClipsInfos[i];
+			
+			if (renderUtility == null)
+				renderUtility = new PreviewRenderUtility();
+			
 			renderUtility.BeginPreview(rect, GUIStyle.none);
 
 			if (block == null) block = new MaterialPropertyBlock();
