@@ -8,8 +8,8 @@
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 		_EmissionFactor ("Emission Factor", float) = .2
 		_Emission ("Emission", 2D) = "white" {}
-		//		[Header(Skinning)]
-		//		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
+		[Header(Skinning)]
+		[KeywordEnum(Four, Three, Two, One)] Skin_Quality("Skin Quality", Float) = 0
 	}
 	SubShader
 	{
@@ -25,7 +25,7 @@
 		#pragma multi_compile_instancing
 		#pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
-		#include "Include/Skinning.cginc"
+		#include "Include/Skinning.cginc" 
 
 
 		sampler2D _MainTex, _Emission;

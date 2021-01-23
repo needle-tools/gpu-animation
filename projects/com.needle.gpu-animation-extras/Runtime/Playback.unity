@@ -121,6 +121,54 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &191616208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 191616210}
+  - component: {fileID: 191616209}
+  m_Layer: 0
+  m_Name: Male
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &191616209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191616208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed0c3add66f24b2e960b4afd5aac08c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animation: {fileID: 11400000, guid: 4a79d788b71fb2e4a967e744e7f7c89c, type: 2}
+  PreviewMaterial: {fileID: 1320031265}
+  skinQuality: 3
+  Offset: {x: 0, y: 0, z: -2}
+  Clip: -1
+--- !u!4 &191616210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191616208}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.826, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &276898983
 Material:
   serializedVersion: 6
@@ -149,6 +197,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Skin_Quality: 0
     - _EmissionFactor: 0.2
     - _Glossiness: 0.2
     - _Metallic: 0
@@ -185,6 +234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 9263c0cd37a4898458fc1b60e52c7349, type: 2}
   PreviewMaterial: {fileID: 1733983831}
+  skinQuality: 3
   Offset: {x: 0, y: 0, z: -0.07701436}
   Clip: -1
 --- !u!4 &387856592
@@ -199,7 +249,7 @@ Transform:
   m_LocalScale: {x: 0.035764787, y: 0.035764787, z: 0.035764787}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &398923413
 GameObject:
@@ -378,13 +428,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 434016024}
-  m_LocalRotation: {x: 0.14106561, y: 0.6134248, z: -0.11254779, w: 0.7688586}
+  m_LocalRotation: {x: 0.16775759, y: 0.36247987, z: -0.06650461, w: 0.91435385}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 20.793001, y: 77.16801, z: 0}
+  m_LocalEulerAnglesHint: {x: 20.793001, y: 43.25, z: 0}
 --- !u!1 &598229152
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,6 +518,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &646621788
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BakedAnimation-Preview
+  m_Shader: {fileID: 4800000, guid: c69b0ce0855244f8947ae5e27b0ea9e6, type: 3}
+  m_ShaderKeywords: SKIN_QUALITY_FOUR
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Emission:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Skin_Quality: 0
+    - _EmissionFactor: 0.2
+    - _Glossiness: 0.2
+    - _Metallic: 0
+    m_Colors:
+    - _Color: {r: 0.4, g: 0.4, b: 0.4, a: 1}
 --- !u!1 &916490391
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,7 +563,7 @@ GameObject:
   - component: {fileID: 916490393}
   - component: {fileID: 916490392}
   m_Layer: 0
-  m_Name: Male
+  m_Name: Male_SkinQuality1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -498,9 +582,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 4a79d788b71fb2e4a967e744e7f7c89c, type: 2}
-  PreviewMaterial: {fileID: 1234183081}
-  Offset: {x: 0, y: 0, z: -1.08}
-  Clip: -1
+  PreviewMaterial: {fileID: 646621788}
+  skinQuality: 0
+  Offset: {x: 0, y: 0, z: -2}
+  Clip: 0
 --- !u!4 &916490393
 Transform:
   m_ObjectHideFlags: 0
@@ -509,11 +594,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 916490391}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.844, y: 0, z: 0}
+  m_LocalPosition: {x: 4.187, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1084357297
 GameObject:
@@ -546,6 +631,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 8d22fe501234fcf47aba01544891fcab, type: 2}
   PreviewMaterial: {fileID: 1731096510}
+  skinQuality: 0
   Offset: {x: 0, y: 0, z: -3.4}
   Clip: -1
 --- !u!4 &1084357299
@@ -562,7 +648,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1234183081
+--- !u!21 &1320031265
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -571,7 +657,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: BakedAnimation-Preview
   m_Shader: {fileID: 4800000, guid: c69b0ce0855244f8947ae5e27b0ea9e6, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: SKIN_QUALITY_FOUR
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -590,6 +676,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Skin_Quality: 0
     - _EmissionFactor: 0.2
     - _Glossiness: 0.2
     - _Metallic: 0
@@ -626,6 +713,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 5ceac057bb4b081439b5f83f43f8e36b, type: 2}
   PreviewMaterial: {fileID: 276898983}
+  skinQuality: 3
   Offset: {x: 0, y: 0, z: -1.08}
   Clip: -1
 --- !u!4 &1405463119
@@ -640,7 +728,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1731096510
 Material:
@@ -651,7 +739,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: BakedAnimation-Preview
   m_Shader: {fileID: 4800000, guid: c69b0ce0855244f8947ae5e27b0ea9e6, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: SKIN_QUALITY_ONE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -670,6 +758,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Skin_Quality: 3
     - _EmissionFactor: 0.2
     - _Glossiness: 0.2
     - _Metallic: 0
@@ -703,6 +792,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Skin_Quality: 0
     - _EmissionFactor: 0.2
     - _Glossiness: 0.2
     - _Metallic: 0

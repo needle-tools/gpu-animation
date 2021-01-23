@@ -1,8 +1,9 @@
+using System;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
+
 #if UNITY_EDITOR
 using UnityEditor.Experimental.SceneManagement;
-
 #endif
 namespace needle.GpuAnimation
 {
@@ -11,15 +12,25 @@ namespace needle.GpuAnimation
 	{
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
+		public SkinQuality skinQuality = SkinQuality.Four;
 
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
+		private Material _material;
 		private MaterialPropertyBlock[] _blocks;
+
+		private static event Action RequestDestroyMaterial;
 
 		protected virtual void OnEnable()
 		{
+			_material = null;
+			
+			#if UNITY_EDITOR
+			RequestDestroyMaterial += () => _material = null;
+			#endif
+			
 #if SHADERGRAPH_INSTALLED
 			RenderPipelineManager.beginCameraRendering += BeforeRender;
 #else
@@ -27,8 +38,9 @@ namespace needle.GpuAnimation
 #endif
 		}
 
-		protected virtual  void OnDisable()
+		protected virtual void OnDisable()
 		{
+			_material = null;
 			_blocks = null;
 #if SHADERGRAPH_INSTALLED
 			RenderPipelineManager.beginCameraRendering -= BeforeRender;
@@ -69,7 +81,20 @@ namespace needle.GpuAnimation
 			{
 				_blocks = new MaterialPropertyBlock[Animation.ClipsCount];
 			}
+
+#if UNITY_EDITOR
+			if (ShaderUtil.anythingCompiling) RequestDestroyMaterial?.Invoke();
+#endif
+
+			if (!_material || _material.shader != PreviewMaterial.shader || !_material.shader)
+			{
+				_material = new Material(PreviewMaterial);
+			}
+			else if (_material != PreviewMaterial)
+				_material.CopyPropertiesFromMaterial(PreviewMaterial);
 			
+			_material.SetSkinQuality(this.skinQuality);
+
 			OnBeforeRender(cam);
 
 			var matIndex = 0;
@@ -85,13 +110,16 @@ namespace needle.GpuAnimation
 					block.SetTexture(Animation1, animationBake.Texture);
 					block.SetTexture(Skinning, skin.Texture);
 					block.SetVector(CurrentAnimation, clip.AsVector4);
-					Render(cam, skin.Mesh, PreviewMaterial, block, i, animationBake.ClipsInfos.Count);
+					Render(cam, skin.Mesh, _material, block, i, animationBake.ClipsInfos.Count);
 					++matIndex;
 				}
 			}
 		}
 
-		protected virtual void OnBeforeRender(Camera cam){}
+		protected virtual void OnBeforeRender(Camera cam)
+		{
+		}
+
 		protected abstract void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount);
 	}
 }
