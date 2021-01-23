@@ -1,8 +1,10 @@
 using System;
-using UnityEditor;
 using UnityEngine;
-
+#if SHADERGRAPH_INSTALLED
+using UnityEngine.Rendering;
+#endif
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 #endif
 namespace needle.GpuAnimation
@@ -26,11 +28,11 @@ namespace needle.GpuAnimation
 		protected virtual void OnEnable()
 		{
 			_material = null;
-			
-			#if UNITY_EDITOR
+
+#if UNITY_EDITOR
 			RequestDestroyMaterial += () => _material = null;
-			#endif
-			
+#endif
+
 #if SHADERGRAPH_INSTALLED
 			RenderPipelineManager.beginCameraRendering += BeforeRender;
 #else
@@ -92,7 +94,7 @@ namespace needle.GpuAnimation
 			}
 			else if (_material != PreviewMaterial)
 				_material.CopyPropertiesFromMaterial(PreviewMaterial);
-			
+
 			_material.SetSkinQuality(this.skinQuality);
 
 			OnBeforeRender(cam);
