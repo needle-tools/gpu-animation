@@ -10,10 +10,11 @@ using UnityEditor;
 
 namespace needle.GpuAnimation
 {
+	[Serializable]
 	public class BakedModel
 	{
-		public readonly BakedMeshSkinningData Skinning;
-		public readonly BakedAnimationData Animations;
+		public BakedMeshSkinningData Skinning;
+		public BakedAnimationData Animations;
 		public Mesh Mesh => Skinning?.Mesh;
 		public bool IsValid => Mesh && Animations?.ClipsInfos?.Count > 0 && Skinning.Texture && Animations.Texture;
 
@@ -52,6 +53,7 @@ namespace needle.GpuAnimation
 
 		[SerializeField] private List<AnimationClip> Animations;
 
+		[SerializeField]
 		private List<BakedModel> _bakes;
 
 		private void OnEnable()
@@ -78,9 +80,9 @@ namespace needle.GpuAnimation
 		}
 
 		[ContextMenu("Bake Now")]
-		public void BakeAnimations()
+		public bool BakeAnimations()
 		{
-			if (!CheckCanBake(false)) return;
+			if (!CheckCanBake(false)) return false;
 
 			if (_bakes == null) _bakes = new List<BakedModel>();
 			else _bakes.Clear();
@@ -113,6 +115,8 @@ namespace needle.GpuAnimation
 			{
 				DestroyImmediate(instance);
 			}
+
+			return true;
 		}
 
 

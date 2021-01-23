@@ -1,7 +1,6 @@
 #ifndef _GPU_SKINNING_
 #define _GPU_SKINNING_
 
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
 
 // defines supported: SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 
@@ -76,6 +75,7 @@ void skin(inout float4 vert, inout float3 normal, int vertId,
 	#endif
 }
 
+#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
 
 void skin(inout float4 vert, inout float3 normal, int vertId,
     StructuredBuffer<BoneWeight> boneWeights, StructuredBuffer<Bone> animations, uint startIndex, uint animationLength, uint frame)
@@ -134,6 +134,7 @@ void skin(inout float4 vert, inout float3 normal, int vertId,
 	#endif
 }
 
+#endif
 
 // void skin(inout float4 vert, inout float3 normal, int vertId,
 // 	StructuredBuffer<BoneWeight> boneWeights, sampler2D animation, float4 animationTexel, uint startIndex, uint animationLength, uint frame)
@@ -155,5 +156,4 @@ void skin(inout float4 vert, inout float3 normal, int vertId,
 // 	skin(vert, normal, m0, w0, m1, w1, m2, w2, m3, w3);
 // }
 
-#endif
 #endif

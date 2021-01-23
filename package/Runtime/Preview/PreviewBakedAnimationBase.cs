@@ -65,9 +65,9 @@ namespace needle.GpuAnimation
 
 		private void BeforeRender(Camera cam)
 		{
-			if (cam.name == "Preview Scene Camera") return;
 
 #if UNITY_EDITOR
+			if (cam.name == "Preview Scene Camera") return;
 			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
 			if (prefabStage != null && !prefabStage.IsPartOfPrefabContents(this.gameObject)) return;
 #endif

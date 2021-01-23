@@ -17,13 +17,13 @@
 		{
 			"RenderType"="Opaque"
 		}
-		LOD 200
+		LOD 200 
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
 		#pragma target 4.5 
 		#pragma multi_compile_instancing
-		#pragma instancing_options procedural:setup
+		// #pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 		#include "Include/Skinning.cginc" 
 
@@ -43,38 +43,35 @@
 			float2 texcoord2 : TEXCOORD2;
 			float4 tangent : TANGENT;
 			uint vertex_id : SV_VertexID;
-			uint instance_id : SV_InstanceID;
-			UNITY_VERTEX_INPUT_INSTANCE_ID
+			// uint instance_id : SV_InstanceID;
+			// UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
 		struct Input
 		{
 			float2 uv_MainTex;
 			float4 color;
-			float2 skinCoords;
-			UNITY_VERTEX_INPUT_INSTANCE_ID
+			// UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
 		float4 _CurrentAnimation;
-		float Time;
 
-
-		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-        StructuredBuffer<float4x4> positions;
-		#endif
-
-		void setup()
-		{
-			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-            float4x4 data = positions[unity_InstanceID];
-            unity_ObjectToWorld = data;
-            unity_WorldToObject = unity_ObjectToWorld;
-            unity_WorldToObject._14_24_34 *= -1;
-            unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
-			#endif
-		}
+		// #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+  //       StructuredBuffer<float4x4> positions;
+		// #endif
+  //
+		// void setup()
+		// {
+		// 	#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+  //           float4x4 data = positions[unity_InstanceID];
+  //           unity_ObjectToWorld = data;
+  //           unity_WorldToObject = unity_ObjectToWorld;
+  //           unity_WorldToObject._14_24_34 *= -1;
+  //           unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
+		// 	#endif
+		// }
 
 		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		// StructuredBuffer<BoneWeight> _BoneWeights;

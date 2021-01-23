@@ -17,38 +17,64 @@ namespace needle.GpuAnimation
 
 		public void OnPreprocessBuild(BuildReport report)
 		{
-			BakeIntoSubAssets();
+			BakeTexturesAsAssets(true);
 		}
 
 		public void OnPostprocessBuild(BuildReport report)
 		{
 		}
 
-		private void BakeIntoSubAssets()
+		[MenuItem("Tools/Gpu Animation/" + nameof(ForceBakeTexturesAsAssets))]
+		private static void ForceBakeTexturesAsAssets()
+		{
+			BakeTexturesAsAssets(false);
+		}
+		
+		private static void BakeTexturesAsAssets(bool skipIfHasData)
 		{
 			var guids = AssetDatabase.FindAssets("t:" + typeof(BakedAnimation));
 			var paths = guids.Select(AssetDatabase.GUIDToAssetPath);
 			var assets = paths.Select(AssetDatabase.LoadAssetAtPath<BakedAnimation>);
+			var savedAssets = 0;
 			foreach (var baked in assets)
 			{
 				if (!baked) continue;
+				if (skipIfHasData && baked.HasBakedAnimation)
+				{
+					Debug.Log("Skip " + baked + " because it has data", baked);
+					continue;
+				}
+				
 				var output = "Assets/_Baked/" + baked.name;
-				baked.BakeAnimations();
+				if (!baked.BakeAnimations())
+				{
+					Debug.LogWarning("Failed baking " + baked, baked);
+				}
+
 				foreach (var entry in baked.Models)
 				{
-					CreatePersistentAsset(entry.Animations, output, entry.Mesh.name + "-animations");
-					CreatePersistentAsset(entry.Skinning, output, entry.Mesh.name + "-skinning");
+					if (!CreatePersistentAsset(entry.Animations, output, entry.Mesh.name + "-animations", ref savedAssets))
+						Debug.LogWarning("Failed storing animations texture " + baked, baked);
+					if (!CreatePersistentAsset(entry.Skinning, output, entry.Mesh.name + "-skinning", ref savedAssets))
+						Debug.LogWarning("Failed storing skinning texture " + baked, baked);
 				}
+
+				EditorUtility.SetDirty(baked);
 			}
+
+
+			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 			AssetDatabase.SaveAssets();
+			Debug.Log("Saved " + savedAssets + " baked textures");
 		}
 
-		private bool CreatePersistentAsset(BakedData data, string outputDirectory, string name)
+		private static bool CreatePersistentAsset(BakedData data, string outputDirectory, string name, ref int savedFilesCounter)
 		{
 			if (data == null) return false;
 			if (!data.Texture) return false;
 			var src = data.Texture as RenderTexture;
 			if (!src) return false;
+			if (EditorUtility.IsPersistent(src)) return false;
 			var dst = new Texture2D(src.width, src.height, GraphicsFormatUtility.GetTextureFormat(src.graphicsFormat), src.mipmapCount > 0);
 			RenderTexture.active = src;
 			dst.ReadPixels(new Rect(Vector2.zero, new Vector2(dst.width, dst.height)), 0, 0);
@@ -59,6 +85,7 @@ namespace needle.GpuAnimation
 			if (File.Exists(path)) File.Delete(path);
 			AssetDatabase.CreateAsset(dst, path);
 			data.Texture = dst;
+			savedFilesCounter += 1;
 			return true;
 		}
 	}
