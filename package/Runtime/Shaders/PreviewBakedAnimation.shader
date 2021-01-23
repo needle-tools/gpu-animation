@@ -8,8 +8,8 @@
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 		_EmissionFactor ("Emission Factor", float) = .2
 		_Emission ("Emission", 2D) = "white" {}
-//		[Header(Skinning)]
-//		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
+		//		[Header(Skinning)]
+		//		[KeywordEnum(Four, Three, Two, One, Dynamic)] Skin_Quality("Skin Quality", Float) = 0
 	}
 	SubShader
 	{
@@ -23,8 +23,10 @@
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
 		#pragma target 4.5
 		#pragma multi_compile_instancing
+		#pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 		#include "Include/Skinning.cginc"
+
 
 		sampler2D _MainTex, _Emission;
 		half _Glossiness;
@@ -58,6 +60,22 @@
 		float4 _CurrentAnimation;
 		float Time;
 
+
+		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+        StructuredBuffer<float4x4> positions;
+		#endif
+
+		void setup()
+		{
+			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+            float4x4 data = positions[unity_InstanceID];
+            unity_ObjectToWorld = data;
+            unity_WorldToObject = unity_ObjectToWorld;
+            unity_WorldToObject._14_24_34 *= -1;
+            unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
+			#endif
+		}
+
 		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		// StructuredBuffer<BoneWeight> _BoneWeights;
 		// StructuredBuffer<Bone> _Animations;
@@ -71,13 +89,14 @@
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 			TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
+			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames,
+			     (_Time.y * (clip.FramesPerSecond)));
 			#endif
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color; 
+			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 			o.Albedo = col.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;

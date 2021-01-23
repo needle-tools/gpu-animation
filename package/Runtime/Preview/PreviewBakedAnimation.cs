@@ -7,98 +7,23 @@ using UnityEditor.Experimental.SceneManagement;
 namespace needle.GpuAnimation
 {
 	[ExecuteAlways]
-	public class PreviewBakedAnimation : MonoBehaviour
+	public class PreviewBakedAnimation : PreviewBakedAnimationBase
 	{
-		public BakedAnimation Animation;
-		public Material PreviewMaterial;
-
 		public Vector3 Offset = new Vector3(0, 0, 1);
 		public int Clip = -1;
 
-		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
-		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
-		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
 
-		private MaterialPropertyBlock[] _blocks;
-
-		private void OnEnable()
+		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
-			Camera.onPreCull += BeforeRender;
-#if SHADERGRAPH_INSTALLED
-			RenderPipelineManager.beginCameraRendering += BeforeRender;
-#endif
-		}
-
-		private void OnDisable()
-		{
-			_blocks = null;
-			Camera.onPreCull -= BeforeRender;
-#if SHADERGRAPH_INSTALLED
-			RenderPipelineManager.beginCameraRendering -= BeforeRender;
-#endif
-		}
-
-#if SHADERGRAPH_INSTALLED
-		private void BeforeRender(ScriptableRenderContext context, Camera cam)
-		{
-			BeforeRender(cam);
-		}
-#endif
-
-		private void BeforeRender(Camera cam)
-		{
-			if (cam.name == "Preview Scene Camera") return;
-
-#if UNITY_EDITOR
-			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-			if (prefabStage != null && !prefabStage.IsPartOfPrefabContents(this.gameObject)) return;
-#endif
-
-			if (!Animation || !Animation.HasBakedAnimation)
-			{
+			if (Clip != -1 && clipIndex != Clip)
 				return;
-			}
+			
+			var offset = Offset;
+			offset *= clipIndex;
+			var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
 
-			if (!PreviewMaterial)
-			{
-				PreviewMaterial = PreviewUtility.CreateNewPreviewMaterial();
-				if (!PreviewMaterial)
-					return;
-			}
-
-			if (_blocks == null || _blocks.Length != Animation.ClipsCount)
-			{
-				_blocks = new MaterialPropertyBlock[Animation.ClipsCount];
-			}
-
-			var matIndex = 0;
-			foreach (var bake in Animation.Models)
-			{
-				var skin = bake.Skinning;
-				var animationBake = bake.Animations;
-				for (var i = 0; i < animationBake.ClipsInfos.Count; i++)
-				{
-					if (Clip != -1 && i != (Clip % animationBake.ClipsInfos.Count))
-					{
-						continue;
-					}
-
-					var clip = animationBake.ClipsInfos[i];
-
-					if (_blocks[matIndex] == null) _blocks[matIndex] = new MaterialPropertyBlock();
-					var block = _blocks[matIndex];
-					block.SetTexture(Animation1, animationBake.Texture);
-					block.SetTexture(Skinning, skin.Texture);
-					block.SetVector(CurrentAnimation, clip.AsVector4);
-					var offset = Offset;
-					offset *= i;
-					var matrix = transform.localToWorldMatrix * Matrix4x4.Translate(offset);
-
-					for (var k = 0; k < skin.Mesh.subMeshCount; k++)
-						Graphics.DrawMesh(skin.Mesh, matrix, PreviewMaterial, 0, cam, k, block);
-					++matIndex;
-				}
-			}
+			for (var k = 0; k < mesh.subMeshCount; k++)
+				Graphics.DrawMesh(mesh, matrix, material, 0, cam, k, block);
 		}
 	}
 }
