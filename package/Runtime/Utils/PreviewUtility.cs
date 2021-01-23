@@ -4,12 +4,15 @@ namespace needle.GpuAnimation
 {
 	public static class PreviewUtility
 	{
+		public const string PreviewShaderNameURP = "Shader Graphs/PreviewBakedAnimation";
+		public const string PreviewShaderNameBuiltIn = "BakedAnimation/PreviewAnimation";
 		public const string PreviewShaderName =
 #if SHADERGRAPH_INSTALLED
-			"Shader Graphs/PreviewBakedAnimation";
+			PreviewShaderNameURP;
 #else
-			"BakedAnimation/PreviewAnimation";
+			PreviewShaderNameBuiltIn;
 #endif
+
 		private static bool _searchedPreviewShader;
 		private static Shader _previewShader;
 
@@ -25,6 +28,16 @@ namespace needle.GpuAnimation
 
 				return _previewShader;
 			}
+		}
+
+		public static bool IsPreviewMaterialForWrongRenderPipeline(Material mat)
+		{
+#if SHADERGRAPH_INSTALLED
+			if (mat.shader.name == PreviewShaderNameBuiltIn) return true;
+#else
+			if (mat.shader.name == PreviewShaderNameURP) return true;
+#endif
+			return false;
 		}
 
 		public static Material CreateNewPreviewMaterial()

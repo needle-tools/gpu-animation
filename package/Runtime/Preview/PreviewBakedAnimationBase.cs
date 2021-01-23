@@ -58,7 +58,7 @@ namespace needle.GpuAnimation
 				return;
 			}
 
-			if (!PreviewMaterial)
+			if (!PreviewMaterial || PreviewUtility.IsPreviewMaterialForWrongRenderPipeline(PreviewMaterial))
 			{
 				PreviewMaterial = PreviewUtility.CreateNewPreviewMaterial();
 				if (!PreviewMaterial)
