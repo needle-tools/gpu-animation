@@ -25,7 +25,9 @@ namespace needle.GpuAnimation
 		private Material _material;
 		private MaterialPropertyBlock[] _blocks;
 
+#if UNITY_EDITOR
 		private static event Action RequestDestroyMaterial;
+#endif
 
 		protected virtual void OnEnable()
 		{

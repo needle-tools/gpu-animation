@@ -1,7 +1,7 @@
 #ifndef _GPU_SKINNING_
 #define _GPU_SKINNING_
 
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
+#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
 
 // defines supported: SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 

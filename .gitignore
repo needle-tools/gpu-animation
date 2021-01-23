@@ -39,3 +39,5 @@ projects/*/Logs
 projects/**/builds
 projects/*/.idea
 projects/*/UserSettings
+projects/**/Assets/_Baked
+projects/**/Assets/_Baked.meta

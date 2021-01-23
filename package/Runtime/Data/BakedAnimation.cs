@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
+
 #endif
 
 namespace needle.GpuAnimation
@@ -31,10 +31,12 @@ namespace needle.GpuAnimation
 		{
 			get
 			{
+#if UNITY_EDITOR || !UNITY_WEBGL
 				if (_bakes == null || !_bakes.All(b => b.IsValid))
 				{
 					BakeAnimations();
 				}
+#endif
 				return _bakes;
 			}
 		}
@@ -42,6 +44,7 @@ namespace needle.GpuAnimation
 		public bool HasBakedAnimation => Models != null && ClipsCount > 0;
 		public int ClipsCount => Models?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
 
+		
 		[SerializeField] private ComputeShader Shader;
 
 		[Header("Input Data")] [SerializeField]
@@ -56,7 +59,7 @@ namespace needle.GpuAnimation
 			_bakes = null;
 			CheckCanBake(true);
 		}
-		
+
 		private bool CheckCanBake(bool allowLogs)
 		{
 			if (!GameObject)
@@ -75,7 +78,7 @@ namespace needle.GpuAnimation
 		}
 
 		[ContextMenu("Bake Now")]
-		private void BakeAnimations()
+		public void BakeAnimations()
 		{
 			if (!CheckCanBake(false)) return;
 

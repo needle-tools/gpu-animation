@@ -21,7 +21,7 @@
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
-		#pragma target 4.5
+		#pragma target 4.5 
 		#pragma multi_compile_instancing
 		#pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
@@ -86,8 +86,8 @@
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
-			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-			TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
+			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
+			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
 			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames,
 			     (_Time.y * (clip.FramesPerSecond)));
