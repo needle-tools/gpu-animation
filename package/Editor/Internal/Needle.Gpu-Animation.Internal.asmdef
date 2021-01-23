@@ -1,19 +1,21 @@
 {
-    "name": "Needle.Gpu-Animation",
+    "name": "Needle.Gpu-Animation.Internal",
     "rootNamespace": "",
     "references": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [
         {
-            "name": "com.unity.shadergraph",
+            "name": "com.unity.modules.ui",
             "expression": "",
-            "define": "SHADERGRAPH_INSTALLED"
+            "define": "NO_INTERNALS_ACCESS"
         }
     ],
     "noEngineReferences": false

@@ -34,7 +34,7 @@ namespace needle.GpuAnimation
 			ShowInternalData = EditorGUILayout.Foldout(ShowInternalData, "Internal Data");
 			if (ShowInternalData)
 				DrawInternalData();
-			
+
 			EditorGUILayout.Space(5);
 			ShowPreview = EditorGUILayout.Foldout(ShowPreview, "Preview");
 			if (ShowPreview)
@@ -116,18 +116,18 @@ namespace needle.GpuAnimation
 			if (!baked.IsValid) return;
 			if (i < 0 || i >= baked.Animations.ClipsInfos.Count) return;
 			var clip = baked.Animations.ClipsInfos[i];
-			
+
 			if (renderUtility == null)
 				renderUtility = new PreviewRenderUtility();
-			
+
 			renderUtility.BeginPreview(rect, GUIStyle.none);
-			
+
 			if (block == null) block = new MaterialPropertyBlock();
 			block.SetTexture(Animation1, baked.Animations.Texture);
 			block.SetTexture(Skinning, baked.Skinning.Texture);
 			block.SetVector(CurrentAnimation, clip.AsVector4);
 			block.SetVector(Time, new Vector4(0, time, 0, 0));
-			
+
 			var bounds = baked.Skinning.Mesh.bounds;
 			var cam = renderUtility.camera;
 			cam.nearClipPlane = .01f;
@@ -144,8 +144,8 @@ namespace needle.GpuAnimation
 			previewCameraTransform.rotation = camRot;
 			var l0 = renderUtility.lights[0];
 			l0.transform.rotation = camRot;
-			
-			
+
+
 			renderUtility.DrawMesh(baked.Skinning.Mesh, Matrix4x4.identity, PreviewMaterial, 0, block);
 			renderUtility.Render(true, false);
 			var tex = renderUtility.EndPreview();
@@ -160,15 +160,15 @@ namespace needle.GpuAnimation
 				base.Initialize(targets);
 				block = new MaterialPropertyBlock();
 			}
-		
+
 			public override bool HasPreviewGUI()
 			{
 				return true;
 			}
-		
+
 			private float angle, time;
 			private int index;
-		
+
 			public override void OnPreviewSettings()
 			{
 				base.OnPreviewSettings();
@@ -180,22 +180,22 @@ namespace needle.GpuAnimation
 				// index %= t.ClipsCount;
 				EditorGUI.EndDisabledGroup();
 			}
-		
+
 			private static MaterialPropertyBlock block;
-		
-		
+
+
 			public override void OnInteractivePreviewGUI(Rect r, GUIStyle background)
 			{
 				base.OnInteractivePreviewGUI(r, background);
-		
+
 				if (Event.current.type == EventType.MouseDrag)
 				{
 					angle += Event.current.delta.x * 2f;
 				}
-				
+
 				if (Event.current.type == EventType.Layout)
 					time += 1f / 30;
-		
+
 				var baked = target as BakedAnimation;
 				if (baked)
 				{
@@ -208,9 +208,15 @@ namespace needle.GpuAnimation
 		}
 
 
+#if UNITY_2020_2_OR_NEWER
+		// ReSharper disable once Unity.IncorrectMethodSignature
+		// ReSharper disable once UnusedMember.Global
+		public void OnSceneDrag(SceneView sceneView, int index)
+#else
 		// ReSharper disable once Unity.IncorrectMethodSignature
 		// ReSharper disable once UnusedMember.Global
 		public void OnSceneDrag(SceneView sceneView)
+#endif
 		{
 			var bake = target as BakedAnimation;
 			if (!bake) return;

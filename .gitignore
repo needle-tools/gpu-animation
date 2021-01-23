@@ -37,3 +37,5 @@ projects/**/Temp
 projects/**/obj
 projects/*/Logs
 projects/**/builds
+projects/*/.idea
+projects/*/UserSettings
