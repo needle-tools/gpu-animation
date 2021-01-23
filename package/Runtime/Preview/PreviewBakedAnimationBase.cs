@@ -3,9 +3,11 @@ using UnityEngine;
 #if SHADERGRAPH_INSTALLED
 using UnityEngine.Rendering;
 #endif
+
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
+using UnityEditor.Rendering;
 #endif
 namespace needle.GpuAnimation
 {
@@ -30,6 +32,7 @@ namespace needle.GpuAnimation
 			_material = null;
 
 #if UNITY_EDITOR
+			EditorApplication.projectChanged += () => _material = null;
 			RequestDestroyMaterial += () => _material = null;
 #endif
 
@@ -85,7 +88,10 @@ namespace needle.GpuAnimation
 			}
 
 #if UNITY_EDITOR
-			if (ShaderUtil.anythingCompiling) RequestDestroyMaterial?.Invoke();
+			if (ShaderUtil.anythingCompiling)
+			{
+				RequestDestroyMaterial?.Invoke();
+			}
 #endif
 
 			if (!_material || _material.shader != PreviewMaterial.shader || !_material.shader)
