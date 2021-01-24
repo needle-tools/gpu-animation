@@ -1,0 +1,17 @@
+{
+    "name": "LiteFPSCounter.Editor",
+    "references": [
+        "GUID:8a0377c9d892fad4290e1376fca4bf01"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
