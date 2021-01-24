@@ -104,7 +104,9 @@ namespace needle.GpuAnimation
 					args[2] = (uint) mesh.GetIndexStart(k);
 					args[3] = (uint) mesh.GetBaseVertex(k);
 					argsBuffer.SetData(args);
-					Graphics.DrawMeshInstancedIndirect(mesh, k, material, new Bounds(transform.position, Vector3.one * 1000), argsBuffer, 0, block,
+					Debug.Log("Render " + args[1] + " - " + mesh);
+					Graphics.DrawMeshInstancedIndirect(mesh, k, material, 
+						new Bounds(transform.position, Vector3.one * 100000), argsBuffer, 0, block,
 						ShadowCastingMode.On, true, 0, cam);
 				}
 				else
@@ -112,7 +114,7 @@ namespace needle.GpuAnimation
 					if (!material.enableInstancing) material.enableInstancing = true;
 					var mats = buffers[key].matrices;
 					var count = mats.Length;
-					Graphics.DrawMeshInstanced(mesh, k, material, mats, count, block, ShadowCastingMode.On, true, 0);
+					Graphics.DrawMeshInstanced(mesh, k, material, mats, count, block, ShadowCastingMode.On, true, 0, cam);
 				}
 			}
 		}
