@@ -10,11 +10,12 @@ namespace needle.GpuAnimation.TestAssets
 		public Material Material;
 		public int Animation;
 
-		private BakedAnimationRenderer rend;
+		private IBakedAnimationRenderer rend;
 
 		private void OnEnable()
 		{
-			rend = Bake.StartRendering(this.transform, Material, Animation);
+			rend = new BakedAnimationRendererSingle(Bake, this.transform, Material);
+			rend.StartRendering();
 		}
 
 		private void OnDisable()

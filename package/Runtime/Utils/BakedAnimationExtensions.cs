@@ -8,33 +8,13 @@ namespace needle.GpuAnimation
 	public static class BakedAnimationExtensions
 	{
 		private static readonly MaterialPropertyBlock fallbackBlock = new MaterialPropertyBlock();
-		private static readonly Dictionary<Transform, BakedAnimationRenderer> renderers = new Dictionary<Transform, BakedAnimationRenderer>();
+		private static readonly Dictionary<Transform, BakedAnimationRendererBase> renderers = new Dictionary<Transform, BakedAnimationRendererBase>();
 
 		public static readonly int AnimationProp = Shader.PropertyToID("_Animation");
 		public static readonly int SkinningProp = Shader.PropertyToID("_Skinning");
 		public static readonly int CurrentAnimationProp = Shader.PropertyToID("_CurrentAnimation");
 		public static readonly int PositionBuffer = Shader.PropertyToID("positions");
 
-
-		public static BakedAnimationRenderer StartRendering(this BakedAnimation bakedAnimation, Transform transform, Material material, int animationClipIndex, MaterialPropertyBlock block = null)
-		{
-			if (!renderers.ContainsKey(transform))
-			{
-				renderers.Add(transform, new BakedAnimationRenderer(bakedAnimation, transform, material, block));
-			}
-
-			var renderer = renderers[transform];
-			renderer.CurrentClipIndex = animationClipIndex;
-			renderer.Material = material;
-			renderer.StartRendering();
-			return renderer;
-		}
-
-		public static void StopRendering(this BakedAnimation bakedAnimation, Transform transform)
-		{
-			if (!transform) return;
-			if (renderers.ContainsKey(transform)) renderers[transform].StopRendering();
-		}
 		
 		public static void Render(this BakedAnimation bakedAnimation, Matrix4x4 transform, Material material, int animationClipIndex,
 			MaterialPropertyBlock block = null, Camera cam = null)

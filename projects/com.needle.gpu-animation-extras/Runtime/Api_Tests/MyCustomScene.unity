@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -118,8 +118,6 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
-    maxJobWorkers: 0
-    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -237,7 +235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bake: {fileID: 11400000, guid: 8d22fe501234fcf47aba01544891fcab, type: 2}
   Material: {fileID: 2100000, guid: 0a41ca9d8280b69448f908039583afc3, type: 2}
-  Animation: 1
+  Animation: 0
 --- !u!4 &704179301
 Transform:
   m_ObjectHideFlags: 0
@@ -328,7 +326,6 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &977669275
@@ -421,7 +418,6 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &1685645837
@@ -445,6 +441,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5197710147150144549, guid: 88509c54282065441aedef5d9575ee6a,
+        type: 3}
+      propertyPath: Animation
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197710147150144549, guid: 88509c54282065441aedef5d9575ee6a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197710148182875333, guid: 88509c54282065441aedef5d9575ee6a,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.5778275
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197710148182875333, guid: 88509c54282065441aedef5d9575ee6a,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5778272
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197710148182875333, guid: 88509c54282065441aedef5d9575ee6a,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3.5778275
+      objectReference: {fileID: 0}
     - target: {fileID: 5197710148620461048, guid: 88509c54282065441aedef5d9575ee6a,
         type: 3}
       propertyPath: m_Name
