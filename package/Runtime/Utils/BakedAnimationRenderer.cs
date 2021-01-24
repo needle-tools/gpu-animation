@@ -52,6 +52,7 @@ namespace needle.GpuAnimation
 		{
 			if (isRendering) return;
 			isRendering = true;
+			// TODO: URP callback
 			Camera.onPreCull += OnRender;
 		}
 

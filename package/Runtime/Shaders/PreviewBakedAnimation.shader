@@ -52,10 +52,6 @@
 		};
 
 
-		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-        StructuredBuffer<float4x4> positions;
-		#endif
-  
 		void setup()
 		{
 			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
