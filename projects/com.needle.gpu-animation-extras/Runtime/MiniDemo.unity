@@ -875,7 +875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animation: {fileID: 11400000, guid: 9263c0cd37a4898458fc1b60e52c7349, type: 2}
   PreviewMaterial: {fileID: 2100000, guid: 17126f21e152b7b4ca0d83b3cd277775, type: 2}
-  skinQuality: 3
+  skinQuality: 1
   Count: {x: 10, y: 10}
   Offset: {x: 1, y: 1}
   UseInstancedIndirect: 0
