@@ -17,7 +17,8 @@ namespace needle.GpuAnimation
 		private ComputeBuffer argsBuffer;
 		private uint[] args;
 
-		[Header("Internal")] public int CurrentCount;
+		[Header("Internal")] public int InstanceCount = default;
+		public int VertexCount = 0;
 
 
 		private void OnValidate()
@@ -48,7 +49,7 @@ namespace needle.GpuAnimation
 		private bool EnsureBuffers(Object obj, int index, int clipsCount, out string key)
 		{
 			var count = Count.x * Count.y;
-			CurrentCount = count * clipsCount;
+			InstanceCount = count * clipsCount;
 
 			index += 1;
 			var offset = Offset;
@@ -91,6 +92,8 @@ namespace needle.GpuAnimation
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
 			if (!EnsureBuffers(mesh, clipIndex, clipsCount, out var key)) return;
+
+			VertexCount = mesh.vertexCount * InstanceCount;
 
 			for (var k = 0; k < mesh.subMeshCount; k++)
 			{
