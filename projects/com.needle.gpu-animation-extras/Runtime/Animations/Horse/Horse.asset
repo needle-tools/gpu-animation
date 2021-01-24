@@ -18,4 +18,23 @@ MonoBehaviour:
   - {fileID: 7400000, guid: a748dee4242461842b2f083a18157d1f, type: 3}
   - {fileID: 7400000, guid: f93e0aef0e51f7240b6df07faa08500d, type: 3}
   - {fileID: 7400000, guid: 739a527acf30e794999333672821df88, type: 3}
+  _bakes:
+  - Skinning:
+      Texture: {fileID: 2800000, guid: e34ad826ad302f145809211c07457058, type: 2}
+      Mesh: {fileID: 4300002, guid: a85d92b72304a79449904f3b49e3d5ea, type: 3}
+    Animations:
+      Texture: {fileID: 2800000, guid: f476654517c226b4488e704c98017b44, type: 2}
+      ClipsInfos:
+      - IndexStart: 0
+        Length: 1075
+        Frames: 25
+        FPS: 30
+      - IndexStart: 1075
+        Length: 1075
+        Frames: 25
+        FPS: 30
+      - IndexStart: 2150
+        Length: 5160
+        Frames: 120
+        FPS: 30
   UpdateImmediately: 1
