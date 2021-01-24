@@ -50,7 +50,7 @@ namespace needle.GpuAnimation
 					}
 				}
 				
-				var output = "Assets/_Baked/" + baked.name;
+				var output = "Assets/GPU Animation Baked Textures Output/" + baked.name;
 				if (!baked.BakeAnimations())
 				{
 					Debug.LogWarning("Failed baking " + baked, baked);

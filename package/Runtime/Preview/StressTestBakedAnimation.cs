@@ -104,7 +104,6 @@ namespace needle.GpuAnimation
 					args[2] = (uint) mesh.GetIndexStart(k);
 					args[3] = (uint) mesh.GetBaseVertex(k);
 					argsBuffer.SetData(args);
-					Debug.Log("Render " + args[1] + " - " + mesh);
 					Graphics.DrawMeshInstancedIndirect(mesh, k, material, 
 						new Bounds(transform.position, Vector3.one * 100000), argsBuffer, 0, block,
 						ShadowCastingMode.On, true, 0, cam);
