@@ -189,9 +189,9 @@ namespace OmniSARTechnologies.LiteFPSCounter {
         private void UpdateStaticContentAndData() {
             m_DynamicConfigurationFormat = string.Format(
                 "{0} FPS {1} ms {2}"   + Environment.NewLine +
-                "{3} FPS {4} ms {5}"   + Environment.NewLine +
-                "{6} FPS {7} ms {8}"   + Environment.NewLine +
-                "{9} FPS {10} ms {11}",
+                "Min {3} FPS {4} ms {5}"   + Environment.NewLine +
+                "Max {6} FPS {7} ms {8}"   + Environment.NewLine +
+                "Fluctuation {9} FPS {10} ms {11}",
 
                 ColorHelper.ColorText("{0}", m_FPSFieldsColor),
                 ColorHelper.ColorText("{1}", m_FPSFieldsColor),
