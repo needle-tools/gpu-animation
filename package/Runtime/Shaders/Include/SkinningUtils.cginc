@@ -1,5 +1,5 @@
-﻿#ifndef _SKINNING_UTILS
-#define _SKINNING_UTILS
+﻿#ifndef NEEDLE_GPU_ANIMATION_SKINNING_UTILS
+#define NEEDLE_GPU_ANIMATION_SKINNING_UTILS
 
 #include "AnimationTypes.cginc"
 

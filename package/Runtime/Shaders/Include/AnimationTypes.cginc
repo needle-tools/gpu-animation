@@ -1,5 +1,5 @@
-﻿#ifndef _ANIMATION_DATA
-#define _ANIMATION_DATA
+﻿#ifndef NEEDLE_GPU_ANIMATION_TYPES
+#define NEEDLE_GPU_ANIMATION_TYPES
 
 struct BoneWeight
 {

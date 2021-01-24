@@ -1,5 +1,5 @@
-#ifndef _GPU_SKINNING_
-#define _GPU_SKINNING_
+#ifndef NEEDLE_GPU_ANIMATION_SKINNING
+#define NEEDLE_GPU_ANIMATION_SKINNING
 #include "SkinningFunctions.cginc"
 #include "SkinningProperties.cginc"
 #endif

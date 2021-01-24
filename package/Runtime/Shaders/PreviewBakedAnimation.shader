@@ -67,18 +67,12 @@
 			#endif
 		}
 
-		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-		// StructuredBuffer<BoneWeight> _BoneWeights;
-		// StructuredBuffer<Bone> _Animations;
-		// #endif
-
 		void vert(inout appdata v, out Input result)
 		{
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
 			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
 				clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
 		}
