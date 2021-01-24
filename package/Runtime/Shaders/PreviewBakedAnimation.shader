@@ -21,9 +21,9 @@
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert addshadow
-		#pragma target 4.5 
+		#pragma target 3.5 
 		#pragma multi_compile_instancing
-		// #pragma instancing_options procedural:setup
+		#pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 		#include "Include/Skinning.cginc" 
 
@@ -43,35 +43,35 @@
 			float2 texcoord2 : TEXCOORD2;
 			float4 tangent : TANGENT;
 			uint vertex_id : SV_VertexID;
-			// uint instance_id : SV_InstanceID;
-			// UNITY_VERTEX_INPUT_INSTANCE_ID
+			uint instance_id : SV_InstanceID;
+			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
 		struct Input
 		{
 			float2 uv_MainTex;
 			float4 color;
-			// UNITY_VERTEX_INPUT_INSTANCE_ID
+			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
 		sampler2D _Animation, _Skinning;
 		float4 _Animation_TexelSize, _Skinning_TexelSize;
 		float4 _CurrentAnimation;
 
-		// #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-  //       StructuredBuffer<float4x4> positions;
-		// #endif
-  //
-		// void setup()
-		// {
-		// 	#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-  //           float4x4 data = positions[unity_InstanceID];
-  //           unity_ObjectToWorld = data;
-  //           unity_WorldToObject = unity_ObjectToWorld;
-  //           unity_WorldToObject._14_24_34 *= -1;
-  //           unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
-		// 	#endif
-		// }
+		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+        StructuredBuffer<float4x4> positions;
+		#endif
+  
+		void setup()
+		{
+			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+            float4x4 data = positions[unity_InstanceID];
+            unity_ObjectToWorld = data;
+            unity_WorldToObject = unity_ObjectToWorld;
+            unity_WorldToObject._14_24_34 *= -1;
+            unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
+			#endif
+		}
 
 		// #if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 		// StructuredBuffer<BoneWeight> _BoneWeights;
@@ -83,12 +83,10 @@
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
 
-			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
 			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames,
 			     (_Time.y * (clip.FramesPerSecond)));
-			#endif
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)

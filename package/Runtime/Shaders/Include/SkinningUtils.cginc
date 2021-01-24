@@ -1,6 +1,8 @@
 ﻿#ifndef _SKINNING_UTILS
 #define _SKINNING_UTILS
 
+#include "AnimationTypes.cginc"
+
 static const int BONEWEIGHT_PIXEL_COUNT = 2; // weight takes 2 pixel (one BoneWeight is 2 x 4 floats)
 static const int ANIMATION_MATRIX_4x4_PIXEL_COUNT = 4; // 4x4 matrix takes 4 pixel (one matrix is 4 x 4 floats)
 

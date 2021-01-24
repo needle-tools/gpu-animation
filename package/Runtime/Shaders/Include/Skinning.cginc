@@ -4,8 +4,8 @@
 
 // defines supported: SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 
-#include "AnimationTypes.cginc"
 #include "SkinningUtils.cginc"
+#include "AnimationTypes.cginc"
 
 void skin(inout float4 vert, inout float3 normal, float4x4 m1, float w1, float4x4 m2, float w2, float4x4 m3, float w3, float4x4 m4, float w4)
 {

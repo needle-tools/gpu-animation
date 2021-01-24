@@ -23,6 +23,12 @@ namespace needle.GpuAnimation
 			this.Skinning = skinning;
 			this.Animations = animations;
 		}
+
+		public IEnumerable<Texture> EnumerateTextures()
+		{
+			yield return Skinning?.Texture;
+			yield return Animations?.Texture;
+		}
 	}
 
 	[CreateAssetMenu(menuName = "Animation/Baked Animation", order = -1000)]
@@ -45,7 +51,7 @@ namespace needle.GpuAnimation
 		public bool HasBakedAnimation => Models != null && ClipsCount > 0;
 		public int ClipsCount => Models?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
 
-		
+
 		[SerializeField] private ComputeShader Shader;
 
 		[Header("Input Data")] [SerializeField]
@@ -53,14 +59,7 @@ namespace needle.GpuAnimation
 
 		[SerializeField] private List<AnimationClip> Animations;
 
-		[SerializeField]
-		private List<BakedModel> _bakes;
-
-		private void OnEnable()
-		{
-			_bakes = null;
-			CheckCanBake(true);
-		}
+		[SerializeField, HideInInspector] private List<BakedModel> _bakes;
 
 		private bool CheckCanBake(bool allowLogs)
 		{
@@ -127,10 +126,14 @@ namespace needle.GpuAnimation
 
 		private async void OnValidate()
 		{
+			if(Selection.Contains(this)) 
+				CheckCanBake(true);
+			
 			var count = ++validateCounter;
 			await Task.Delay(100);
 			while (EditorApplication.isCompiling || EditorApplication.isUpdating) await Task.Delay(100);
 			if (validateCounter != count) return;
+			
 			if (UpdateImmediately)
 			{
 				if (GameObject)

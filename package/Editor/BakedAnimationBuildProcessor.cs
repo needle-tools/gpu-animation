@@ -39,10 +39,15 @@ namespace needle.GpuAnimation
 			foreach (var baked in assets)
 			{
 				if (!baked) continue;
+				
+				// loop all textures
 				if (skipIfHasData && baked.HasBakedAnimation)
 				{
-					Debug.Log("Skip " + baked + " because it has data", baked);
-					continue;
+					if(baked.Models?.All(m => m?.EnumerateTextures().All(t => t && t.imageContentsHash.isValid) ?? false) ?? false)
+					{
+						Debug.Log("Skip " + baked + " because it is already baked", baked);
+						continue;
+					}
 				}
 				
 				var output = "Assets/_Baked/" + baked.name;
@@ -67,17 +72,17 @@ namespace needle.GpuAnimation
 			AssetDatabase.SaveAssets();
 			Debug.Log("Saved " + savedAssets + " baked textures");
 		}
-
+		
 		private static bool CreatePersistentAsset(BakedData data, string outputDirectory, string name, ref int savedFilesCounter)
 		{
 			if (data == null) return false;
 			if (!data.Texture) return false;
 			var src = data.Texture as RenderTexture;
 			if (!src) return false;
-			if (EditorUtility.IsPersistent(src)) return false;
 			var dst = new Texture2D(src.width, src.height, GraphicsFormatUtility.GetTextureFormat(src.graphicsFormat), src.mipmapCount > 0);
 			RenderTexture.active = src;
-			dst.ReadPixels(new Rect(Vector2.zero, new Vector2(dst.width, dst.height)), 0, 0);
+			dst.ReadPixels(new Rect(Vector2.zero, new Vector2(src.width, src.height)), 0, 0);
+			dst.Apply();
 			RenderTexture.active = null;
 			if (!Directory.Exists(outputDirectory))
 				Directory.CreateDirectory(outputDirectory);
