@@ -85,8 +85,8 @@
 
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			// v.vertex = skin(v.vertex, v.vertex_id, _BoneWeights, _Animations, _CurrentAnimation.x, _CurrentAnimation.y, _CurrentAnimation.z);
-			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames,
-			     (_Time.y * (clip.FramesPerSecond)));
+			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
+				clip.IndexStart, clip.Frames, (_Time.y * (clip.FramesPerSecond)));
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
