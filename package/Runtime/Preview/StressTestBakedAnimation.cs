@@ -91,14 +91,14 @@ namespace needle.GpuAnimation
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
 			if (!EnsureBuffers(mesh, clipIndex, clipsCount, out var key)) return;
-			block.SetBuffer(PositionBuffer, buffers[key].buffer);
-			if (argsBuffer == null || !argsBuffer.IsValid()) argsBuffer = new ComputeBuffer(5, sizeof(uint), ComputeBufferType.IndirectArguments);
 
-			if (args == null) args = new uint[5];
 			for (var k = 0; k < mesh.subMeshCount; k++)
 			{
 				if (UseInstancedIndirect)
 				{
+					if (args == null) args = new uint[5];
+					if (argsBuffer == null || !argsBuffer.IsValid()) argsBuffer = new ComputeBuffer(5, sizeof(uint), ComputeBufferType.IndirectArguments);
+					block.SetBuffer(PositionBuffer, buffers[key].buffer);
 					args[0] = (uint) mesh.GetIndexCount(k);
 					args[1] = (uint) (Count.x * Count.y);
 					args[2] = (uint) mesh.GetIndexStart(k);
