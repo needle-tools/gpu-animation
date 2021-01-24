@@ -25,6 +25,7 @@ namespace needle.GpuAnimation
 
 			var renderer = renderers[transform];
 			renderer.CurrentClipIndex = animationClipIndex;
+			renderer.Material = material;
 			renderer.StartRendering();
 			return renderer;
 		}

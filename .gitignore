@@ -41,3 +41,5 @@ projects/*/.idea
 projects/*/UserSettings
 projects/**/Assets/_Baked
 projects/**/Assets/_Baked.meta
+projects/**/Assets/GPU Animation Baked Textures Output
+projects/**/Assets/GPU Animation Baked Textures Output.meta

@@ -22,6 +22,18 @@ namespace needle.GpuAnimation.TestAssets
 			rend?.StopRendering();
 		}
 
+		private void OnValidate()
+		{
+			if (!Bake)
+			{
+				rend?.StopRendering();
+			}
+			else
+			{
+				rend?.StartRendering();
+			}
+		}
+
 		private void Update()
 		{
 			rend.CurrentClipIndex = Animation;
