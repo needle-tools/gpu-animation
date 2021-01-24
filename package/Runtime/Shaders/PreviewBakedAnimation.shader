@@ -3,11 +3,9 @@
 	Properties
 	{
 		_Color ("Color", Color) = (.5,.5,.5,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.2
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 		_EmissionFactor ("Emission Factor", float) = .2
-		_Emission ("Emission", 2D) = "white" {}
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One)] Skin_Quality("Skin Quality", Float) = 0
 	}
@@ -28,7 +26,6 @@
 		#include "Include/Skinning.cginc" 
 
 
-		sampler2D _MainTex, _Emission;
 		half _Glossiness;
 		half _Metallic;
 		half _EmissionFactor;
@@ -54,9 +51,6 @@
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
-		sampler2D _Animation, _Skinning;
-		float4 _Animation_TexelSize, _Skinning_TexelSize;
-		float4 _CurrentAnimation;
 
 		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
         StructuredBuffer<float4x4> positions;
@@ -91,11 +85,11 @@
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 col = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+			fixed4 col = _Color;
 			o.Albedo = col.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-			o.Emission = tex2D(_Emission, IN.uv_MainTex) * _EmissionFactor;
+			o.Emission = _EmissionFactor;
 			o.Alpha = col.a;
 		}
 		ENDCG

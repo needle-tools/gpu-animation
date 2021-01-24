@@ -26,6 +26,13 @@ struct TextureClipInfo
     int FramesPerSecond;
 };
 
+struct AnimationClipInfo
+{
+    int IndexStart;
+    int FrameCount;
+    float CurrentTime;
+};
+
 inline TextureClipInfo ToTextureClipInfo(float4 vec)
 {
     TextureClipInfo ci;
@@ -33,6 +40,15 @@ inline TextureClipInfo ToTextureClipInfo(float4 vec)
     ci.TotalLength = vec.y;
     ci.Frames = vec.z;
     ci.FramesPerSecond = vec.w;
+    return ci;
+}
+
+inline AnimationClipInfo ToAnimationClipInfo(float4 vec)
+{
+    AnimationClipInfo ci;
+    ci.IndexStart = vec.x;
+    ci.FrameCount = vec.y;
+    ci.CurrentTime = vec.z;
     return ci;
 }
 

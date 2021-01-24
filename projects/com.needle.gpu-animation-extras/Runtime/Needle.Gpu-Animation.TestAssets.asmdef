@@ -1,0 +1,15 @@
+{
+    "name": "Needle.Gpu-Animation.TestAssets",
+    "references": [
+        "GUID:c5c671378facd1c49ad3e8520d8e537e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
