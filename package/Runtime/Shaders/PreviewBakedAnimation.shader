@@ -5,6 +5,7 @@
 		_Color ("Color", Color) = (.5,.5,.5,1)
 		_Glossiness ("Smoothness", Range(0,1)) = 0.2
 		_Metallic ("Metallic", Range(0,1)) = 0.0
+		_EmissionColor ("Emission Color", Color) = (1,1,1,1)
 		_EmissionFactor ("Emission Factor", float) = .2
 		[Header(Skinning)]
 		[KeywordEnum(Four, Three, Two, One)] Skin_Quality("Skin Quality", Float) = 0
@@ -29,7 +30,7 @@
 		half _Glossiness;
 		half _Metallic;
 		half _EmissionFactor;
-		fixed4 _Color;
+		fixed4 _Color, _EmissionColor;
 
 		struct appdata
 		{
@@ -79,7 +80,7 @@
 			o.Albedo = col.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-			o.Emission = _EmissionFactor;
+			o.Emission = _EmissionColor * _EmissionFactor;
 			o.Alpha = col.a;
 		}
 		ENDCG
