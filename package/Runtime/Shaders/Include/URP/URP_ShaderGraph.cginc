@@ -4,17 +4,13 @@
 #define URP_AnimationBaking
 
 #include "../Skinning.cginc"
-#include "../AnimationTypes.cginc"
 
-sampler2D _Animation, _Skinning;
-float4 _Animation_TexelSize, _Skinning_TexelSize;
-
-void GpuSkinning_float(float vertexId, float4 vert, float3 normal, float time, float4 currentAnimation, out float4 skinnedVertex, out float3 skinnedNormal)
+void GpuSkinning_float(float vertexId, float4 vert, float3 normal, float time, out float4 skinnedVertex, out float3 skinnedNormal)
 {
     skinnedVertex = vert;
     skinnedNormal = normal;
 
-    const TextureClipInfo clip = ToTextureClipInfo(currentAnimation);
+    const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
     skin(skinnedVertex, skinnedNormal, (uint)vertexId, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond))); 
 }
 

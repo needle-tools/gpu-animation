@@ -2,11 +2,7 @@
     "m_SGVersion": 2,
     "m_Type": "UnityEditor.ShaderGraph.GraphData",
     "m_ObjectId": "0759fb3b10924c31ae5cb3536c3ed4b3",
-    "m_Properties": [
-        {
-            "m_Id": "404543e9cb52432d9d4f6c6501487351"
-        }
-    ],
+    "m_Properties": [],
     "m_Keywords": [],
     "m_Nodes": [
         {
@@ -56,9 +52,6 @@
         },
         {
             "m_Id": "6f1e2c0b775c49a5842fce358cebf7a9"
-        },
-        {
-            "m_Id": "525fb34d72824b04b154f9d77efb73dd"
         }
     ],
     "m_GroupDatas": [],
@@ -76,20 +69,6 @@
                     "m_Id": "6f1e2c0b775c49a5842fce358cebf7a9"
                 },
                 "m_SlotId": 5
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "525fb34d72824b04b154f9d77efb73dd"
-                },
-                "m_SlotId": 0
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "6f1e2c0b775c49a5842fce358cebf7a9"
-                },
-                "m_SlotId": 6
             }
         },
         {
@@ -412,29 +391,6 @@
 }
 
 {
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector4ShaderProperty",
-    "m_ObjectId": "404543e9cb52432d9d4f6c6501487351",
-    "m_Guid": {
-        "m_GuidSerialized": "c1818246-2de7-4f95-baf9-ce3bc57a7aed"
-    },
-    "m_Name": "_CurrentAnimation",
-    "m_DefaultReferenceName": "Vector4_404543e9cb52432d9d4f6c6501487351",
-    "m_OverrideReferenceName": "_CurrentAnimation",
-    "m_GeneratePropertyBlock": true,
-    "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
-    "m_Hidden": false,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    }
-}
-
-{
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.BlockNode",
     "m_ObjectId": "49fad5d70b78464d8e07de8714133080",
@@ -488,40 +444,6 @@
     },
     "m_Labels": [],
     "m_Space": 0
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
-    "m_ObjectId": "525fb34d72824b04b154f9d77efb73dd",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Property",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -578.9210815429688,
-            "y": 351.55023193359377,
-            "width": 0.0,
-            "height": 0.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "9b9731efd7bf4f72b5c37ca82ba02cea"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_Property": {
-        "m_Id": "404543e9cb52432d9d4f6c6501487351"
-    }
 }
 
 {
@@ -719,9 +641,6 @@
         },
         {
             "m_Id": "cdae401256ae48709cf360612099454a"
-        },
-        {
-            "m_Id": "b29abe09f0ce4354b4c81050061a06b0"
         }
     ],
     "synonyms": [],
@@ -853,31 +772,6 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
-    "m_ObjectId": "9b9731efd7bf4f72b5c37ca82ba02cea",
-    "m_Id": 0,
-    "m_DisplayName": "_CurrentAnimation",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "Out",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "a1d37c1398c7c780b2a3f529e17b7aaa",
     "m_Id": 1,
@@ -988,31 +882,6 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.NormalTS"
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
-    "m_ObjectId": "b29abe09f0ce4354b4c81050061a06b0",
-    "m_Id": 6,
-    "m_DisplayName": "CurrentAnimation",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "CurrentAnimation",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_Labels": []
 }
 
 {
