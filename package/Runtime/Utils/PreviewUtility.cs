@@ -30,14 +30,14 @@ namespace needle.GpuAnimation
 			}
 		}
 
-		public static bool IsPreviewMaterialForWrongRenderPipeline(Material mat)
+		public static bool IsPreviewMaterialForWrongRenderPipelineOrError(Material mat)
 		{
 #if SHADERGRAPH_INSTALLED
 			if (mat.shader.name == PreviewShaderNameBuiltIn) return true;
 #else
 			if (mat.shader.name == PreviewShaderNameURP) return true;
 #endif
-			return false;
+			return mat.shader.name == "Hidden/InternalErrorShader";
 		}
 
 		public static Material CreateNewPreviewMaterial()
