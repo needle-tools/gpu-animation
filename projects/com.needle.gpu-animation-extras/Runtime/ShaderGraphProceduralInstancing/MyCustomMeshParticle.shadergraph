@@ -607,7 +607,7 @@
     "m_SourceType": 1,
     "m_FunctionName": "CustomStuff",
     "m_FunctionSource": "",
-    "m_FunctionBody": "\tPos_1 = Pos;\n}\n\n#pragma instancing_options procedural:vertInstancingSetup\n#include \"Assets/CustomInstancing.cginc\"\n\nvoid Dummy() {"
+    "m_FunctionBody": "\tPos_1 = Pos;\n}\n\n#pragma instancing_options procedural:vertInstancingSetup\n#include \"Packages/com.needle.gpu-animation-extras/Runtime/ShaderGraphProceduralInstancing/CustomInstancing.cginc\"\n\nvoid Dummy() {"
 }
 
 {
