@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.needle.gpu-animation": "file:../../../package",
-    "com.needle.gpu-animation-extras": "file:../../com.needle.gpu-animation-extras",
+    "com.needle.gpu-animation-extras": "file:../../../modules/gpu-animation-testassets/package",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "3.5.2",

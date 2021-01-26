@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.needle.gpu-animation-extras": "file:../../com.needle.gpu-animation-extras",
+    "com.needle.gpu-animation-extras": "file:../../../modules/gpu-animation-testassets/package",
     "com.needle.gpu-animation": "file:../../../package",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ide.rider": "2.0.7",
