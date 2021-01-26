@@ -45,6 +45,7 @@ namespace needle.GpuAnimation
 			if (PreviewShader)
 			{
 				var mat = new Material(PreviewShader);
+				mat.enableInstancing = true;
 				mat.name = nameof(BakedAnimation) + "-Preview";
 				var val = 102 / 255f;
 				mat.SetColor(Color, new Color(val, val, val));

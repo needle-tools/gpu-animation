@@ -11,18 +11,20 @@ StructuredBuffer<float4x4> _InstanceTransforms;
 #endif
 
 
-#if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
-StructuredBuffer<float4> _InstanceTimeOffsets;
+#if SHADER_TARGET < 45
+uniform float _InstanceTimeOffsets[1024];
+#elif defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_GLES3)
+StructuredBuffer<float> _InstanceTimeOffsets;
 #endif
-
-
-float GetTime(uint instanceId)
+		
+float GetTime(uint id)
 {
     #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
-    return _Time.y + _InstanceTimeOffsets[instanceId].y;
+    return _Time.y + _InstanceTimeOffsets[id];
     #else
     return _Time.y;
     #endif
 }
+
 
 #endif
