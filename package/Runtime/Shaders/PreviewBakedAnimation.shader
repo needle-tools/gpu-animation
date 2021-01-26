@@ -56,7 +56,7 @@
 		void setup()
 		{
 			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-            float4x4 data = positions[unity_InstanceID];
+            float4x4 data = _InstanceTransforms[unity_InstanceID];
             unity_ObjectToWorld = data;
             unity_WorldToObject = unity_ObjectToWorld;
             unity_WorldToObject._14_24_34 *= -1;

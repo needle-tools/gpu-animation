@@ -7,7 +7,7 @@ float4 _CurrentAnimation;
 
 
 #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-StructuredBuffer<float4x4> positions;
+StructuredBuffer<float4x4> _InstanceTransforms;
 #endif
 
 

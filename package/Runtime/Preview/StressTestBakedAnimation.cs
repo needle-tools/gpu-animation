@@ -11,10 +11,17 @@ namespace needle.GpuAnimation
 		public Vector2 Offset = new Vector2(1, 1);
 		public bool UseInstancedIndirect = true;
 
-		private readonly Dictionary<string, (ComputeBuffer buffer, Matrix4x4[] matrices)> buffers = new Dictionary<string, (ComputeBuffer, Matrix4x4[])>();
-		private static readonly int PositionBuffer = Shader.PropertyToID("positions");
+		private class RenderData
+		{
+			public ComputeBuffer Buffer;
+			public Matrix4x4[] Matrices;
+			// args buffer per sub mesh
+			public List<ComputeBuffer> Args;
+		}
+
+		private readonly Dictionary<string, RenderData> buffers = new Dictionary<string, RenderData>();
+		private static readonly int PositionBuffer = Shader.PropertyToID("_InstanceTransforms");
 		private int previousCount;
-		private ComputeBuffer argsBuffer;
 		private uint[] args;
 
 		[Header("Internal")] public int InstanceCount = default;
@@ -35,15 +42,12 @@ namespace needle.GpuAnimation
 		{
 			base.OnDisable();
 
-			foreach (var buf in buffers.Values)
+			foreach (var data in buffers.Values)
 			{
-				buf.buffer.Dispose();
+				data.Buffer.Dispose();
 			}
 
 			buffers.Clear();
-
-			argsBuffer?.Release();
-			argsBuffer = null;
 		}
 
 		private bool EnsureBuffers(Object obj, int index, int clipsCount, out string key)
@@ -55,7 +59,7 @@ namespace needle.GpuAnimation
 			var offset = Offset;
 			offset.x *= clipsCount;
 
-			(ComputeBuffer, Matrix4x4[]) CreateNewBuffer()
+			RenderData CreateNewBuffer()
 			{
 				var buffer = new ComputeBuffer(count, sizeof(float) * 4 * 4);
 				var positions = new Matrix4x4[count];
@@ -72,41 +76,53 @@ namespace needle.GpuAnimation
 				}
 
 				buffer.SetData(positions);
-				return (buffer, positions);
+				var data = new RenderData();
+				data.Buffer = buffer;
+				data.Matrices = positions;
+				data.Args = new List<ComputeBuffer>();
+				return data;
 			}
 
 			key = obj.name + index;
 
 			if (!buffers.ContainsKey(key))
 				buffers.Add(key, CreateNewBuffer());
-			else if (buffers.ContainsKey(key) && !buffers[key].buffer.IsValid() || buffers[key].buffer.count != count)
+			else if (buffers.ContainsKey(key) && !buffers[key].Buffer.IsValid() || buffers[key].Buffer.count != count)
 			{
-				buffers[key].buffer.Dispose();
+				buffers[key].Buffer.Dispose();
 				buffers[key] = CreateNewBuffer();
 			}
 
 			return true;
 		}
 
-
+		
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
+
 			if (!EnsureBuffers(mesh, clipIndex, clipsCount, out var key)) return;
 
 			VertexCount = mesh.vertexCount * InstanceCount;
+			
+			var data = buffers[key];
+			if (UseInstancedIndirect)
+			{
+				if (args == null) args = new uint[5];
+				block.SetBuffer(PositionBuffer, data.Buffer);
+			}
 
 			for (var k = 0; k < mesh.subMeshCount; k++)
 			{
 				if (UseInstancedIndirect)
 				{
-					if (args == null) args = new uint[5];
-					if (argsBuffer == null || !argsBuffer.IsValid()) argsBuffer = new ComputeBuffer(5, sizeof(uint), ComputeBufferType.IndirectArguments);
-					block.SetBuffer(PositionBuffer, buffers[key].buffer);
-					args[0] = (uint) mesh.GetIndexCount(k);
-					args[1] = (uint) (Count.x * Count.y);
-					args[2] = (uint) mesh.GetIndexStart(k);
-					args[3] = (uint) mesh.GetBaseVertex(k);
+					args[0] = mesh.GetIndexCount(k);
+					args[1] = (uint) InstanceCount;
+					args[2] = mesh.GetIndexStart(k);
+					args[3] = mesh.GetBaseVertex(k);
+					if (data.Args.Count <= k) data.Args.Add(new ComputeBuffer(5, sizeof(uint), ComputeBufferType.IndirectArguments));
+					var argsBuffer = data.Args[k];
 					argsBuffer.SetData(args);
+					
 					Graphics.DrawMeshInstancedIndirect(mesh, k, material, 
 						new Bounds(transform.position, Vector3.one * 100000), argsBuffer, 0, block,
 						ShadowCastingMode.On, true, 0, cam);
@@ -114,7 +130,7 @@ namespace needle.GpuAnimation
 				else
 				{
 					if (!material.enableInstancing) material.enableInstancing = true;
-					var mats = buffers[key].matrices;
+					var mats = data.Matrices;
 					var count = mats.Length;
 					Graphics.DrawMeshInstanced(mesh, k, material, mats, count, block, ShadowCastingMode.On, true, 0, cam);
 				}
