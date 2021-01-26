@@ -1,27 +1,40 @@
+using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace needle.GpuAnimation
 {
-	public class StressTestBakedAnimation : PreviewBakedAnimationBase
+	public class PreviewBakedAnimationInstancing : PreviewBakedAnimationBase, IDisposable
 	{
+		public int ClipIndex = -1;
 		public Vector2Int Count = new Vector2Int(10, 10);
 		public Vector2 Offset = new Vector2(1, 1);
 		public bool UseInstancedIndirect = true;
 
-		private class RenderData
+		private class RenderData : IDisposable
 		{
 			public ComputeBuffer Buffer;
+
 			public Matrix4x4[] Matrices;
+
 			// args buffer per sub mesh
 			public List<ComputeBuffer> Args;
+
+			public void Dispose()
+			{
+				Buffer?.Dispose();
+				if (Args != null)
+					foreach (var ab in Args)
+						ab?.Dispose();
+			}
 		}
 
 		private readonly Dictionary<string, RenderData> buffers = new Dictionary<string, RenderData>();
 		private static readonly int PositionBuffer = Shader.PropertyToID("_InstanceTransforms");
-		private int previousCount;
 		private uint[] args;
 
 		private ComputeBuffer _timeOffsets;
@@ -39,26 +52,35 @@ namespace needle.GpuAnimation
 				Debug.LogWarning("Instancing is disabled, please enable instancing: " + PreviewMaterial, PreviewMaterial);
 			}
 #endif
+
+#if UNITY_EDITOR
+			if (Selection.Contains(this.gameObject)) Dispose();
+#endif
 		}
 
 		protected override void OnDisable()
 		{
 			base.OnDisable();
+			Dispose();
+		}
 
-			foreach (var data in buffers.Values) data.Buffer.Dispose();
+		public void Dispose()
+		{
+			foreach (var data in buffers.Values) data.Dispose();
 			buffers.Clear();
-			
 			_timeOffsets?.Dispose();
 		}
 
-		private bool EnsureBuffers(Object obj, int index, int clipsCount, out string key)
+		private bool EnsureBuffers(Object obj, int clipIndex, int clipsCount, out string key)
 		{
 			var count = Count.x * Count.y;
 			InstanceCount = count * clipsCount;
 
-			index += 1;
 			var offset = Offset;
-			offset.x *= clipsCount;
+			if (ClipIndex < 0)
+			{
+				offset.x *= clipsCount;
+			}
 
 			RenderData CreateNewBuffer()
 			{
@@ -67,9 +89,11 @@ namespace needle.GpuAnimation
 				var i = 0;
 				for (var x = 0; x < Count.x; x++)
 				{
+					var ox = x * offset.x;
+					if (ClipIndex < 0) ox += clipIndex;
 					for (var y = 0; y < Count.y; y++)
 					{
-						positions[i] = Matrix4x4.Translate(new Vector3(x * offset.x + index * Offset.x * .8f, 0, y * offset.y)) * transform.localToWorldMatrix *
+						positions[i] = Matrix4x4.Translate(new Vector3(ox, 0, y * offset.y)) * transform.localToWorldMatrix *
 						               Matrix4x4.TRS(Vector3.zero,
 							               Quaternion.identity, Vector3.one);
 						++i;
@@ -84,7 +108,7 @@ namespace needle.GpuAnimation
 				return data;
 			}
 
-			key = obj.name + index;
+			key = obj.name + clipIndex;
 
 			if (!buffers.ContainsKey(key))
 				buffers.Add(key, CreateNewBuffer());
@@ -94,13 +118,14 @@ namespace needle.GpuAnimation
 				buffers[key] = CreateNewBuffer();
 			}
 
-			if (_timeOffsets == null || !_timeOffsets.IsValid() || _timeOffsets.count != InstanceCount) 
+			if (_timeOffsets == null || !_timeOffsets.IsValid() || _timeOffsets.count != InstanceCount)
 			{
 				var times = new float[InstanceCount];
 				for (int i = 0; i < times.Length; i++)
 				{
 					times[i] = Random.value * 100;
 				}
+
 				_timeOffsets = new ComputeBuffer(times.Length, sizeof(float));
 				_timeOffsets.SetData(times);
 			}
@@ -108,21 +133,28 @@ namespace needle.GpuAnimation
 			return true;
 		}
 
-		
+
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
+			if (ClipIndex >= 0 && ClipIndex != clipIndex) return;
 
+			if (transform.hasChanged)
+			{
+				transform.hasChanged = false;
+				Dispose();
+			}
+			
 			if (!EnsureBuffers(mesh, clipIndex, clipsCount, out var key)) return;
 
 			VertexCount = mesh.vertexCount * InstanceCount;
-			
+
 			var data = buffers[key];
 			if (UseInstancedIndirect)
 			{
 				if (args == null) args = new uint[5];
 				block.SetBuffer(PositionBuffer, data.Buffer);
 			}
-			
+
 			block.SetBuffer(InstanceTimeOffsets, _timeOffsets);
 
 			for (var k = 0; k < mesh.subMeshCount; k++)
@@ -136,8 +168,8 @@ namespace needle.GpuAnimation
 					if (data.Args.Count <= k) data.Args.Add(new ComputeBuffer(5, sizeof(uint), ComputeBufferType.IndirectArguments));
 					var argsBuffer = data.Args[k];
 					argsBuffer.SetData(args);
-					
-					Graphics.DrawMeshInstancedIndirect(mesh, k, material, 
+
+					Graphics.DrawMeshInstancedIndirect(mesh, k, material,
 						new Bounds(transform.position, Vector3.one * 100000), argsBuffer, 0, block,
 						ShadowCastingMode.On, true, 0, cam);
 				}
