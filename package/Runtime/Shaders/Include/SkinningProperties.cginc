@@ -11,4 +11,18 @@ StructuredBuffer<float4x4> _InstanceTransforms;
 #endif
 
 
+#if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
+StructuredBuffer<float4> _InstanceTimeOffsets;
+#endif
+
+
+float GetTime(uint instanceId)
+{
+    #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
+    return _Time.y + _InstanceTimeOffsets[instanceId].y;
+    #else
+    return _Time.y;
+    #endif
+}
+
 #endif
