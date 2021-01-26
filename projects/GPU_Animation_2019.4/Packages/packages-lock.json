@@ -7,7 +7,7 @@
       "dependencies": {}
     },
     "com.needle.gpu-animation-extras": {
-      "version": "file:../../com.needle.gpu-animation-extras",
+      "version": "file:../../../modules/gpu-animation-testassets/package",
       "depth": 0,
       "source": "local",
       "dependencies": {}
