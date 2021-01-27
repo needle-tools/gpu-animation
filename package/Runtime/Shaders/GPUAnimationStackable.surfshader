@@ -29,7 +29,7 @@ BEGIN_CODE
         #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(INSTANCING_ON)
         const float time = AnimationTime + GetTime(unity_InstanceID);
         const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-        skin(v.vertex, v.normal, v.vertexID, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
+        skin(v.vertex, v.normal, v.tangent, v.vertexID, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
         #endif
 	}
 

@@ -38,10 +38,10 @@
 		{
 			float4 vertex : POSITION;
 			float3 normal : NORMAL;
+			float4 tangent : TANGENT;
 			float2 texcoord : TEXCOORD0;
 			float2 texcoord1 : TEXCOORD1;
 			float2 texcoord2 : TEXCOORD2;
-			float4 tangent : TANGENT;
 			uint vertex_id : SV_VertexID;
 			uint instance_id : SV_InstanceID;
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -73,7 +73,7 @@
 
 			const float time  = GetTime(v.instance_id);
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
+			skin(v.vertex, v.normal, v.tangent, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
 				clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
 		}
 

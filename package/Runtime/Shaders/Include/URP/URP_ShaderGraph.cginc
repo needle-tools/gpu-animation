@@ -11,7 +11,8 @@ void GpuSkinning_float(float vertexId, float4 vert, float3 normal, float time, o
     skinnedNormal = normal;
 
     const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-    skin(skinnedVertex, skinnedNormal, (uint)vertexId, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond))); 
+    float4 tangent = 0;
+    skin(skinnedVertex, skinnedNormal, tangent, (uint)vertexId, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond))); 
 }
 
 
