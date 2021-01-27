@@ -70,7 +70,6 @@
 		{
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_OUTPUT(Input, result);
-
 			const float time  = GetTime(v.instance_id);
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
 			skin(v.vertex, v.normal, v.tangent, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
