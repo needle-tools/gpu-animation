@@ -1,4 +1,4 @@
-#if !NO_INTERNALS_ACCESS
+#if !NO_INTERNALS_ACCESS && UNITY_2020_2_OR_NEWER
 
 using UnityEditor.Graphing;
 using UnityEditor.ShaderGraph.Internal;

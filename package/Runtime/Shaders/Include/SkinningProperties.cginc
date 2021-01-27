@@ -22,7 +22,7 @@ float GetTime(uint id)
     #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
     return _Time.y + _InstanceTimeOffsets[id];
     #else
-    return _Time.y;
+    return 0;
     #endif
 }
 

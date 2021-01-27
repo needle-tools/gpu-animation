@@ -24,7 +24,7 @@ BEGIN_CODE
 	{
         UNITY_SETUP_INSTANCE_ID(v);
         
-        const float time = _Time.y;// unity_InstanceID;// GetTime(unity_InstanceID);
+        const float time = 0;// _Time.y;// unity_InstanceID;// GetTime(unity_InstanceID);
         const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
         skin(v.vertex, v.normal, v.vertexID, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize, clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
         
