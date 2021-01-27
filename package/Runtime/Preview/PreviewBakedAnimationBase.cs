@@ -1,4 +1,5 @@
 using System;
+using UnityEditorInternal;
 using UnityEngine;
 #if SHADERGRAPH_INSTALLED
 using UnityEngine.Rendering;
@@ -63,9 +64,12 @@ namespace needle.GpuAnimation
 		}
 #endif
 
+
+		private int _lastUpdate;
+		private float _time;
+
 		private void BeforeRender(Camera cam)
 		{
-
 #if UNITY_EDITOR
 			if (cam.name == "Preview Scene Camera") return;
 			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
@@ -105,6 +109,12 @@ namespace needle.GpuAnimation
 
 			_material.SetSkinQuality(this.skinQuality);
 
+			if (Time.frameCount != _lastUpdate)
+			{
+				_lastUpdate = Time.frameCount;
+				_time += Time.deltaTime;
+			}
+
 			OnBeforeRender(cam);
 
 			var matIndex = 0;
@@ -120,11 +130,13 @@ namespace needle.GpuAnimation
 					block.SetTexture(Animation1, animationBake.Texture);
 					block.SetTexture(Skinning, skin.Texture);
 					block.SetVector(CurrentAnimation, clip.AsVector4);
+					block.SetFloat("AnimationTime", _time);
 					Render(cam, skin.Mesh, _material, block, i, animationBake.ClipsInfos.Count);
 					++matIndex;
 				}
 			}
 		}
+
 
 		protected virtual void OnBeforeRender(Camera cam)
 		{

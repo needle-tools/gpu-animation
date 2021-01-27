@@ -17,13 +17,12 @@ uniform float _InstanceTimeOffsets[1024];
 StructuredBuffer<float> _InstanceTimeOffsets;
 #endif
 		
-float GetTime(uint id)
+inline float GetTime(uint id)
 {
-    #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
-    return _Time.y + _InstanceTimeOffsets[id];
-    #else
-    return 0;
+    #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(INSTANCING_ON)
+    return _InstanceTimeOffsets[id];
     #endif
+    return 0;
 }
 
 
