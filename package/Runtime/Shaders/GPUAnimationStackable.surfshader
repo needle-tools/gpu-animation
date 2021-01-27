@@ -10,18 +10,6 @@ BEGIN_CBUFFER
 	float AnimationTime;
 END_CBUFFER
 
-BEGIN_SUBSHADERS
-/*
-"Include/Skinning.cginc"
-"C:/git/needle-packages-master/development/gpu-animation/package/Runtime/Shaders/Include/AnimationTypes.cginc"
-"C:/git/needle-packages-master/development/gpu-animation/package/Runtime/Shaders/Include/SkinningUtils.cginc"
-"C:/git/needle-packages-master/development/gpu-animation/package/Runtime/Shaders/Include/SkinningFunctions.cginc"
-"C:/git/needle-packages-master/development/gpu-animation/package/Runtime/Shaders/Include/SkinningProperties.cginc"
-*/
-//"C:/git/needle-packages-master/development/gpu-animation/package/Runtime/Shaders/Include/Skinning.cginc"
-//"Packages/com.needle.gpu-animation/Runtime/Shaders/Include/Skinning.cginc"
-END_SUBSHADERS
-
 BEGIN_CODE
 	void ModifyVertex(inout VertexData v, inout ExtraV2F d)
 	{
