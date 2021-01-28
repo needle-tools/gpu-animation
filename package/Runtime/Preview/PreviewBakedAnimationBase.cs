@@ -1,10 +1,10 @@
 using System;
-using UnityEditorInternal;
 using UnityEngine;
 #if SHADERGRAPH_INSTALLED
 using UnityEngine.Rendering;
 #endif
 #if UNITY_EDITOR
+using UnityEditorInternal;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.Rendering;
