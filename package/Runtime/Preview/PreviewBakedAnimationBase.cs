@@ -3,11 +3,11 @@ using UnityEngine;
 #if SHADERGRAPH_INSTALLED
 using UnityEngine.Rendering;
 #endif
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.Rendering;
+
 #endif
 namespace needle.GpuAnimation
 {
@@ -21,6 +21,7 @@ namespace needle.GpuAnimation
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
+		private static readonly int AnimationTime = Shader.PropertyToID("_AnimationTime");
 
 		private Material _material;
 		private MaterialPropertyBlock[] _blocks;
@@ -62,6 +63,8 @@ namespace needle.GpuAnimation
 			BeforeRender(cam);
 		}
 #endif
+
+
 
 		private void BeforeRender(Camera cam)
 		{
@@ -120,10 +123,15 @@ namespace needle.GpuAnimation
 					block.SetTexture(Animation1, animationBake.Texture);
 					block.SetTexture(Skinning, skin.Texture);
 					block.SetVector(CurrentAnimation, clip.AsVector4);
+					block.SetFloat(AnimationTime, Time.time);
 					Render(cam, skin.Mesh, _material, block, i, animationBake.ClipsInfos.Count);
 					++matIndex;
 				}
 			}
+
+#if UNITY_EDITOR
+			EditorUtility.SetDirty(this.gameObject);
+#endif
 		}
 
 		protected virtual void OnBeforeRender(Camera cam)
