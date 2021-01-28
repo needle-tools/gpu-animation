@@ -16,6 +16,7 @@ namespace needle.GpuAnimation
 		public BakedAnimation Animation;
 		public Material PreviewMaterial;
 		public SkinQuality skinQuality = SkinQuality.Four;
+		public int ModelIndex = -1;
 
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
@@ -28,6 +29,12 @@ namespace needle.GpuAnimation
 #if UNITY_EDITOR
 		private static event Action RequestDestroyMaterial;
 #endif
+
+		protected virtual void OnValidate()
+		{
+			if (ModelIndex > 0 && Animation && Animation.HasBakedAnimation)
+				ModelIndex %= Animation.Models.Count;
+		}
 
 		protected virtual void OnEnable()
 		{
@@ -110,8 +117,10 @@ namespace needle.GpuAnimation
 			OnBeforeRender(cam);
 
 			var matIndex = 0;
-			foreach (var bake in Animation.Models)
+			for (var index = 0; index < Animation.Models.Count; index++)
 			{
+				if (ModelIndex >= 0 && index != ModelIndex) continue;
+				var bake = Animation.Models[index];
 				var skin = bake.Skinning;
 				var animationBake = bake.Animations;
 				for (var i = 0; i < animationBake.ClipsInfos.Count; i++)

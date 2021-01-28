@@ -12,6 +12,12 @@ namespace needle.GpuAnimation
 		public Vector3 Offset = new Vector3(0, 0, 1);
 		public int Clip = -1;
 
+		protected override void OnValidate()
+		{
+			base.OnValidate();
+			if (Clip > 0 && Animation && Animation.ClipsCount > 0)
+				Clip %= Animation.ClipsCount;
+		}
 
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
