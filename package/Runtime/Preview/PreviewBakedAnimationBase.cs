@@ -4,12 +4,10 @@ using UnityEngine;
 using UnityEngine.Rendering;
 #endif
 #if UNITY_EDITOR
-using UnityEditorInternal;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
-using UnityEditor.Rendering;
-
 #endif
+
 namespace needle.GpuAnimation
 {
 	[ExecuteAlways]
