@@ -2,7 +2,7 @@
 #pragma kernel BakeBoneWeights
 #pragma kernel ReadAnimation
 
-#include "../AnimationTypes.cginc"
+#include "../Include/AnimationTypes.cginc"
 
 StructuredBuffer<float4x4> Matrices;
 RWTexture2D<float4> Texture;
@@ -107,4 +107,46 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
         bone.transformation = mat;
         Bones[matIndex] = bone;
     }
+}
+
+
+struct VertexData
+{
+    float3 position;
+    float3 normal;
+    float3 tangent;
+};
+
+StructuredBuffer<VertexData> Vertices;
+
+[numthreads(64,1,1)]
+void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
+{
+    const uint matrixIndex = id.x;
+    const uint vertexIndex = id.y;
+    
+    uint matrixCount, _;
+    Matrices.GetDimensions(matrixCount, _);
+    if(matrixIndex >= matrixCount) return;
+
+    uint verts;
+    Vertices.GetDimensions(verts, _);
+    if(vertexIndex >= verts) return; 
+    
+    uint tw;
+    Texture.GetDimensions(tw, _);
+    
+    float4x4 mat = Matrices[matrixIndex];
+    VertexData vertex = Vertices[vertexIndex];
+        
+    float3 pos = mul(mat, float4(vertex.position, 1));
+    float3 normal = mul(mat, vertex.normal);
+    float3 tangent = mul(mat, vertex.tangent);
+
+    uint pixelIndex = (vertexIndex * verts + matrixIndex * verts) * 3;
+    
+    Texture[uint2(pixelIndex % tw, floor(pixelIndex / (float)tw))] = float4(pos.xyz, normal.x);
+    pixelIndex += 1;
+    Texture[uint2(pixelIndex % tw, floor(pixelIndex / (float)tw))] = float4(normal.z, tangent.xyz);
+    
 }
