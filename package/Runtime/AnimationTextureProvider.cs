@@ -8,37 +8,59 @@ namespace needle.GpuAnimation
 	{
 		public static bool DebugLog = false;
 
-		public static BakedAnimationData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader)
+		public static BakedAnimationData BakeAnimation(IEnumerable<AnimationTransformationData> animationData, ComputeShader shader, bool bakeMesh, Mesh mesh = null)
 		{
-			using (var animationBuffer = GetBuffer(animationData, out var clipInfos))
+			if (bakeMesh && !mesh) throw new ArgumentNullException(nameof(mesh));
+			
+			using (var animationBuffer = GetAnimatedBonesBuffer(animationData, out var clipInfos))
 			{
-				return BakeAnimation(shader, animationBuffer, clipInfos);
+				return BakeAnimation(shader, animationBuffer, clipInfos, bakeMesh, mesh);
 			}
 		}
 
-		public static BakedAnimationData BakeAnimation(ComputeShader shader, ComputeBuffer animationBuffer, List<TextureClipInfo> clipInfos)
+		public static BakedAnimationData BakeAnimation(ComputeShader shader, ComputeBuffer animationBuffer, List<TextureClipInfo> clipInfos, bool bakeMesh, Mesh mesh = null)
 		{
-			var textureSize = ToTextureSize(animationBuffer.count * 4);
-			if (DebugLog)
-				Debug.Log("Bake into " + textureSize + " Texture");
+			if (bakeMesh && !mesh) throw new ArgumentNullException(nameof(mesh));
+			Vector2Int textureSize;
+			if (bakeMesh)
+			{
+				textureSize = ToTextureSize(animationBuffer.count * 3 * mesh.vertexCount);
+			}
+			else
+			{
+				textureSize = ToTextureSize(animationBuffer.count * 4);
+			}
+			
+			if (DebugLog) Debug.Log("Bake into " + textureSize + " Texture");
 			var texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGBHalf);
 			texture.name = "animation";
 			texture.enableRandomWrite = true;
 			texture.useMipMap = false;
 			texture.filterMode = FilterMode.Point;
 			texture.Create();
+			
 			var res = new BakedAnimationData();
 			res.Texture = texture;
 			res.ClipsInfos = clipInfos;
 
-			var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
-			shader.SetBuffer(kernel, "Matrices", animationBuffer);
-			shader.SetTexture(kernel, "Texture", texture);
-			shader.Dispatch(kernel, Mathf.CeilToInt(animationBuffer.count / 32f), 1, 1);
+			if (!bakeMesh)
+			{
+				var kernel = shader.FindKernel("BakeAnimationTexture_Float4");
+				shader.SetBuffer(kernel, "Matrices", animationBuffer);
+				shader.SetTexture(kernel, "Texture", texture);
+				shader.Dispatch(kernel, Mathf.CeilToInt(animationBuffer.count / 32f), 1, 1);
+			}
+			else
+			{
+				var kernel = shader.FindKernel("BakeAnimationMeshTexture");
+				shader.SetBuffer(kernel, "Matrices", animationBuffer);
+				shader.SetTexture(kernel, "Texture", texture);
+				shader.Dispatch(kernel, Mathf.CeilToInt(animationBuffer.count / 32f), 1, 1);
+			}
 			return res;
 		}
 
-		public static ComputeBuffer GetBuffer(IEnumerable<AnimationTransformationData> animationData, out List<TextureClipInfo> clipInfos)
+		public static ComputeBuffer GetAnimatedBonesBuffer(IEnumerable<AnimationTransformationData> animationData, out List<TextureClipInfo> clipInfos)
 		{
 			var matrixData = new List<Bone>();
 			clipInfos = new List<TextureClipInfo>();

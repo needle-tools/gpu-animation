@@ -15,13 +15,28 @@ namespace needle.GpuAnimation
 	{
 		public BakedMeshSkinningData Skinning;
 		public BakedAnimationData Animations;
+		
+		public bool IsBakedMesh { get; private set; }
 		public Mesh Mesh => Skinning?.Mesh;
-		public bool IsValid => Mesh && Animations?.ClipsInfos?.Count > 0 && Skinning.Texture && Animations.Texture;
+		public bool IsValid
+		{
+			get
+			{
+				if (!Mesh) return false;
+				if (Animations?.ClipsInfos?.Count <= 0) return false;
+				if (IsBakedMesh)
+				{
+					return Animations.Texture;
+				}
+				else return Skinning.Texture && Animations.Texture;
+			}
+		}
 
-		public BakedModel(BakedMeshSkinningData skinning, BakedAnimationData animations)
+		public BakedModel(BakedMeshSkinningData skinning, BakedAnimationData animations, bool bakedMesh)
 		{
 			this.Skinning = skinning;
 			this.Animations = animations;
+			this.IsBakedMesh = bakedMesh;
 		}
 
 		public IEnumerable<Texture> EnumerateTextures()
@@ -54,7 +69,12 @@ namespace needle.GpuAnimation
 
 		[SerializeField] private ComputeShader Shader;
 
-		[Header("Input Data")] [SerializeField]
+		[Header("Settings")] 
+		[SerializeField]
+		private bool BakeMesh;
+
+		[Header("Input Data")] 
+		[SerializeField]
 		private GameObject GameObject;
 
 		[SerializeField] private List<AnimationClip> Animations;
@@ -101,8 +121,8 @@ namespace needle.GpuAnimation
 					{
 						renderer = renderers[index];
 						var skinBake = AnimationTextureProvider.BakeSkinning(renderer.sharedMesh, Shader);
-						var animationBake = AnimationTextureProvider.BakeAnimation(animData, Shader);
-						_bakes.Add(new BakedModel(skinBake, animationBake));
+						var animationBake = AnimationTextureProvider.BakeAnimation(animData, Shader, BakeMesh, renderer.sharedMesh);
+						_bakes.Add(new BakedModel(skinBake, animationBake, BakeMesh));
 					}
 				}
 			}
