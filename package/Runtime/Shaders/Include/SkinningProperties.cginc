@@ -4,6 +4,7 @@
 sampler2D _Animation, _Skinning;
 float4 _Animation_TexelSize, _Skinning_TexelSize;
 float4 _CurrentAnimation;
+float _AnimationTime;
 
 
 #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -20,9 +21,9 @@ StructuredBuffer<float> _InstanceTimeOffsets;
 inline float GetTime(uint id)
 {
     #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(INSTANCING_ON)
-    return _InstanceTimeOffsets[id];
+    return _AnimationTime + _InstanceTimeOffsets[id];
     #endif
-    return 0;
+    return _AnimationTime;
 }
 
 
