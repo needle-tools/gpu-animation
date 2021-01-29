@@ -21,11 +21,14 @@ namespace Experimental
 		private void OnEnable()
 		{
 			Camera.onPreCull += OnBeforeRender;
+			Camera.onPostRender += OnAfterRender;
+			once = true;
 		}
-		
+
 		private void OnDisable()
 		{
 			Camera.onPreCull -= OnBeforeRender;
+			Camera.onPostRender -= OnAfterRender;
 			rt.Release();
 		}
 
@@ -37,17 +40,16 @@ namespace Experimental
 
 		private void OnBeforeRender(Camera cam)
 		{
-			Debug.Log("Render " + cam);// + " - " + Time.frameCount, cam); 
+			Debug.Log("Render " + cam); // + " - " + Time.frameCount, cam); 
 			Execute(cam);
 		}
 
-		// private void Update()
-		// {
-		// 	Execute();
-		// }
+		public bool once = true;
 
 		private void Execute(Camera cam)
 		{
+			if (Cam != cam) return;
+			
 			if (!rt)
 			{
 				rt = new RenderTexture(5, 5, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
@@ -56,25 +58,36 @@ namespace Experimental
 				rt.filterMode = FilterMode.Point;
 				rt.Create();
 				Shader.SetGlobalTexture("_MyTex", rt);
-				Graphics.ClearRandomWriteTargets(); 
-				Graphics.SetRandomWriteTarget(4, rt);;
+				Graphics.ClearRandomWriteTargets();
+				Graphics.SetRandomWriteTarget(4, rt);
+				;
 			}
-			
+
 			Output.mainTexture = rt;
 			Material.SetTexture("_MyTex", rt);
-			
+
 			Graphics.SetRandomWriteTarget(4, rt);
 			// Material.enableInstancing = true;
 			// Graphics.DrawMeshInstanced(Mesh, 0, Material, new []{transform.localToWorldMatrix});
 			Graphics.ClearRandomWriteTargets();
-			
+
 			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
+			if (once)
+			{
+				if (cam == Camera.main)
+					once = false;
+				var cmd = new CommandBuffer();
+				cmd.ClearRandomWriteTargets();
+				cmd.SetRandomWriteTarget(4, new RenderTargetIdentifier(rt));
+				Cam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, cmd);
+			}
+		}
+
+		private void OnAfterRender(Camera cam)
+		{
+			if (cam != Cam) return;
 			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
-			var cmd = new CommandBuffer();
-			cmd.ClearRandomWriteTargets();
-			cmd.SetRandomWriteTarget(4, new RenderTargetIdentifier(rt));
-			Cam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, cmd);
-		
+			once = false;
 		}
 
 		// ()
