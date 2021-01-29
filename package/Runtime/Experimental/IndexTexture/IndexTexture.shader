@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+        _Id ("Id", int) = 1
 	}
 	SubShader
 	{
@@ -32,6 +33,7 @@
 		uniform RWTexture2D<float> _IdTexture : register(u4);
 		#endif
 
+		int _Id;
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
@@ -42,7 +44,7 @@
 			uint idw, idh;
 			_IdTexture.GetDimensions(idw, idh);
 			int2 px = coords * float2(idw, idh);
-			_IdTexture[px] = 1 + _Time.y;
+			_IdTexture[px] = _Id;
 			#endif
 
 
