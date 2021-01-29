@@ -49,7 +49,7 @@ namespace Experimental
 		private void Execute()
 		{
 			RenderTexture.active = idMap;
-			GL.Clear(false, true, Color.black);
+			GL.Clear(false, true, new Color(0,1000,0,0));
 			RenderTexture.active = null;
 
 			if (commandBuffer == null)
@@ -60,7 +60,7 @@ namespace Experimental
 					idMap = null;
 				}
 				const int size = 100;
-				idMap = new RenderTexture(size, size, 0, RenderTextureFormat.RInt, RenderTextureReadWrite.Linear);
+				idMap = new RenderTexture(size, size, 0, RenderTextureFormat.RGFloat, RenderTextureReadWrite.Linear);
 				idMap.enableRandomWrite = true;
 				idMap.name = "Id Tex";
 				idMap.filterMode = FilterMode.Point;

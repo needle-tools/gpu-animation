@@ -1,6 +1,6 @@
 #pragma kernel CSMain
 
-Texture2D<float> IdMap;
+Texture2D<float2> IdMap;
 SamplerState samplerIdMap;
 
 float2 SampleUV;

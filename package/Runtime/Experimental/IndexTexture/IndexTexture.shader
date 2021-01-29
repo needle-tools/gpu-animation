@@ -30,7 +30,9 @@
 
 
 		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-		uniform RWTexture2D<float> _IdTexture : register(u4);
+		uniform RWTexture2D<float2> _IdTexture : register(u4);
+        sampler2D_float _CameraDepthTexture;
+        float4 _CameraDepthTexture_TexelSize;
 		#endif
 
 		int _Id;
@@ -43,12 +45,20 @@
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
 			uint idw, idh;
 			_IdTexture.GetDimensions(idw, idh);
-			int2 px = coords * float2(idw, idh);
-			_IdTexture[px] = _Id;
+			const int2 pixel = coords * float2(idw, idh);
+			float2 values = _IdTexture[pixel];
+			float rawZ = SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(IN.screenPos));
+			float sceneZ = LinearEyeDepth(rawZ);
+			if(sceneZ < values.y)
+			{
+				values.x = _Id;
+				values.y = sceneZ;
+				_IdTexture[pixel] = values;
+			}
 			#endif
 
 
-			o.Albedo.xy = coords;
+			o.Albedo.xy = coords;// _Id / 20.0;
 		}
 		ENDCG
 	}
