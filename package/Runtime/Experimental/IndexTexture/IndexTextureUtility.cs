@@ -11,9 +11,13 @@ namespace Experimental
 		public int RWIndex = 4;
 
 		private Camera mainCam;
-		private CommandBuffer commandBuffer;
+		[SerializeField]
 		private RenderTexture idMap;
 		private RenderTexture debugOutput;
+		
+		[SerializeField, HideInInspector]
+		private CameraEvent evt, prevEvt;
+		private CommandBuffer commandBuffer;
 
 		private void OnEnable()
 		{
@@ -26,7 +30,7 @@ namespace Experimental
 		{
 			Camera.onPreCull -= OnBeforeRender;
 			Camera.onPostRender -= OnAfterRender;
-			
+
 			if (idMap)
 			{
 				idMap.Release();
@@ -39,7 +43,7 @@ namespace Experimental
 				debugOutput = null;
 			}
 		}
-		
+
 		private void OnBeforeRender(Camera cam)
 		{
 			if (mainCam != cam) return;
@@ -49,30 +53,48 @@ namespace Experimental
 		private void Execute()
 		{
 			RenderTexture.active = idMap;
-			GL.Clear(false, true, new Color(0,1000,0,0));
+			GL.Clear(true, true, Color.black);
 			RenderTexture.active = null;
 
-			if (commandBuffer == null)
+			if (mainCam.renderingPath == RenderingPath.Forward)
+				evt = CameraEvent.BeforeForwardOpaque;
+			else if (mainCam.renderingPath == RenderingPath.DeferredShading)
+				evt = CameraEvent.BeforeGBuffer;
+
+			if (commandBuffer == null || evt != prevEvt)
 			{
 				if (idMap)
 				{
 					idMap.Release();
 					idMap = null;
 				}
+
 				const int size = 100;
-				idMap = new RenderTexture(size, size, 0, RenderTextureFormat.RGFloat, RenderTextureReadWrite.Linear);
-				idMap.enableRandomWrite = true;
+				idMap = new RenderTexture(size, size, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Default);
 				idMap.name = "Id Tex";
 				idMap.filterMode = FilterMode.Point;
 				idMap.Create();
-				
-				mainCam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
+
+				RemoveCommandBuffer();
+				prevEvt = evt;
 				commandBuffer = new CommandBuffer();
 				commandBuffer.name = "Render Id Texture";
-				commandBuffer.ClearRandomWriteTargets();
-				commandBuffer.SetRandomWriteTarget(RWIndex, idMap);
-				mainCam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, commandBuffer);
+				// commandBuffer.ClearRandomWriteTargets();
+				
+				var rt = new RenderTargetIdentifier[]
+				{
+					BuiltinRenderTextureType.CurrentActive,
+					idMap
+				};
+				commandBuffer.SetRenderTarget(rt, BuiltinRenderTextureType.Depth);
+				mainCam.AddCommandBuffer(prevEvt, commandBuffer);
 			}
+		}
+
+		private void RemoveCommandBuffer()
+		{
+			mainCam.RemoveCommandBuffers(evt);
+			mainCam.RemoveCommandBuffers(prevEvt);
 		}
 
 		private void OnAfterRender(Camera cam)
@@ -80,9 +102,10 @@ namespace Experimental
 			if (cam != mainCam) return;
 			// important:
 			Graphics.ClearRandomWriteTargets();
+			
 
 			if (!idMap) return;
-			
+
 			Shader.SetTexture(0, "IdMap", idMap);
 			Shader.SetVector("SampleUV", Input.mousePosition / new Vector2(Screen.width, Screen.height));
 			using (var buf = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Structured))
@@ -103,6 +126,7 @@ namespace Experimental
 					debugOutput.filterMode = FilterMode.Point;
 					debugOutput.Create();
 				}
+
 				Graphics.Blit(idMap, debugOutput);
 				DebugOutput.mainTexture = debugOutput;
 			}
