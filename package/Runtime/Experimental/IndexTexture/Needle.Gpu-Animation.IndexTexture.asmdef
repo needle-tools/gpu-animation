@@ -1,0 +1,15 @@
+{
+    "name": "Needle.Gpu-Animation.IndexTexture",
+    "references": [
+        "GUID:2b4711977e47f414aa8f5d08e5702b8b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

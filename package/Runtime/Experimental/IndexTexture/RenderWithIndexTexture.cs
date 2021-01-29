@@ -55,29 +55,31 @@ namespace Experimental
 		private void Execute(Camera cam)
 		{
 			if (Cam != cam) return;
-			
-			if (!rt)
-			{
-				int size = 100;
-				rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-				rt.enableRandomWrite = true;
-				rt.name = "MyTex";
-				rt.filterMode = FilterMode.Point;
-				rt.Create();
-				// Shader.SetGlobalTexture("_MyTex", rt);
-				// Graphics.ClearRandomWriteTargets();
-				// Graphics.SetRandomWriteTarget(4, rt);
-				
-				Output.mainTexture = rt;
-				Material.SetTexture("_MyTex", rt);
-			}
-
-
 
 			Graphics.ClearRandomWriteTargets();
-			if (once) 
-			// if (Time.frameCount % 2 == 0)
+			if (once)
 			{
+			
+				// if (!rt)
+				{
+					if (rt)
+					{
+						rt.Release();
+						rt = null;
+					}
+					int size = 100;
+					rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+					rt.enableRandomWrite = true;
+					rt.name = "Id Tex";
+					rt.filterMode = FilterMode.Point;
+					rt.Create();
+					// Shader.SetGlobalTexture("_MyTex", rt);
+					// Graphics.ClearRandomWriteTargets();
+					// Graphics.SetRandomWriteTarget(4, rt);
+					// Output.mainTexture = rt;
+					// Material.SetTexture("_MyTex", rt);
+				}
+				
 				Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
 				var cmd = new CommandBuffer();
 				cmd.ClearRandomWriteTargets();
@@ -89,21 +91,21 @@ namespace Experimental
 		private void OnAfterRender(Camera cam)
 		{
 			if (cam != Cam) return;
+			
 			once = false;
 			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
 
-			if (!temp)
+			if (rt)
 			{
-				temp = new RenderTexture(rt);
-				temp.filterMode = FilterMode.Point;
-				temp.Create();
+				if (!temp)
+				{
+					temp = new RenderTexture(rt);
+					temp.filterMode = FilterMode.Point;
+					temp.Create();
+				}
+				Graphics.Blit(rt, temp);
+				Output.mainTexture = temp;
 			}
-			Graphics.Blit(rt, temp);
-			Output.mainTexture = temp;
 		}
-
-		// ()
-		// {
-		// }
 	}
 }
