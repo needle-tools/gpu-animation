@@ -29,7 +29,7 @@
 
 
 		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-		uniform RWTexture2D<float4> _MyTex : register(u4);
+		uniform RWTexture2D<float> _MyTex : register(u4);
 		#endif
 
 
@@ -37,17 +37,10 @@
 		{
 			float2 coords = IN.screenPos.xy / IN.screenPos.w;
 
-			int2 px = coords * 100;
 			
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-			int num = (int)(_Time.y * 1);
-			for (int x = 0; x < 10; x++)
-			{
-				for (int y = 0; y < 10; y++)
-				{
-					_MyTex[px] = 1;// (x + num) % 3 == 0 ? 1 : 0;
-				}
-			}
+			int2 px = coords * 100; // 100 is texture size
+			_MyTex[px] = 1 + _Time.y;
 			#endif
 
 

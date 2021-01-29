@@ -1,10 +1,5 @@
-﻿using System;
-using UnityEditor;
-using UnityEditor.Graphs;
-using UnityEngine;
-using UnityEngine.Experimental.Rendering;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 namespace Experimental
 {
@@ -15,15 +10,17 @@ namespace Experimental
 		public Mesh Mesh;
 		public Material Material;
 		public Material Output;
+		public ComputeShader Shader;
 
 		private RenderTexture rt;
 		private RenderTexture temp;
+		private CommandBuffer cmd;
 
 		private void OnEnable()
 		{
 			Camera.onPreCull += OnBeforeRender;
 			Camera.onPostRender += OnAfterRender;
-			once = true;
+			run = true;
 		}
 
 		private void OnDisable()
@@ -36,52 +33,45 @@ namespace Experimental
 				rt = null;
 			}
 		}
-
-		private void Update()
-		{
-			if (Input.GetMouseButtonUp(0))
-			{
-				once = true;
-			}
-		}
-
+		
 		private void OnBeforeRender(Camera cam)
 		{
 			Execute(cam);
 		}
 
-		public bool once = true;
+		public bool run = true;
 
 		private void Execute(Camera cam)
 		{
 			if (Cam != cam) return;
+			Sample();
+		}
 
-			Graphics.ClearRandomWriteTargets();
-			if (once)
+		private void Sample()
+		{
+			if (!run) return;
+
+			RenderTexture.active = rt;
+			GL.Clear(false, true, Color.black);
+			RenderTexture.active = null;
+
+			if (cmd == null)
 			{
-			
-				// if (!rt)
+				if (rt)
 				{
-					if (rt)
-					{
-						rt.Release();
-						rt = null;
-					}
-					int size = 100;
-					rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-					rt.enableRandomWrite = true;
-					rt.name = "Id Tex";
-					rt.filterMode = FilterMode.Point;
-					rt.Create();
-					// Shader.SetGlobalTexture("_MyTex", rt);
-					// Graphics.ClearRandomWriteTargets();
-					// Graphics.SetRandomWriteTarget(4, rt);
-					// Output.mainTexture = rt;
-					// Material.SetTexture("_MyTex", rt);
+					rt.Release();
+					rt = null;
 				}
+				const int size = 100;
+				rt = new RenderTexture(size, size, 0, RenderTextureFormat.RInt, RenderTextureReadWrite.Linear);
+				rt.enableRandomWrite = true;
+				rt.name = "Id Tex";
+				rt.filterMode = FilterMode.Point;
+				rt.Create();
 				
 				Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
-				var cmd = new CommandBuffer();
+				cmd = new CommandBuffer();
+				cmd.name = "Render Id Texture";
 				cmd.ClearRandomWriteTargets();
 				cmd.SetRandomWriteTarget(4, rt);
 				Cam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, cmd);
@@ -90,16 +80,29 @@ namespace Experimental
 
 		private void OnAfterRender(Camera cam)
 		{
+			if (!run) return;
 			if (cam != Cam) return;
 			
-			once = false;
-			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
-
-			if (rt)
+			// important:
+			Graphics.ClearRandomWriteTargets();
+			
+			if (run && rt)
 			{
+				Shader.SetTexture(0, "IdMap", rt);
+				Shader.SetVector("SampleUV", Input.mousePosition / new Vector2(Screen.width, Screen.height));
+				using (var buf = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Structured))
+				{
+					Shader.SetBuffer(0, "Result", buf);
+					Shader.Dispatch(0, 1, 1, 1);
+					var data = new int[1];
+					buf.GetData(data);
+					Debug.Log(data[0]);
+				}
+				
 				if (!temp)
 				{
 					temp = new RenderTexture(rt);
+					temp.format = RenderTextureFormat.RInt;
 					temp.filterMode = FilterMode.Point;
 					temp.Create();
 				}

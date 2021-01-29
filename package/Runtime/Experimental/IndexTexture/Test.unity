@@ -154,7 +154,8 @@ MonoBehaviour:
   Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   Material: {fileID: 2100000, guid: 5d78a4936d73dc84a82acd2af9f28207, type: 2}
   Output: {fileID: 2100000, guid: 54219ce0a7ceccd4eadefb15807e7dce, type: 2}
-  once: 0
+  Shader: {fileID: 7200000, guid: e479bd24dd4346b08ffcca6ed864b4a7, type: 3}
+  run: 1
 --- !u!4 &260216832
 Transform:
   m_ObjectHideFlags: 0
