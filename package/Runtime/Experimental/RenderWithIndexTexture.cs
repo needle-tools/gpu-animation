@@ -17,6 +17,7 @@ namespace Experimental
 		public Material Output;
 
 		private RenderTexture rt;
+		private RenderTexture temp;
 
 		private void OnEnable()
 		{
@@ -29,18 +30,23 @@ namespace Experimental
 		{
 			Camera.onPreCull -= OnBeforeRender;
 			Camera.onPostRender -= OnAfterRender;
-			rt.Release();
+			if (rt)
+			{
+				rt.Release();
+				rt = null;
+			}
 		}
 
-		// private void OnRenderImage(RenderTexture src, RenderTexture dest)
-		// {
-		// 	Execute();
-		// 	Graphics.Blit(src, dest);
-		// }
+		private void Update()
+		{
+			if (Input.GetMouseButtonUp(0))
+			{
+				once = true;
+			}
+		}
 
 		private void OnBeforeRender(Camera cam)
 		{
-			Debug.Log("Render " + cam); // + " - " + Time.frameCount, cam); 
 			Execute(cam);
 		}
 
@@ -52,33 +58,30 @@ namespace Experimental
 			
 			if (!rt)
 			{
-				rt = new RenderTexture(5, 5, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+				int size = 100;
+				rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
 				rt.enableRandomWrite = true;
 				rt.name = "MyTex";
 				rt.filterMode = FilterMode.Point;
 				rt.Create();
-				Shader.SetGlobalTexture("_MyTex", rt);
-				Graphics.ClearRandomWriteTargets();
-				Graphics.SetRandomWriteTarget(4, rt);
-				;
+				// Shader.SetGlobalTexture("_MyTex", rt);
+				// Graphics.ClearRandomWriteTargets();
+				// Graphics.SetRandomWriteTarget(4, rt);
+				
+				Output.mainTexture = rt;
+				Material.SetTexture("_MyTex", rt);
 			}
 
-			Output.mainTexture = rt;
-			Material.SetTexture("_MyTex", rt);
 
-			Graphics.SetRandomWriteTarget(4, rt);
-			// Material.enableInstancing = true;
-			// Graphics.DrawMeshInstanced(Mesh, 0, Material, new []{transform.localToWorldMatrix});
+
 			Graphics.ClearRandomWriteTargets();
-
-			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
-			if (once)
+			if (once) 
+			// if (Time.frameCount % 2 == 0)
 			{
-				if (cam == Camera.main)
-					once = false;
+				Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
 				var cmd = new CommandBuffer();
 				cmd.ClearRandomWriteTargets();
-				cmd.SetRandomWriteTarget(4, new RenderTargetIdentifier(rt));
+				cmd.SetRandomWriteTarget(4, rt);
 				Cam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, cmd);
 			}
 		}
@@ -86,8 +89,17 @@ namespace Experimental
 		private void OnAfterRender(Camera cam)
 		{
 			if (cam != Cam) return;
-			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
 			once = false;
+			Cam.RemoveCommandBuffers(CameraEvent.BeforeForwardOpaque);
+
+			if (!temp)
+			{
+				temp = new RenderTexture(rt);
+				temp.filterMode = FilterMode.Point;
+				temp.Create();
+			}
+			Graphics.Blit(rt, temp);
+			Output.mainTexture = temp;
 		}
 
 		// ()
