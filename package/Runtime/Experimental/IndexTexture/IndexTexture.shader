@@ -29,7 +29,7 @@
 
 
 		#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-		uniform RWTexture2D<float> _MyTex : register(u4);
+		uniform RWTexture2D<float> _IdTexture : register(u4);
 		#endif
 
 
@@ -39,8 +39,10 @@
 
 			
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_METAL)
-			int2 px = coords * 100; // 100 is texture size
-			_MyTex[px] = 1 + _Time.y;
+			uint idw, idh;
+			_IdTexture.GetDimensions(idw, idh);
+			int2 px = coords * float2(idw, idh);
+			_IdTexture[px] = 1 + _Time.y;
 			#endif
 
 

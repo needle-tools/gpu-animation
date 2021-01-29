@@ -150,12 +150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93142fee1322b2540b32b42dccaefa2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cam: {fileID: 1466800952}
-  Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  Material: {fileID: 2100000, guid: 5d78a4936d73dc84a82acd2af9f28207, type: 2}
-  Output: {fileID: 2100000, guid: 54219ce0a7ceccd4eadefb15807e7dce, type: 2}
+  DebugOutput: {fileID: 2100000, guid: 54219ce0a7ceccd4eadefb15807e7dce, type: 2}
   Shader: {fileID: 7200000, guid: e479bd24dd4346b08ffcca6ed864b4a7, type: 3}
-  run: 1
+  RWIndex: 4
 --- !u!4 &260216832
 Transform:
   m_ObjectHideFlags: 0
