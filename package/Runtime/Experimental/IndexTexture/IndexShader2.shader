@@ -1,41 +1,45 @@
 Shader "Custom/IndexTextureMRT"
 {
-    Properties
-    {
-        _MainTex("", 2D) = "white"{}
-    }
+	Properties
+	{
+		_MainTex("", 2D) = "white"{}
+	}
 
-    CGINCLUDE
-    #include "UnityCG.cginc"
+	CGINCLUDE
+	#include "UnityCG.cginc"
 
-    sampler2D _MainTex;
-    sampler2D _SecondTex;
-    sampler2D _ThirdTex;
+	sampler2D _MainTex;
+	sampler2D _SecondTex;
+	sampler2D _ThirdTex;
 
-    // MRT shader
-    struct FragmentOutput
-    {
-        half4 dest0 : SV_Target0;
-        float dest1 : SV_Target1;
-    };
+	// MRT shader
+	struct v2f
+	{
+		half4 dest0 : SV_Target0;
+		float dest1 : SV_Target1;
+	};
 
-    FragmentOutput frag_mrt(v2f_img i) : SV_Target
-    {
-        FragmentOutput o;
-        o.dest0 = frac(float4(i.uv, 0, 0));
-        o.dest1 = 100;
-        return o;
-    }
-    ENDCG
+	void frag(
+		v2f i,
+		out float GRT0:SV_Target0,
+		out float GRT1:SV_Target1,
+		out float GRTDepth:SV_Depth)
+	{
+		// float4 col = tex2D(_MainTex, i.uv); 
+		GRT0 = 0;
+		GRT1 = 1;
+		GRTDepth = 1;
+	}
+	ENDCG
 
-    SubShader
-    {
-        Pass
-        {
-            CGPROGRAM
-            #pragma vertex vert_img
-            #pragma fragment frag_mrt
-            ENDCG
-        }
-    }
+	SubShader
+	{
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert_img
+			#pragma fragment frag
+			ENDCG
+		}
+	}
 }
