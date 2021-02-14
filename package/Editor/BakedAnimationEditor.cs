@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEditor;
+using UnityEditor.Experimental.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -104,7 +105,7 @@ namespace needle.GpuAnimation
 		private static readonly int Animation1 = Shader.PropertyToID("_Animation");
 		private static readonly int Skinning = Shader.PropertyToID("_Skinning");
 		private static readonly int CurrentAnimation = Shader.PropertyToID("_CurrentAnimation");
-		private static readonly int Time = Shader.PropertyToID("_Time");
+		private static readonly int Time = Shader.PropertyToID("_AnimationTime");
 
 		private MaterialPropertyBlock block;
 		private float angle;
@@ -126,7 +127,7 @@ namespace needle.GpuAnimation
 			block.SetTexture(Animation1, baked.Animations.Texture);
 			block.SetTexture(Skinning, baked.Skinning.Texture);
 			block.SetVector(CurrentAnimation, clip.AsVector4);
-			block.SetVector(Time, new Vector4(0, time, 0, 0));
+			block.SetFloat(Time, time);
 
 			var bounds = baked.Skinning.Mesh.bounds;
 			var cam = renderUtility.camera;
@@ -145,8 +146,10 @@ namespace needle.GpuAnimation
 			var l0 = renderUtility.lights[0];
 			l0.transform.rotation = camRot;
 
-
-			renderUtility.DrawMesh(baked.Skinning.Mesh, Matrix4x4.identity, PreviewMaterial, 0, block);
+			for (var s = 0; s < baked.Skinning.Mesh.subMeshCount; s++)
+			{
+				renderUtility.DrawMesh(baked.Skinning.Mesh, Matrix4x4.identity, PreviewMaterial, s, block);
+			}
 			renderUtility.Render(true, false);
 			var tex = renderUtility.EndPreview();
 			EditorGUI.DrawTextureTransparent(rect, tex);
