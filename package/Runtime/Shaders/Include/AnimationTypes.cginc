@@ -21,6 +21,7 @@ struct Bone
 struct TextureClipInfo
 {
     int IndexStart;
+    // BoneCount*Frames
     int TotalLength;
     int Frames;
     int FramesPerSecond;

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-
 #endif
 
 namespace needle.GpuAnimation
@@ -28,14 +28,15 @@ namespace needle.GpuAnimation
 				{
 					return Animations.Texture;
 				}
-				else return Skinning.Texture && Animations.Texture;
+
+				return Skinning.Texture && Animations.Texture;
 			}
 		}
 
 		public BakedModel(BakedMeshSkinningData skinning, BakedAnimationData animations, bool bakedMesh)
 		{
 			this.Skinning = skinning;
-			this.Animations = animations;
+			this.Animations = animations ?? throw new ArgumentNullException(nameof(animations));
 			this.IsBakedMesh = bakedMesh;
 		}
 
@@ -65,8 +66,7 @@ namespace needle.GpuAnimation
 
 		public bool HasBakedAnimation => Models != null && ClipsCount > 0;
 		public int ClipsCount => Models?.Sum(b => b?.Animations?.ClipsInfos?.Count ?? 0) ?? 0;
-
-
+		
 		[SerializeField] private ComputeShader Shader;
 
 		[Header("Settings")] 

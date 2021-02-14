@@ -1,6 +1,7 @@
 ﻿#pragma kernel BakeAnimationTexture_Float4
 #pragma kernel BakeBoneWeights
 #pragma kernel ReadAnimation
+#pragma kernel BakeAnimationMeshTexture
 
 #include "../Include/AnimationTypes.cginc"
 #include "../Include/SkinningFunctions.cginc"
@@ -42,12 +43,12 @@ void BakeAnimationTexture_Float4(uint3 id : SV_DispatchThreadID)
 
 StructuredBuffer<BoneWeight> Weights;
 
-void Write(uint index, uint textureWidth, uint textureHeight, float4 values)
+void Write(const uint index, const uint textureWidth, const float4 values)
 {
     int x = index % textureWidth;
     int y = floor(index / (float)textureWidth);
-    uint2 coord = uint2(x, y);
-    Texture[coord] = values; // 1 - (float)x / textureWidth;// values;
+    const uint2 coord = uint2(x, y);
+    Texture[coord] = values;
 }
 
 [numthreads(32,1,1)]
@@ -61,13 +62,13 @@ void BakeBoneWeights(uint3 _id : SV_DispatchThreadID)
     Texture.GetDimensions(tw, th);
     BoneWeight weight = Weights[weightIndex];
     int textureIndex = weightIndex * 2; // because we store a weight into two pixels
-    float4 skin01 = float4(weight.weight0, weight.boneIndex0, weight.weight1, weight.boneIndex1);
-    float4 skin23 = float4(weight.weight2, weight.boneIndex2, weight.weight3, weight.boneIndex3);
+    const float4 skin01 = float4(weight.weight0, weight.boneIndex0, weight.weight1, weight.boneIndex1);
+    const float4 skin23 = float4(weight.weight2, weight.boneIndex2, weight.weight3, weight.boneIndex3);
     // skin23 = 0;
     // skin01 = float4(1,0, 0, 0);
-    Write(textureIndex, tw, th, skin01);
+    Write(textureIndex, tw, skin01);
     textureIndex += 1;
-    Write(textureIndex, tw, th, skin23);
+    Write(textureIndex, tw, skin23);
 }
 
 
@@ -111,71 +112,72 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
 }
 
 
-struct VertexData
-{
-    float3 position;
-    float3 normal;
-    float3 tangent;
-};
+StructuredBuffer<float3> VertexPositions;
+StructuredBuffer<float3> Normals;
+StructuredBuffer<float4> Tangents;
 
-StructuredBuffer<VertexData> Vertices;
-
-[numthreads(64, 32, 4)]
+[numthreads(64, 1, 1)]
 void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
 {
     const uint vertexIndex = id.x;
-    const uint weightIndex = id.y;
-    // const uint clipIndex = id.z;
 
     uint weightsCount, _;
     Weights.GetDimensions(weightsCount, _);
-    if (weightIndex >= weightsCount) return;
+    // if (vertexIndex >= weightsCount) return;
 
-    uint verts;
-    Vertices.GetDimensions(verts, _);
-    if (vertexIndex >= verts) return;
+    uint vertsCount;
+    VertexPositions.GetDimensions(vertsCount, _);
+    // if (vertexIndex >= vertsCount) return;
 
-    uint clips;
-    Clips.GetDimensions(clips, _);
-    // if (clipIndex >= clips) return;
+    uint clipsCount;
+    Clips.GetDimensions(clipsCount, _);
 
     uint tw;
     Texture.GetDimensions(tw, _);
 
-    BoneWeight weight = Weights[weightIndex];
-    VertexData vertex = Vertices[vertexIndex];
+    const BoneWeight weight = Weights[vertexIndex];
+    float3 vertPos = VertexPositions[vertexIndex];
+    float3 normal = Normals[vertexIndex];
+    float4 tangent = Tangents[vertexIndex];
+    const uint requiredPixel = 2;
 
-    for(int c = 0; c < clips; c++)
+    int clipIndexLengths = 0;
+    for(uint ci = 0; ci < clipsCount; ci++)
     {
-        TextureClipInfo clip = Clips[c];
+        const TextureClipInfo clip = Clips[ci];
         
-        for(int i = 0; i < clip.TotalLength; i++)
+        for(int mati = 0; mati < clip.TotalLength; mati++)
         {
             int b0 = weight.boneIndex0;
             int b1 = weight.boneIndex1;
             int b2 = weight.boneIndex2;
             int b3 = weight.boneIndex3;
-
-            float w0 = weight.weight0;
-            float w1 = weight.weight1;
-            float w2 = weight.weight2;
-            float w3 = weight.weight3;
-
+            
+            const float w0 = weight.weight0;
+            const float w1 = weight.weight1;
+            const float w2 = weight.weight2;
+            const float w3 = weight.weight3;
+            
             b0 += clip.IndexStart;
             b1 += clip.IndexStart;
             b2 += clip.IndexStart;
             b3 += clip.IndexStart;
+            
+            const float4x4 m0 = Matrices[b0];
+            const float4x4 m1 = Matrices[b1];
+            const float4x4 m2 = Matrices[b2];
+            const float4x4 m3 = Matrices[b3];
 
-            float4x4 m0 = Matrices[b0];
-            float4x4 m1 = Matrices[b1];
-            float4x4 m2 = Matrices[b2];
-            float4x4 m3 = Matrices[b3];
-
-            float4x4 mat = skinMatrix(m0, w0, m1, w1, m2, w2, m3, w3);
-            float3 pos = mul(mat, float4(vertex.position, 1));
-            float3 normal = mul(mat, vertex.normal);
-            float3 tangent = mul(mat, vertex.tangent);
+            const float4x4 mat = skinMatrix(m0, w0, m1, w1, m2, w2, m3, w3);
+            const float4 pos = mul(mat, float4(vertPos, 1));
+            normal = mul(mat, normal);
+            tangent = mul(mat, tangent);
+            const uint outIndex = (clipIndexLengths + vertexIndex + mati * vertsCount) * requiredPixel;
+            Write(outIndex, tw, pos);
+            Write(outIndex+1, tw, float4(normal, 0));
+            Write(outIndex+2, tw, tangent);
         }
+        clipIndexLengths += clip.TotalLength;
     }
 
 

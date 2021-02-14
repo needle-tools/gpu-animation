@@ -12,6 +12,7 @@ namespace needle.GpuAnimation
 		public Vector3 Offset = new Vector3(0, 0, 1);
 		public int Clip = -1;
 
+		public Material Mat;
 
 		protected override void Render(Camera cam, Mesh mesh, Material material, MaterialPropertyBlock block, int clipIndex, int clipsCount)
 		{
@@ -24,6 +25,8 @@ namespace needle.GpuAnimation
 
 			for (var k = 0; k < mesh.subMeshCount; k++)
 				Graphics.DrawMesh(mesh, matrix, material, 0, cam, k, block);
+
+			Mat.mainTexture = Animation.Models[0].Animations.Texture;
 		}
 	}
 }

@@ -58,7 +58,7 @@ namespace needle.GpuAnimation
 			var baked = target as BakedAnimation;
 			if (!baked || !baked.HasBakedAnimation) return;
 
-			time += 1f / 30;
+			time += UnityEngine.Time.deltaTime; // 1f / 30;
 			if (Event.current.type == EventType.MouseDrag)
 			{
 				angle += Event.current.delta.x * 2f;
