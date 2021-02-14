@@ -115,6 +115,7 @@ void ReadAnimation(uint3 _id : SV_DispatchThreadID)
 StructuredBuffer<float3> VertexPositions;
 StructuredBuffer<float3> Normals;
 StructuredBuffer<float4> Tangents;
+int TotalLength;
 
 [numthreads(64, 1, 1)]
 void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
@@ -123,11 +124,11 @@ void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
 
     uint weightsCount, _;
     Weights.GetDimensions(weightsCount, _);
-    // if (vertexIndex >= weightsCount) return;
+    if (vertexIndex >= weightsCount) return;
 
     uint vertsCount;
     VertexPositions.GetDimensions(vertsCount, _);
-    // if (vertexIndex >= vertsCount) return;
+    if (vertexIndex >= vertsCount) return;
 
     uint clipsCount;
     Clips.GetDimensions(clipsCount, _);
@@ -136,10 +137,10 @@ void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
     Texture.GetDimensions(tw, _);
 
     const BoneWeight weight = Weights[vertexIndex];
-    float3 vertPos = VertexPositions[vertexIndex];
-    float3 normal = Normals[vertexIndex];
-    float4 tangent = Tangents[vertexIndex];
-    const uint requiredPixel = 2;
+    const float3 vertPos = VertexPositions[vertexIndex];
+    const float3 normal = Normals[vertexIndex];
+    const float4 tangent = Tangents[vertexIndex];
+    const uint requiredPixel = 1;
 
     int clipIndexLengths = 0;
     for(uint ci = 0; ci < clipsCount; ci++)
@@ -169,13 +170,14 @@ void BakeAnimationMeshTexture(uint3 id : SV_DispatchThreadID)
             const float4x4 m3 = Matrices[b3];
 
             const float4x4 mat = skinMatrix(m0, w0, m1, w1, m2, w2, m3, w3);
-            const float4 pos = mul(mat, float4(vertPos, 1));
-            normal = mul(mat, normal);
-            tangent = mul(mat, tangent);
-            const uint outIndex = (clipIndexLengths + vertexIndex + mati * vertsCount) * requiredPixel;
-            Write(outIndex, tw, pos);
-            Write(outIndex+1, tw, float4(normal, 0));
-            Write(outIndex+2, tw, tangent);
+            const float4 bakedVertex = mul(mat, float4(vertPos, 1));
+            const float3 bakedNormal = mul(mat, normal);
+            const float3 bakedTangent = mul(mat, tangent);
+            
+            const uint outIndex = (vertexIndex + ci) * TotalLength + mati + clipIndexLengths;
+            Write(outIndex, tw, bakedVertex);
+            // Write(outIndex+1, tw, float4(normal, 0));
+            // Write(outIndex+2, tw, tangent);
         }
         clipIndexLengths += clip.TotalLength;
     }

@@ -37,7 +37,6 @@ void skin(inout float4 vert, inout float3 normal, float4x4 mat)
     normal = mul(mat, float4(normal,0)).xyz;
 }
 
-
 void skin(inout float4 vert, inout float3 normal, int vertId,
 	sampler2D weights, float4 weightsTexel, sampler2D animation, float4 animationTexel, uint startIndex, uint animationLength, uint frame)
 {

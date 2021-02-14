@@ -29,7 +29,7 @@ namespace needle.GpuAnimation
 			{
 				var animationsLength = clipInfos.Sum(clip => clip.Length);
 				Debug.Log(animationsLength);
-				const int requiredPixel = 3;
+				const int requiredPixel = 1;
 				textureSize = ToTextureSize(animationsLength * mesh.vertexCount * requiredPixel);
 			}
 			else
@@ -44,7 +44,7 @@ namespace needle.GpuAnimation
 			texture.useMipMap = false;
 			texture.filterMode = FilterMode.Point;
 			texture.Create();
-
+			
 			var res = new BakedAnimationData
 			{
 				Texture = texture, 
@@ -80,6 +80,7 @@ namespace needle.GpuAnimation
 					shader.SetBuffer(kernel, "Clips", clips);
 					shader.SetBuffer(kernel, "Matrices", animationBuffer);
 					shader.SetTexture(kernel, "Texture", texture);
+					shader.SetInt("TotalLength", res.TotalLength);
 					var tx = Mathf.CeilToInt(vertexBuffer.count / 64f);
 					Debug.Log(vertexBuffer.count + ", " + tx);
 					shader.Dispatch(kernel, tx, 1, 1);
@@ -166,7 +167,7 @@ namespace needle.GpuAnimation
 		public static ComputeBuffer ReadAnimation(BakedAnimationData data, ComputeShader shader)
 		{
 			var kernel = shader.FindKernel("ReadAnimation");
-			var res = new ComputeBuffer(data.TotalFrames, Bone.Stride);
+			var res = new ComputeBuffer(data.TotalLength, Bone.Stride);
 			using (var clipsBuffer = new ComputeBuffer(data.ClipsInfos.Count, TextureClipInfo.Stride))
 			{
 				clipsBuffer.SetData(data.ClipsInfos);

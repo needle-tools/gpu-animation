@@ -8,7 +8,7 @@ namespace needle.GpuAnimation
 	public class BakedAnimationData : BakedData
 	{
 		public List<TextureClipInfo> ClipsInfos;
-		public int TotalFrames => ClipsInfos.Sum(c => c.Length);
+		public int TotalLength => ClipsInfos.Sum(c => c.Length);
 	}
 	
 }

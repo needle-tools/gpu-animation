@@ -26,8 +26,8 @@
 		#pragma instancing_options procedural:setup
 		#pragma multi_compile SKIN_QUALITY_FOUR SKIN_QUALITY_THREE SKIN_QUALITY_TWO SKIN_QUALITY_ONE
 		#include "Include/Skinning.cginc" 
-
-
+		#include "Include/SkinningBaked.cginc"
+		
         sampler2D _MainTex;
 		half _Glossiness;
 		half _Metallic;
@@ -73,8 +73,9 @@
 
 			const float time  = GetTime(v.instance_id);
 			const TextureClipInfo clip = ToTextureClipInfo(_CurrentAnimation);
-			skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
-				clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
+			skinBaked(v.vertex, v.vertex_id, _Animation, _Animation_TexelSize, time * (clip.FramesPerSecond), clip);
+			// skin(v.vertex, v.normal, v.vertex_id, _Skinning, _Skinning_TexelSize, _Animation, _Animation_TexelSize,
+			// 	clip.IndexStart, clip.Frames, (time * (clip.FramesPerSecond)));
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
